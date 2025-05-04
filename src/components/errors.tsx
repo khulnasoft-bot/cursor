@@ -4,12 +4,8 @@ import { getError, getShowErrors } from '../features/selectors'
 import { faClose } from '@fortawesome/pro-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Modal from 'react-modal'
-import {
-    NoAuthGlobalOldRateLimitError,
-    NotLoggedInError,
-    OpenAIError,
-} from '../utils'
-import { CursorLogin, OpenAILoginPanel } from './settingsPane'
+import { NoAuthGlobalOldRateLimitError, NotLoggedInError } from '../utils'
+import { OpenAILoginPanel } from './settingsPane'
 import { signInCursor, upgradeCursor } from '../features/tools/toolSlice'
 
 const customStyles = {
