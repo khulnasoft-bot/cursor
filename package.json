@@ -1,9 +1,9 @@
 {
-    "homepage": "https://cursor.so",
+    "homepage": "https://cursor.com",
     "name": "cursor",
     "author": {
         "name": "Cursor AI, Inc.",
-        "email": "hiring@cursor.so"
+        "email": "hiring@cursor.com"
     },
     "productName": "Cursor",
     "version": "0.1.11",

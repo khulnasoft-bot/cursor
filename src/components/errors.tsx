@@ -79,7 +79,7 @@ export function ErrorPopup() {
                     </div>
                     <div className="errorPopup__body">
                         Something unexpected happened. Please try again later.
-                        If this continues, please contact michael@cursor.so.
+                        If this continues, please contact michael@cursor.com.
                         <br />
                     </div>
                 </div>
