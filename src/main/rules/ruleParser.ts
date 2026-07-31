@@ -278,6 +278,14 @@ export class RuleParser {
         })
     }
 
+    getRuleSet(name: string): RuleSet | undefined {
+        return this.ruleSets.get(name)
+    }
+
+    getAllRuleSets(): RuleSet[] {
+        return Array.from(this.ruleSets.values())
+    }
+
     private matchesPattern(fileName: string, pattern: string): boolean {
         const regex = new RegExp(pattern.replace(/\*/g, '.*'))
         return regex.test(fileName)
