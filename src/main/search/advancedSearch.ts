@@ -30,6 +30,7 @@ export interface SearchOptions {
     contextLines?: number
     fileExtensions?: string[]
     excludePatterns?: string[]
+    symbolType?: 'function' | 'class' | 'variable' | 'constant' | 'all'
 }
 
 export interface SearchIndex {
@@ -57,8 +58,20 @@ export class AdvancedSearchService {
             maxResults = 100,
             contextLines = 2,
             fileExtensions,
-            excludePatterns
+            excludePatterns,
+            symbolType
         } = options
+
+        // If symbolType is specified, use symbol-aware search
+        if (symbolType && symbolType !== 'all') {
+            return this.searchSymbols(pattern, directory, symbolType, {
+                caseSensitive,
+                maxResults,
+                contextLines,
+                fileExtensions,
+                excludePatterns
+            })
+        }
 
         const args = this.buildRipgrepArgs(pattern, directory, {
             caseSensitive,
@@ -77,6 +90,105 @@ export class AdvancedSearchService {
             log.error('Search failed:', error)
             throw error
         }
+    }
+
+    private async searchSymbols(
+        pattern: string,
+        directory: string,
+        symbolType: 'function' | 'class' | 'variable' | 'constant',
+        options: {
+            caseSensitive?: boolean
+            maxResults?: number
+            contextLines?: number
+            fileExtensions?: string[]
+            excludePatterns?: string[]
+        }
+    ): Promise<SearchResult[]> {
+        // Build symbol-specific patterns based on language
+        const symbolPatterns = this.getSymbolPatterns(symbolType)
+
+        const allResults: SearchResult[] = []
+
+        for (const symbolPattern of symbolPatterns) {
+            const combinedPattern = `${symbolPattern}${pattern}`
+
+            const args = this.buildRipgrepArgs(combinedPattern, directory, {
+                caseSensitive: options.caseSensitive || false,
+                regex: true,
+                wholeWord: false,
+                maxResults: options.maxResults || 100,
+                contextLines: options.contextLines || 2,
+                fileExtensions: options.fileExtensions,
+                excludePatterns: options.excludePatterns
+            })
+
+            try {
+                const output = await this.executeRipgrep(args)
+                const results = this.parseRipgrepOutput(output)
+                allResults.push(...results)
+            } catch (error) {
+                log.warn(`Symbol search failed for pattern ${combinedPattern}:`, error)
+            }
+        }
+
+        // Remove duplicates and limit results
+        const uniqueResults = this.deduplicateResults(allResults)
+        return uniqueResults.slice(0, options.maxResults || 100)
+    }
+
+    private getSymbolPatterns(symbolType: 'function' | 'class' | 'variable' | 'constant'): string[] {
+        switch (symbolType) {
+            case 'function':
+                return [
+                    'function\\s+', // JavaScript/TypeScript
+                    'const\\s+.*=\\s*\\(', // Arrow functions
+                    'def\\s+', // Python
+                    'func\\s+', // Go
+                    'fn\\s+', // Rust
+                    'public\\s+\\w+\\s+\\w+\\s*\\(', // Java/C# methods
+                    'private\\s+\\w+\\s+\\w+\\s*\\(', // Java/C# methods
+                ]
+            case 'class':
+                return [
+                    'class\\s+', // JavaScript/TypeScript/Python
+                    'interface\\s+', // TypeScript
+                    'type\\s+', // TypeScript
+                    'struct\\s+', // Go/Rust
+                    'enum\\s+', // TypeScript/Go/Rust
+                ]
+            case 'variable':
+                return [
+                    'let\\s+', // JavaScript/TypeScript
+                    'var\\s+', // JavaScript
+                    'const\\s+[^=]+=', // JavaScript/TypeScript (not functions)
+                    'var\\s+', // Python
+                    'let\\s+', // Rust
+                    'var\\s+', // Go
+                ]
+            case 'constant':
+                return [
+                    'const\\s+[A-Z_]+', // JavaScript/TypeScript (uppercase)
+                    '#define\\s+', // C/C++
+                    'const\\s+[A-Z_]+', // Go/Rust
+                ]
+            default:
+                return []
+        }
+    }
+
+    private deduplicateResults(results: SearchResult[]): SearchResult[] {
+        const seen = new Set<string>()
+        const unique: SearchResult[] = []
+
+        for (const result of results) {
+            const key = `${result.filePath}:${result.lineNumber}:${result.matchText}`
+            if (!seen.has(key)) {
+                seen.add(key)
+                unique.push(result)
+            }
+        }
+
+        return unique
     }
 
     async searchInFile(filePath: string, pattern: string, options: Partial<SearchOptions> = {}): Promise<SearchResult[]> {
