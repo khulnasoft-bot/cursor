@@ -1,21 +1,24 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "lib": ["dom", "dom.iterable", "esnext"],
+        "target": "ES2020",
+        "lib": ["dom", "dom.iterable", "ES2020"],
         "allowJs": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "noFallthroughCasesInSwitch": true,
-        "module": "esnext",
-        "moduleResolution": "node",
+        "strict": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false,
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": false,
         "jsx": "react-jsx",
-        "outDir": "dist"
+        "outDir": "dist",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": false
     },
     "files": ["src/index.d.ts"],
     "include": ["eval", "src"]

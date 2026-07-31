@@ -3,7 +3,7 @@ import * as cp from 'child_process'
 import * as rpc from 'vscode-jsonrpc/node'
 import * as path from 'path'
 import { promisify } from 'util'
-import { type } from 'os'
+import { type as osTypeFn } from 'os'
 import { IpcMainInvokeEvent, app, ipcMain } from 'electron'
 import fetch from 'node-fetch'
 import AdmZip from 'adm-zip'
@@ -40,7 +40,7 @@ if (!fs.existsSync(lspDir)) {
 const architecture = process.arch
 
 // osType can take the values of 'Windows_NT', 'Linux', 'Darwin', or 'SunOS'
-const osType = type()
+const osType = osTypeFn()
 
 export const lspStore = (store: Store) => ({
     get: (key: string) => store.get('LSCmd-' + key),
@@ -75,6 +75,18 @@ async function npmDownload(...packages: string[]) {
             await new Promise((resolve, reject) => {
                 const childProcess = cp.spawn('npm', ['install', '-g', p], {
                     shell: true,
+                })
+                childProcess.on('close', (code) => {
+                    if (code === 0) {
+                        resolve(undefined)
+                    } else {
+                        reject(
+                            new Error(`npm install failed with code ${code}`)
+                        )
+                    }
+                })
+                childProcess.on('error', (err) => {
+                    reject(err)
                 })
             })
         } else {
@@ -118,8 +130,8 @@ async function findViableVersion(lang: DownloadedLanguage) {
         let result: Promise<string>
         try {
             childProcess = cp.spawn(command, args, { shell: true })
-            result = new Promise((resolve, reject) => {
-                childProcess.on('error', (err) => {
+            result = new Promise((resolve, _reject) => {
+                childProcess.on('error', (_err) => {
                     log.info('FAILURE for', command, args)
                     resolve('EXITED')
                 })
@@ -139,7 +151,7 @@ async function findViableVersion(lang: DownloadedLanguage) {
             continue
         }
 
-        const timeout = new Promise((resolve, reject) => {
+        const timeout = new Promise((resolve, _reject) => {
             setTimeout(() => {
                 log.info('SUCESS for', command, args)
                 resolve('DONE')
@@ -174,7 +186,6 @@ class LSPManager {
     } = {}
     private supportedNotifications: Set<keyof LSPEventMap> = new Set([
         'textDocument/publishDiagnostics',
-        'window/logMessage',
         'window/logMessage',
     ])
 
@@ -241,7 +252,7 @@ class LSPManager {
     }
     async installLanguage(
         language: Language,
-        rootDir: string
+        _rootDir: string
     ): Promise<DownloadedLanguage | null> {
         log.info('INSTALLING')
         let remoteUrl
@@ -249,7 +260,7 @@ class LSPManager {
         let zip
         let extractFn
         switch (language) {
-            case 'python':
+            case 'python': {
                 log.info('installing python')
                 // try {
                 //     await promisify(cp.exec)('pip install -U "pyright"')
@@ -305,6 +316,7 @@ class LSPManager {
                     ],
                 }
                 return await findViableVersion(candidateLang)
+            }
             case 'typescript':
                 try {
                     await npmDownload(
@@ -354,7 +366,7 @@ class LSPManager {
                     command: path.join(lspDir, 'copilot', 'dist', 'agent.js'),
                     args: [],
                 }
-            case 'go':
+            case 'go': {
                 const goDir = path.join(lspDir, 'go')
                 try {
                     // Check $GOPATH, and remove $GOPATH/go.mod file
@@ -387,7 +399,8 @@ class LSPManager {
                     command: goBinary,
                     args: [],
                 }
-            case 'java':
+            }
+            case 'java': {
                 remoteUrl =
                     'https://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz'
                 // Make dir if not exists path.join(lspPlugin, 'java')
@@ -425,8 +438,8 @@ class LSPManager {
                         'java.base/java.lang=ALL-UNNAMED',
                     ],
                 }
-
-            case 'c':
+            }
+            case 'c': {
                 const cVersion = await getLatestVersion(
                     'https://api.github.com/repos/clangd/clangd/releases/latest'
                 )
@@ -470,7 +483,8 @@ class LSPManager {
                     command: cLSPath,
                     args: [],
                 }
-            case 'rust':
+            }
+            case 'rust': {
                 const rustVersion = await getLatestVersion(
                     'https://api.github.com/repos/rust-analyzer/rust-analyzer/releases/latest'
                 )
@@ -554,7 +568,8 @@ class LSPManager {
                     command: rustLSPath,
                     args: [],
                 }
-            case 'csharp':
+            }
+            case 'csharp': {
                 const csharpVersion = await getLatestVersion(
                     'https://api.github.com/repos/OmniSharp/omnisharp-roslyn/releases/latest'
                 )
@@ -645,7 +660,7 @@ class LSPManager {
                     command: csharpLSPath,
                     args: ['--languageserver'],
                 }
-
+            }
             default:
                 return null
         }
@@ -686,7 +701,7 @@ class LSPManager {
             if (fallbacks != null) {
                 const fallBackIndex = 0
                 // Bind exit event listener
-                childProcess.on('exit', (code, signal) => {
+                childProcess.on('exit', (_code, _signal) => {
                     if (fallbacks != null && fallBackIndex < fallbacks.length) {
                         const { command, args } = fallbacks[fallBackIndex]
                         childProcess = cp.fork(command, args, {
@@ -732,7 +747,7 @@ class LSPManager {
         )
 
         log.info('created connection', language)
-        if (this.runningClients.hasOwnProperty(language)) {
+        if (Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
             log.warn('SHUTTING DOWN OLD CLIENT')
             this.killServer(event, language)
         }
@@ -765,7 +780,7 @@ class LSPManager {
                     identifier: tmpIdentifier,
                 })
                 //
-                const future = new Promise((resolve, reject) => {
+                const future = new Promise((resolve, _reject) => {
                     // TODO - get rid of the response callback later bc it may hurt performance
                     ipcMain.handle(
                         'responseCallbackLS' + tmpIdentifier,
@@ -805,12 +820,11 @@ class LSPManager {
         return language
     }
     killServer(event: IpcMainInvokeEvent, language: Language) {
-        if (this.runningClients.hasOwnProperty(language)) {
+        if (Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
             const { connection, childProcess } = this.runningClients[language]
             connection.dispose()
             childProcess.kill()
             delete this.runningClients[language]
-            const oldLang = this.store.get(language)
         }
     }
     killAll(event: IpcMainInvokeEvent) {
@@ -831,7 +845,7 @@ class LSPManager {
             params: LSPRequestMap[K][0]
         }
     ): Promise<LSPRequestMap[K][1]> {
-        if (!this.runningClients.hasOwnProperty(language)) {
+        if (!Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
             return
         }
         const { connection } = this.runningClients[language]
@@ -855,14 +869,12 @@ class LSPManager {
             const { wordBefore, ...otherParams } =
                 params as LSPCustomCompletionParams
             const wordBeforeLower = wordBefore.toLowerCase()
-            let start = performance.now()
             const out = await connection.sendRequest<LSPRequestMap[K][1]>(
                 method,
                 otherParams
             )
             // Filter down items
             if (out != null) {
-                start = performance.now()
                 // Later we can specify the typing
                 let remainingItems: any[] = []
                 if (Array.isArray(out)) {
@@ -916,23 +928,23 @@ class LSPManager {
                     remainingItems = remainingItems.splice(0, 500)
                 }
 
+                if (sorted) {
+                    remainingItems.sort((a, b) => {
+                        if (a.sortText < b.sortText) {
+                            return -1
+                        } else if (a.sortText > b.sortText) {
+                            return 1
+                        } else {
+                            return 0
+                        }
+                    })
+                }
+
                 remainingItems = remainingItems.sort(
                     (
                         a: { label: string; sortText?: string },
                         b: { label: string; sortText?: string }
                     ) => {
-                        if (sorted) {
-                            remainingItems.sort((a, b) => {
-                                if (a.sortText < b.sortText) {
-                                    return -1
-                                } else if (a.sortText > b.sortText) {
-                                    return 1
-                                } else {
-                                    return 0
-                                }
-                            })
-                        }
-
                         const lowerA = a.label.toLowerCase()
                         const lowerB = b.label.toLowerCase()
 
@@ -1003,7 +1015,7 @@ class LSPManager {
             params: LSPNotifyMap[K]
         }
     ): Promise<void> {
-        if (!this.runningClients.hasOwnProperty(language)) {
+        if (!Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
             return
         }
         const { connection } = this.runningClients[language]

@@ -20,6 +20,20 @@ import mainWindow from '../window'
 import { store } from '../storeHandler'
 import { resourcesDir } from '../utils'
 
+const isPathSafe = (filePath: string): boolean => {
+    const normalized = path.normalize(filePath)
+    if (normalized.includes('\0')) return false
+    if (normalized.startsWith('~')) return false
+    return true
+}
+
+const validatePath = (filePath: string): boolean => {
+    if (!filePath || typeof filePath !== 'string') return false
+    if (!isPathSafe(filePath)) return false
+    if (filePath.includes('..')) return false
+    return true
+}
+
 // TODO: These IPCs should be separated into different modules.
 export default function setupIpcs() {
     ipcMain.handle('return_home_dir', () => {
@@ -169,7 +183,7 @@ export default function setupIpcs() {
                 'icon128.png'
             )
             const basename = path.basename(filePath)
-            const options = {
+            const options: Electron.MessageBoxSyncOptions = {
                 type: 'question',
                 buttons: ['&Go Back', '&Overwrite'],
                 message: `Overwrite ${basename}?`,
@@ -195,7 +209,7 @@ export default function setupIpcs() {
                 'icon128.png'
             )
             const basename = path.basename(filePath)
-            const options = {
+            const options: Electron.MessageBoxSyncOptions = {
                 type: 'question',
                 buttons: ['&Save', "&Don't Save", '&Cancel'],
                 message: `Do you want to save the changes you made to ${basename}`,
@@ -284,16 +298,17 @@ export default function setupIpcs() {
             _event: IpcMainInvokeEvent,
             arg: { path: string; data: string }
         ) {
-            // Get the parent directory of the file
+            if (!validatePath(arg.path)) {
+                log.warn('Invalid path rejected for saveFile:', arg.path)
+                return null
+            }
             const parentDir = path.dirname(arg.path)
 
-            // If the parent directory does not exist, create it
             if (!(await fileSystem.existsSync(parentDir))) {
                 await fileSystem.mkdirSync(parentDir, { recursive: true })
             }
 
-            // next, Save the file
-            log.info('Trying to save the folder', arg.path)
+            log.info('Trying to save the file', arg.path)
             await fileSystem.writeFileSync(arg.path, arg.data)
             log.info('Successfully saved the file')
             return (await fileSystem.statSync(arg.path)).mtimeMs
@@ -371,7 +386,7 @@ export default function setupIpcs() {
                 'icon',
                 'icon128.png'
             )
-            const options = {
+            const options: Electron.MessageBoxOptions = {
                 type: 'question',
                 buttons: ['&Yes', '&No'],
                 title: 'Index this folder?',
@@ -472,7 +487,7 @@ export default function setupIpcs() {
                             'icon',
                             'icon128.png'
                         )
-                        const options = {
+                        const options: Electron.MessageBoxOptions = {
                             type: 'question',
                             buttons: ['&!Delete!', '&Cancel'],
                             title: `DANGER: Do you want to delete`,
@@ -546,9 +561,12 @@ export default function setupIpcs() {
 
     ipcMain.handle(
         'delete_file',
-        async function (_event: IpcMainInvokeEvent, path: string) {
-            // delete the file
-            await fileSystem.unlinkSync(path)
+        async function (_event: IpcMainInvokeEvent, filePath: string) {
+            if (!validatePath(filePath)) {
+                log.warn('Invalid path rejected for delete_file:', filePath)
+                return false
+            }
+            await fileSystem.unlinkSync(filePath)
             return true
         }
     )
@@ -564,8 +582,13 @@ export default function setupIpcs() {
 
     ipcMain.handle(
         'delete_folder',
-        async function (_event: IpcMainInvokeEvent, path: string) {
-            await fileSystem.rmSync(path)
+        async function (_event: IpcMainInvokeEvent, folderPath: string) {
+            if (!validatePath(folderPath)) {
+                log.warn('Invalid path rejected for delete_folder:', folderPath)
+                return false
+            }
+            await fileSystem.rmSync(folderPath)
+            return true
         }
     )
 

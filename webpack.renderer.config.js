@@ -29,5 +29,17 @@ module.exports = {
     externals: 'node-pty',
     resolve: {
         extensions: ['.js', '.ts', '.jsx', '.tsx'],
+        fallback: {
+            fs: false,
+            path: false,
+            url: false,
+            os: false,
+            http: false,
+            https: false,
+            util: false,
+            stream: false,
+            crypto: false,
+            querystring: false,
+        },
     },
 }

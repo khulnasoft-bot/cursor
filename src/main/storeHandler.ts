@@ -32,7 +32,7 @@ export function setupStoreHandlers() {
         async function (event: IpcMainInvokeEvent, arrayKey: string) {
             const arrayLength = store.get(`${arrayKey}.length`) || 0
             const arrayValues = []
-            for (let i = 0; i < arrayLength; i++) {
+            for (let i = 0; i < (arrayLength as number); i++) {
                 arrayValues.push(store.get(`${arrayKey}.${i}`))
             }
             return arrayValues

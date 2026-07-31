@@ -1,4 +1,5 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import log from 'electron-log'
 import { FullState, ToolState } from '../window/state'
 
 const initialState: ToolState = {
@@ -22,21 +23,21 @@ export const refreshLoginDetails = createAsyncThunk(
     async (arg: null, { dispatch }) => {
         const newUserCreds = await connector.getUserCreds()
         dispatch(login(newUserCreds))
-        console.log('FINISHED REFRESH LOGIN HERE')
+        log.info('Finished refresh login details')
     }
 )
 
 export const signInCursor = createAsyncThunk(
     'tool/signIn',
     async (payload: null, { dispatch, getState }) => {
-        await dispatch(refreshLoginDetails(null))
+        await dispatch(refreshLoginDetails())
         const state = (getState() as FullState).toolState
 
-        console.log('CALLING SIGN IN CURSOR')
+        log.info('Calling sign in cursor')
         if (state.cursorLogin.accessToken && state.cursorLogin.profile) {
             return
         } else {
-            console.log('CALL PASSES TO LOGIN CURSOR')
+            log.info('Call passes to login cursor')
             await connector.loginCursor()
         }
     }
@@ -45,12 +46,12 @@ export const signInCursor = createAsyncThunk(
 export const signOutCursor = createAsyncThunk(
     'tool/signOut',
     async (payload: null, { dispatch, getState }) => {
-        await dispatch(refreshLoginDetails(null))
+        await dispatch(refreshLoginDetails())
         const state = (getState() as FullState).toolState
 
-        console.log('CALLING SIGN OUT CURSOR')
+        log.info('Calling sign out cursor')
         if (state.cursorLogin.accessToken && state.cursorLogin.profile) {
-            console.log('CALL PASSES TO LOGOUT CURSOR')
+            log.info('Call passes to logout cursor')
             await connector.logoutCursor()
         } else {
             return
@@ -61,10 +62,9 @@ export const signOutCursor = createAsyncThunk(
 export const upgradeCursor = createAsyncThunk(
     'tool/upgrade',
     async (payload: null, { dispatch, getState }) => {
-        await dispatch(refreshLoginDetails(null))
+        await dispatch(refreshLoginDetails())
         const state = (getState() as FullState).toolState
-        console.log('FINISHED REFRESH LOGIN OUTSIDE')
-        console.log('CALLING UPGRADE CURSOR')
+        log.info('Calling upgrade cursor')
         if (
             state.cursorLogin.accessToken &&
             state.cursorLogin.profile &&
@@ -74,10 +74,10 @@ export const upgradeCursor = createAsyncThunk(
         } else if (
             !(state.cursorLogin.accessToken && state.cursorLogin.profile)
         ) {
-            console.log('UPGRADE CURSOR PASSES TO LOGIN')
+            log.info('Upgrade cursor passes to login')
             await connector.loginCursor()
         } else {
-            console.log('UPGRADE CURSOR PASSES TO PAY')
+            log.info('Upgrade cursor passes to pay')
             await connector.payCursor()
         }
     }
@@ -141,7 +141,7 @@ export const toolSlice = createSlice({
                 stripeProfile?: string | null
             }>
         ) {
-            console.log('Triggered with', action.payload)
+            log.info('Login triggered with payload')
             if (action.payload.accessToken) {
                 state.cursorLogin.accessToken = action.payload.accessToken
             } else if (action.payload.accessToken === null) {

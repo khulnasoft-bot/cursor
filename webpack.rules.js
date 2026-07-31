@@ -33,6 +33,9 @@ module.exports = [
         test: /\.tsx?$/,
         exclude: /(node_modules|.webpack)/,
         loader: 'ts-loader',
+        options: {
+            transpileOnly: true,
+        },
     },
     {
         test: /\.(png|svg|jpg|jpeg|gif|ttf)$/i,

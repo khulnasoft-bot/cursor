@@ -20,7 +20,7 @@ function check() {
     showingDialog = true
     // ask the user if they want to update
     const iconPath = path.join(__dirname, 'assets', 'icon', 'icon128.png')
-    const options = {
+    const options: Electron.MessageBoxOptions = {
         type: 'question',
         buttons: ['&Accept', '&Cancel'],
         message: `Accept update?`,
