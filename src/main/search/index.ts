@@ -1,3 +1,5 @@
 export { getAdvancedSearchService, destroyAdvancedSearchService } from './advancedSearch'
+export { getSearchHistoryService, destroySearchHistoryService } from './searchHistory'
 export { setupSearch } from './ipcHandlers'
 export type { SearchResult, SearchOptions, SearchIndex } from './advancedSearch'
+export type { SearchQuery, SavedQuery } from './searchHistory'
