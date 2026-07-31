@@ -10,6 +10,7 @@ const initialState: ToolState = {
     aiCommandPaletteTriggered: false,
     leftSideExpanded: true,
     cursorLogin: {},
+    composerPanelOpen: false,
 }
 const untriggerAll = (state: ToolState) => {
     state.fileSearchTriggered = false
@@ -124,6 +125,12 @@ export const toolSlice = createSlice({
         untriggerCommandPalette: (state: ToolState) => {
             untriggerAll(state)
         },
+        openComposerPanel: (state: ToolState) => {
+            state.composerPanelOpen = true
+        },
+        closeComposerPanel: (state: ToolState) => {
+            state.composerPanelOpen = false
+        },
         collapseLeftSide: (state: ToolState) => {
             state.leftSideExpanded = false
         },
@@ -177,5 +184,7 @@ export const {
     collapseLeftSide,
     expandLeftSide,
     toggleLeftSide,
+    openComposerPanel,
+    closeComposerPanel,
     login,
 } = toolSlice.actions
