@@ -21,6 +21,8 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
     const [execution, setExecution] = useState<ComposerExecution | null>(null)
     const [selectedFile, setSelectedFile] = useState<string | null>(null)
     const [diffs, setDiffs] = useState<Map<string, FileDiff>>(new Map())
+    const [acceptedFiles, setAcceptedFiles] = useState<Set<string>>(new Set())
+    const [rejectedFiles, setRejectedFiles] = useState<Set<string>>(new Set())
 
     const composerService = getComposerService()
     const diffGenerator = getDiffGenerator()
@@ -31,12 +33,14 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
         setPlanning(true)
         setResult(null)
         setExecution(null)
+        setAcceptedFiles(new Set())
+        setRejectedFiles(new Set())
 
         try {
             // This would integrate with the file system to get file contents
             // For now, use placeholder
             const files = new Map<string, string>()
-            
+
             const request = {
                 prompt,
                 context: {
@@ -70,52 +74,65 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
         }
     }
 
+    const handleAcceptChange = (filePath: string) => {
+        setAcceptedFiles(prev => new Set([...prev, filePath]))
+        setRejectedFiles(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(filePath)
+            return newSet
+        })
+    }
+
+    const handleRejectChange = (filePath: string) => {
+        setRejectedFiles(prev => new Set([...prev, filePath]))
+        setAcceptedFiles(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(filePath)
+            return newSet
+        })
+    }
+
+    const handleAcceptAll = () => {
+        if (result) {
+            setAcceptedFiles(new Set(result.changes.map(c => c.filePath)))
+            setRejectedFiles(new Set())
+        }
+    }
+
+    const handleRejectAll = () => {
+        if (result) {
+            setRejectedFiles(new Set(result.changes.map(c => c.filePath)))
+            setAcceptedFiles(new Set())
+        }
+    }
+
     const handleExecuteChanges = async () => {
         if (!result) return
+
+        // Filter to only execute accepted files
+        const acceptedChanges = result.changes.filter(c => acceptedFiles.has(c.filePath))
+
+        if (acceptedChanges.length === 0) {
+            console.warn('No files accepted for execution')
+            return
+        }
 
         setExecuting(true)
         setExecution(null)
 
         try {
-            const execResult = await composerService.executeChanges(result)
+            const filteredResult: ComposerResult = {
+                ...result,
+                changes: acceptedChanges,
+                executionOrder: result.executionOrder.filter(path => acceptedFiles.has(path))
+            }
+            const execResult = await composerService.executeChanges(filteredResult)
             setExecution(execResult)
         } catch (error) {
             console.error('Failed to execute changes:', error)
         } finally {
             setExecuting(false)
         }
-    }
-
-    const handleAcceptChange = (filePath: string) => {
-        // Apply the change to the file
-        // This would integrate with the file system
-        console.log('Accepting change for:', filePath)
-    }
-
-    const handleRejectChange = (filePath: string) => {
-        // Reject the change
-        console.log('Rejecting change for:', filePath)
-    }
-
-    const handleAcceptAll = () => {
-        // Accept all changes
-        if (result) {
-            for (const change of result.changes) {
-                handleAcceptChange(change.filePath)
-            }
-        }
-    }
-
-    const handleRejectAll = () => {
-        // Reject all changes
-        if (result) {
-            for (const change of result.changes) {
-                handleRejectChange(change.filePath)
-            }
-        }
-        setResult(null)
-        setDiffs(new Map())
-        setSelectedFile(null)
     }
 
     if (!isOpen) return null
@@ -159,22 +176,46 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
                                 {result.executionOrder.map((filePath, index) => {
                                     const change = result.changes.find(c => c.filePath === filePath)
                                     const diff = diffs.get(filePath)
+                                    const isAccepted = acceptedFiles.has(filePath)
+                                    const isRejected = rejectedFiles.has(filePath)
                                     return (
                                         <div
                                             key={filePath}
-                                            className={`composer-panel__file-item ${selectedFile === filePath ? 'selected' : ''}`}
-                                            onClick={() => setSelectedFile(filePath)}
+                                            className={`composer-panel__file-item ${selectedFile === filePath ? 'selected' : ''} ${isAccepted ? 'accepted' : ''} ${isRejected ? 'rejected' : ''}`}
                                         >
                                             <span className="composer-panel__file-index">{index + 1}.</span>
-                                            <span className="composer-panel__file-path">{filePath}</span>
+                                            <span className="composer-panel__file-path" onClick={() => setSelectedFile(filePath)}>{filePath}</span>
                                             {diff && (
                                                 <span className="composer-panel__file-stats">
                                                     +{diff.summary.additions} -{diff.summary.deletions}
                                                 </span>
                                             )}
+                                            <div className="composer-panel__file-actions">
+                                                <button
+                                                    onClick={() => handleAcceptChange(filePath)}
+                                                    disabled={isAccepted}
+                                                    className="composer-panel__file-button composer-panel__file-button--accept"
+                                                    title="Accept change"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={() => handleRejectChange(filePath)}
+                                                    disabled={isRejected}
+                                                    className="composer-panel__file-button composer-panel__file-button--reject"
+                                                    title="Reject change"
+                                                >
+                                                    ✗
+                                                </button>
+                                            </div>
                                         </div>
                                     )
                                 })}
+                            </div>
+                            <div className="composer-panel__file-summary">
+                                <span>Accepted: {acceptedFiles.size}</span>
+                                <span>Rejected: {rejectedFiles.size}</span>
+                                <span>Pending: {result.changes.length - acceptedFiles.size - rejectedFiles.size}</span>
                             </div>
                         </div>
 
