@@ -4,6 +4,9 @@
  */
 
 import log from 'electron-log'
+import { v4 as uuidv4 } from 'uuid'
+import { getModelConfigManager } from './modelConfig'
+import { getRuleService } from '../rules'
 import nodeFetch from 'node-fetch'
 
 export interface AIMessage {
@@ -393,6 +396,18 @@ class AIService {
             systemPrompt += `Primary language: ${context.language}. `
         }
 
+        // Apply team rules to context if available
+        if (context.projectPath && context.files && context.files.length > 0) {
+            try {
+                const ruleService = getRuleService()
+                const firstFile = context.files[0]
+                const enhancedContext = ruleService.applyRulesToAIContext(systemPrompt, firstFile)
+                systemPrompt = enhancedContext
+            } catch (error) {
+                log.warn('Failed to apply rules to AI context:', error)
+            }
+        }
+
         return {
             role: 'system',
             content: systemPrompt
@@ -766,7 +781,7 @@ class AIService {
     }
 
     isProviderAvailable(provider: AIProvider): boolean {
-        return this.providerConfigs.has(provider) || this.config.apiKey
+        return this.providerConfigs.has(provider) || !!this.config.apiKey
     }
 }
 
