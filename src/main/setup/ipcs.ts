@@ -19,6 +19,10 @@ import { FileSystem, fileSystem, setFileSystem } from '../fileSystem'
 import mainWindow from '../window'
 import { store } from '../storeHandler'
 import { resourcesDir } from '../utils'
+import { getPendingDeeplinkAction } from './protocol'
+import { setupSearch } from '../search'
+import { setupComposerIpcs } from '../../features/composer'
+import { setupSemanticIndexerIpcs } from '../semanticIndexer'
 
 const isPathSafe = (filePath: string): boolean => {
     const normalized = path.normalize(filePath)
@@ -38,6 +42,11 @@ const validatePath = (filePath: string): boolean => {
 export default function setupIpcs() {
     ipcMain.handle('return_home_dir', () => {
         return machineIdSync()
+    })
+
+    // Deeplink handler
+    ipcMain.handle('get-pending-deeplink-action', () => {
+        return getPendingDeeplinkAction()
     })
 
     ipcMain.handle(
@@ -630,4 +639,9 @@ export default function setupIpcs() {
     ipcMain.handle('terminal-click-link', (_event, data) => {
         shell.openExternal(data)
     })
+
+    // Initialize new service IPC handlers
+    setupSearch()
+    setupComposerIpcs()
+    setupSemanticIndexerIpcs()
 }
