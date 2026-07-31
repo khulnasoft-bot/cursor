@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 
 import { Switch } from '@headlessui/react'
+import log from 'electron-log'
 import { HOMEPAGE_ROOT } from '../utils'
 
 import * as ssel from '../features/settings/settingsSelectors'
@@ -163,6 +164,7 @@ export function SettingsPopup() {
                             </div>
 
                             <CursorLogin />
+                            <AIModelSettingsPanel />
                             <OpenAIPanel />
                             <CopilotPanel />
                             {/* REMOVED CODEBASE-WIDE FEATURES!
@@ -332,17 +334,13 @@ export function OpenAIPanel() {
     }, [localAPIKey])
 
     const handleNewAPIKey = useCallback(async () => {
-        console.log('here 2')
+        log.info('Validating new API key')
         const { models, isValidKey } = await ssel.getModels(localAPIKey)
-        console.log({ models, isValidKey })
         if (!isValidKey) {
-            // Error, and we let them know
-            console.log('here 3')
             showKeyError(true)
             setAvailableModels([])
         } else {
             setAvailableModels(models)
-            console.log('here')
             dispatch(
                 changeSettings({
                     openAIKey: localAPIKey,
@@ -713,6 +711,309 @@ function CopilotPanel() {
 
 //     return <div className="settings__item"></div>
 // }
+
+function AIModelSettingsPanel() {
+    const dispatch = useAppDispatch()
+    const [provider, setProvider] = useState<'openai' | 'anthropic' | 'google' | 'custom'>('openai')
+    const [model, setModel] = useState('gpt-4o')
+    const [apiKey, setApiKey] = useState('')
+    const [customEndpoint, setCustomEndpoint] = useState('')
+    const [fallbackEnabled, setFallbackEnabled] = useState(true)
+    const [fallbackProvider, setFallbackProvider] = useState<'openai' | 'anthropic' | 'google' | 'custom'>('anthropic')
+    const [temperature, setTemperature] = useState(0.7)
+    const [maxTokens, setMaxTokens] = useState(4096)
+    const [showApiKey, setShowApiKey] = useState(false)
+    const [availableModels, setAvailableModels] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+
+    const providerOptions = [
+        { value: 'openai', label: 'OpenAI' },
+        { value: 'anthropic', label: 'Anthropic' },
+        { value: 'google', label: 'Google' },
+        { value: 'custom', label: 'Custom' }
+    ]
+
+    // Load available models on mount
+    useEffect(() => {
+        loadAvailableModels()
+        loadCurrentSettings()
+    }, [])
+
+    const loadAvailableModels = async () => {
+        try {
+            // @ts-ignore
+            const result = await window.electron.ipcRenderer.invoke('ai-service-get-models')
+            if (result.success) {
+                setAvailableModels(result.models)
+            }
+        } catch (error) {
+            console.error('Failed to load available models:', error)
+        }
+    }
+
+    const loadCurrentSettings = async () => {
+        try {
+            // @ts-ignore
+            const result = await window.electron.ipcRenderer.invoke('model-config-get-all-settings')
+            if (result.success) {
+                const settings = result.settings
+                if (settings.preferredProvider) setProvider(settings.preferredProvider)
+                if (settings.preferredModel) setModel(settings.preferredModel)
+                if (settings.fallbackEnabled !== undefined) setFallbackEnabled(settings.fallbackEnabled)
+                if (settings.fallbackProvider) setFallbackProvider(settings.fallbackProvider)
+
+                // Load API key for current provider
+                if (settings.preferredProvider) {
+                    // @ts-ignore
+                    const keyResult = await window.electron.ipcRenderer.invoke('model-config-get-api-key', settings.preferredProvider)
+                    if (keyResult.success && keyResult.apiKey) {
+                        setApiKey(keyResult.apiKey)
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load current settings:', error)
+        }
+    }
+
+    const modelOptions = useMemo(() => {
+        const providerModels = availableModels
+            .filter(m => m.provider === provider)
+            .map(m => ({ value: m.id, label: m.name }))
+
+        if (providerModels.length > 0) {
+            return providerModels
+        }
+
+        // Fallback to hardcoded options
+        switch (provider) {
+            case 'openai':
+                return [
+                    { value: 'gpt-4o', label: 'GPT-4o' },
+                    { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+                    { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+                ]
+            case 'anthropic':
+                return [
+                    { value: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+                    { value: 'claude-3-opus', label: 'Claude 3 Opus' }
+                ]
+            case 'google':
+                return [
+                    { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' }
+                ]
+            default:
+                return []
+        }
+    }, [provider, availableModels])
+
+    const handleProviderChange = async (value: string) => {
+        setProvider(value as any)
+        // Reset model when provider changes
+        const models = modelOptions
+        if (models.length > 0) {
+            setModel(models[0].value)
+        }
+
+        // Load API key for new provider
+        try {
+            // @ts-ignore
+            const keyResult = await window.electron.ipcRenderer.invoke('model-config-get-api-key', value)
+            if (keyResult.success && keyResult.apiKey) {
+                setApiKey(keyResult.apiKey)
+            } else {
+                setApiKey('')
+            }
+        } catch (error) {
+            console.error('Failed to load API key for provider:', error)
+        }
+    }
+
+    const handleSaveConfig = async () => {
+        setLoading(true)
+        setSaveStatus('saving')
+
+        try {
+            // Save API key
+            if (apiKey) {
+                // @ts-ignore
+                await window.electron.ipcRenderer.invoke('model-config-set-api-key', provider, apiKey)
+            }
+
+            // Save custom endpoint if provided
+            if (customEndpoint && provider === 'custom') {
+                // @ts-ignore
+                await window.electron.ipcRenderer.invoke('model-config-set-custom-endpoint', provider, customEndpoint)
+            }
+
+            // Save model selection
+            // @ts-ignore
+            await window.electron.ipcRenderer.invoke('ai-service-set-model', model)
+
+            // Save fallback settings
+            // @ts-ignore
+            await window.electron.ipcRenderer.invoke('model-config-set-fallback-enabled', fallbackEnabled)
+            if (fallbackEnabled) {
+                // @ts-ignore
+                await window.electron.ipcRenderer.invoke('model-config-set-fallback-provider', fallbackProvider)
+            }
+
+            // Save model preferences
+            // @ts-ignore
+            await window.electron.ipcRenderer.invoke('model-config-set-model-preference', model, {
+                temperature,
+                maxTokens
+            })
+
+            setSaveStatus('success')
+            setTimeout(() => setSaveStatus('idle'), 2000)
+        } catch (error) {
+            console.error('Failed to save AI config:', error)
+            setSaveStatus('error')
+            setTimeout(() => setSaveStatus('idle'), 2000)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <div className="settings__item">
+            <div className="settings__item_title">
+                AI Model Configuration
+            </div>
+            <div className="settings__item_description">
+                Configure AI provider and model settings
+            </div>
+
+            <div className="settings__subitem">
+                <div className="settings__subitem_title">Provider</div>
+                <Dropdown
+                    options={providerOptions}
+                    onChange={(e) => handleProviderChange(e.value)}
+                    value={provider}
+                />
+            </div>
+
+            {provider !== 'custom' && (
+                <div className="settings__subitem">
+                    <div className="settings__subitem_title">Model</div>
+                    <Dropdown
+                        options={modelOptions}
+                        onChange={(e) => setModel(e.value)}
+                        value={model}
+                    />
+                </div>
+            )}
+
+            <div className="settings__subitem">
+                <div className="settings__subitem_title">API Key</div>
+                <div className="flex">
+                    <input
+                        className="settings__item_textarea"
+                        type={showApiKey ? 'text' : 'password'}
+                        placeholder={`Enter ${provider} API Key`}
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        spellCheck="false"
+                    />
+                    <button
+                        className="settings__button"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                    >
+                        {showApiKey ? 'Hide' : 'Show'}
+                    </button>
+                </div>
+            </div>
+
+            {provider === 'custom' && (
+                <div className="settings__subitem">
+                    <div className="settings__subitem_title">Custom Endpoint</div>
+                    <input
+                        className="settings__item_textarea"
+                        placeholder="https://api.example.com/v1"
+                        value={customEndpoint}
+                        onChange={(e) => setCustomEndpoint(e.target.value)}
+                        spellCheck="false"
+                    />
+                </div>
+            )}
+
+            <div className="settings__subitem">
+                <div className="settings__subitem_title">Temperature: {temperature}</div>
+                <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="0.1"
+                    value={temperature}
+                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                    className="settings__slider"
+                />
+            </div>
+
+            <div className="settings__subitem">
+                <div className="settings__subitem_title">Max Tokens: {maxTokens}</div>
+                <input
+                    type="number"
+                    min="1"
+                    max="128000"
+                    value={maxTokens}
+                    onChange={(e) => setMaxTokens(parseInt(e.target.value))}
+                    className="settings__item_textarea"
+                />
+            </div>
+
+            <div className="settings__subitem">
+                <div className="flex items-center">
+                    <Switch
+                        checked={fallbackEnabled}
+                        onChange={setFallbackEnabled}
+                        className={`${
+                            fallbackEnabled ? 'bg-green-500' : 'bg-red-500'
+                        } mt-2 relative inline-flex h-[25px] w-[52px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none`}
+                    >
+                        <span className="sr-only">Enable fallback</span>
+                        <span
+                            aria-hidden="true"
+                            className={`${
+                                fallbackEnabled ? 'translate-x-7' : 'translate-x-0'
+                            } pointer-events-none inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                        />
+                    </Switch>
+                    <span className="ml-2">Enable Fallback</span>
+                </div>
+            </div>
+
+            {fallbackEnabled && (
+                <div className="settings__subitem">
+                    <div className="settings__subitem_title">Fallback Provider</div>
+                    <Dropdown
+                        options={providerOptions.filter(p => p.value !== provider)}
+                        onChange={(e) => setFallbackProvider(e.value as any)}
+                        value={fallbackProvider}
+                    />
+                </div>
+            )}
+
+            <div className="settings__button_container">
+                <button
+                    className="settings__button"
+                    onClick={handleSaveConfig}
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Save Configuration'}
+                </button>
+                {saveStatus === 'success' && (
+                    <span className="text-green-500 ml-2">✓ Saved</span>
+                )}
+                {saveStatus === 'error' && (
+                    <span className="text-red-500 ml-2">✗ Error</span>
+                )}
+            </div>
+        </div>
+    )
+}
 
 function LanguageServerPanel({ languageName }: { languageName: string }) {
     const dispatch = useAppDispatch()
