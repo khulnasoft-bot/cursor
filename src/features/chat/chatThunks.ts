@@ -4,6 +4,7 @@ import {
     ThunkDispatch,
     createAsyncThunk,
 } from '@reduxjs/toolkit'
+import log from 'electron-log'
 import {
     API_ROOT,
     AuthRateLimitError,
@@ -47,6 +48,7 @@ import {
     tokenLimitInterrupt,
     updateLastUserMessageMsgType,
 } from './chatSlice'
+import { getMentionParser, getMentionResolver } from './mentionSystem'
 import { Text } from '@codemirror/state'
 import { addTransaction, openError, openFile } from '../globalSlice'
 import { findFileIdFromPath, getPathForFileId } from '../window/fileUtils'
@@ -68,6 +70,7 @@ import {
     lintState,
     setActiveLint,
 } from '../linter/lint'
+import { getAgentWorkerManager } from '../../workers'
 
 const getBearerTokenHeader = (getState: () => unknown) => {
     const accessToken = (getState() as FullState).toolState.cursorLogin
@@ -150,6 +153,14 @@ export async function getPayload({
     )
 
     const lastUserMessage = userMessages[userMessages.length - 1]
+
+    // Parse @-mentions from the message
+    const mentionParser = getMentionParser()
+    const parsedMessage = mentionParser.parseMessage(lastUserMessage.message)
+
+    // Resolve mentions to context
+    const mentionResolver = getMentionResolver(state.global.rootPath || '')
+    const mentionContext = await mentionResolver.resolveMentions(parsedMessage.mentions)
 
     if (!(forContinue || forDiagnostics)) {
         posthog.capture('Submitted Prompt', {
@@ -279,7 +290,7 @@ export async function getPayload({
     }
     const userRequest = {
         // Core request
-        message: lastUserMessage.message,
+        message: parsedMessage.cleanedText || lastUserMessage.message,
         // Context of the current file
         currentRootPath: rootPath,
         currentFileName: lastUserMessage.currentFile,
@@ -293,6 +304,11 @@ export async function getPayload({
         // Get user defined values
         customCodeBlocks,
         codeBlockIdentifiers,
+        // Mention context
+        mentionFiles: mentionContext.files,
+        mentionSymbols: mentionContext.symbols,
+        mentionDirectories: mentionContext.directories,
+        mentionCodebase: mentionContext.codebase,
         msgType: chatState.msgType,
         // Messy, but needed for the single lsp stuff to work
         maxOrigLine: forContinue
@@ -331,9 +347,7 @@ export async function getPayload({
         apiKey: oaiKey,
         customModel: openAIModel,
     }
-    console.log({ data })
-
-    // document.cookie = `repo_path=${state.global.rootPath}`
+    log.info('Chat data prepared')
     return data
 }
 
