@@ -29,8 +29,11 @@ import {
 import { ChatPopup, CommandBar } from './components/markdown'
 import { SettingsPopup } from './components/settingsPane'
 import { FeedbackArea, LeftSide } from './components/search'
+import { ComposerPanel } from './components/composer/composerPanel'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { openComposerPanel, closeComposerPanel } from './features/tools/toolSlice'
 import { WelcomeScreen } from './components/welcomeScreen'
+import { FullState } from './features/window/state'
 import { TitleBar } from './components/titlebar'
 import { BottomTerminal } from './components/terminal'
 import { throttleCallback } from './components/componentUtils'
@@ -173,6 +176,7 @@ export function App() {
     const rootPath = useAppSelector(getRootPath)
     const folders = useAppSelector(getFolders)
     const leftSideExpanded = useAppSelector(tsel.getLeftSideExpanded)
+    const composerPanelOpen = useAppSelector((state: FullState) => state.toolState.composerPanelOpen)
 
     const paneSplits = useAppSelector(getPaneStateBySplits)
 
@@ -331,6 +335,11 @@ export function App() {
                         <SettingsPopup />
                         <FeedbackArea />
                         <SSHPopup />
+                        <ComposerPanel
+                            isOpen={composerPanelOpen}
+                            onClose={() => dispatch(closeComposerPanel())}
+                            projectPath={rootPath || ''}
+                        />
                     </>
                 )}
             </div>
