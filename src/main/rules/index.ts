@@ -1,5 +1,7 @@
 export { getRuleParser, destroyRuleParser } from './ruleParser'
 export { getRuleService, destroyRuleService } from './ruleService'
+export { getRuleTemplates, destroyRuleTemplates } from './ruleTemplates'
 export { setupRulesIpcs } from './ipcHandlers'
 export type { Rule, RuleSet, ParsedRules } from './ruleParser'
 export type { RuleViolation, RuleApplicationResult } from './ruleService'
+export type { RuleTemplate } from './ruleTemplates'
