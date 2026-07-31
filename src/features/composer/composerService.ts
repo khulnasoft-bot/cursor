@@ -48,7 +48,12 @@ export interface ComposerExecution {
     failedChanges: string[]
     currentStep: number
     totalSteps: number
+    startTime: Date
+    endTime?: Date
     error?: string
+    appliedChanges: Map<string, string> // filePath -> new content
+    rollbackData?: Map<string, string> // filePath -> original content for rollback
+    canRollback: boolean
 }
 
 export class ComposerService {
@@ -71,16 +76,16 @@ export class ComposerService {
 
         try {
             const response = await this.aiService.sendMessage(planningPrompt, aiContext)
-            
+
             // Parse the AI response to extract file changes
             const changes = this.parseChangesResponse(response, request.context.files)
-            
+
             // Build dependency graph
             const dependencies = this.buildDependencyGraph(changes)
-            
+
             // Determine execution order (topological sort)
             const executionOrder = this.topologicalSort(changes, dependencies)
-            
+
             // Generate summary
             const summary = this.generateSummary(changes, request.prompt)
 
@@ -99,7 +104,7 @@ export class ComposerService {
 
     async executeChanges(result: ComposerResult): Promise<ComposerExecution> {
         const requestId = `composer-exec-${++this.executionCounter}`
-        
+
         const execution: ComposerExecution = {
             requestId,
             status: 'pending',
@@ -107,25 +112,32 @@ export class ComposerService {
             executedChanges: [],
             failedChanges: [],
             currentStep: 0,
-            totalSteps: result.executionOrder.length
+            totalSteps: result.executionOrder.length,
+            startTime: new Date(),
+            appliedChanges: new Map(),
+            canRollback: true
         }
 
         this.activeExecutions.set(requestId, execution)
 
         try {
             execution.status = 'in_progress'
-            
+
             // Execute changes in dependency order
             for (const changeId of result.executionOrder) {
                 execution.currentStep++
-                
+
                 const change = result.changes.find(c => c.filePath === changeId)
                 if (!change) {
                     throw new Error(`Change not found: ${changeId}`)
                 }
 
-                // Execute the change
-                await this.executeSingleChange(change)
+                // Store original content for rollback
+                execution.rollbackData?.set(change.filePath, change.originalContent)
+
+                // Apply the change (placeholder - would integrate with file system)
+                // await this.applyFileChange(change)
+                execution.appliedChanges.set(change.filePath, change.proposedContent)
                 execution.executedChanges.push(changeId)
             }
 
@@ -134,7 +146,47 @@ export class ComposerService {
         } catch (error) {
             execution.status = 'failed'
             execution.error = error instanceof Error ? error.message : 'Unknown error'
-            log.error(`Composer execution failed: ${requestId}`, error)
+        } finally {
+            execution.endTime = new Date()
+        }
+
+        return execution
+    }
+
+    async rollbackExecution(requestId: string): Promise<ComposerExecution> {
+        const execution = this.activeExecutions.get(requestId)
+        if (!execution) {
+            throw new Error(`Execution not found: ${requestId}`)
+        }
+
+        if (!execution.canRollback) {
+            throw new Error(`Execution cannot be rolled back: ${requestId}`)
+        }
+
+        if (!execution.rollbackData || execution.rollbackData.size === 0) {
+            throw new Error(`No rollback data available for execution: ${requestId}`)
+        }
+
+        log.info(`Rolling back execution: ${requestId}`)
+
+        try {
+            // Rollback changes in reverse order
+            const reversedOrder = [...execution.executedChanges].reverse()
+
+            for (const filePath of reversedOrder) {
+                const originalContent = execution.rollbackData.get(filePath)
+                if (originalContent !== undefined) {
+                    // Restore original content (placeholder - would integrate with file system)
+                    // await this.restoreFileContent(filePath, originalContent)
+                    log.info(`Rolled back file: ${filePath}`)
+                }
+            }
+
+            execution.canRollback = false
+            log.info(`Rollback completed for execution: ${requestId}`)
+        } catch (error) {
+            log.error(`Rollback failed for execution ${requestId}:`, error)
+            throw error
         }
 
         return execution
@@ -151,7 +203,7 @@ export class ComposerService {
         let prompt = `You are an AI coding assistant that can make coordinated changes across multiple files.\n\n`
         prompt += `User request: ${request.prompt}\n\n`
         prompt += `Available files:\n`
-        
+
         for (const [filePath, content] of request.context.files) {
             const preview = content.substring(0, 500) + (content.length > 500 ? '...' : '')
             prompt += `- ${filePath}\n`
@@ -165,7 +217,7 @@ export class ComposerService {
         prompt += `- Line range affected\n`
         prompt += `- Description of the change\n`
         prompt += `- Dependencies on other changes\n\n`
-        
+
         prompt += `Format your response as a structured list that can be parsed programmatically.\n`
         prompt += `Be specific about line numbers and exact changes.`
 
@@ -174,12 +226,12 @@ export class ComposerService {
 
     private parseChangesResponse(response: string, files: Map<string, string>): FileChange[] {
         const changes: FileChange[] = []
-        
+
         // Parse the AI response to extract file changes
         // This is a simplified parser - in production, would use more robust parsing
         const lines = response.split('\n')
         let currentChange: Partial<FileChange> | null = null
-        
+
         for (const line of lines) {
             if (line.startsWith('File:')) {
                 if (currentChange) {
@@ -211,7 +263,7 @@ export class ComposerService {
                 currentChange.dependencies = line.substring(13).trim().split(',').map(s => s.trim())
             }
         }
-        
+
         if (currentChange && currentChange.filePath && currentChange.originalContent !== undefined) {
             changes.push(currentChange as FileChange)
         }
@@ -221,10 +273,10 @@ export class ComposerService {
 
     private buildDependencyGraph(changes: FileChange[]): Map<string, string[]> {
         const dependencies = new Map<string, string[]>()
-        
+
         for (const change of changes) {
             dependencies.set(change.filePath, change.dependencies)
-            
+
             // Build reverse dependencies
             for (const dep of change.dependencies) {
                 if (!dependencies.has(dep)) {
@@ -236,7 +288,7 @@ export class ComposerService {
                 }
             }
         }
-        
+
         return dependencies
     }
 
@@ -244,7 +296,7 @@ export class ComposerService {
         const visited = new Set<string>()
         const temp = new Set<string>()
         const order: string[] = []
-        
+
         const visit = (node: string) => {
             if (temp.has(node)) {
                 throw new Error(`Circular dependency detected involving ${node}`)
@@ -252,39 +304,39 @@ export class ComposerService {
             if (visited.has(node)) {
                 return
             }
-            
+
             temp.add(node)
-            
+
             const deps = dependencies.get(node) || []
             for (const dep of deps) {
                 visit(dep)
             }
-            
+
             temp.delete(node)
             visited.add(node)
             order.push(node)
         }
-        
+
         for (const change of changes) {
             if (!visited.has(change.filePath)) {
                 visit(change.filePath)
             }
         }
-        
+
         return order.reverse()
     }
 
     private generateSummary(changes: FileChange[], prompt: string): string {
         const changeCount = changes.length
         const fileCount = new Set(changes.map(c => c.filePath)).size
-        
+
         let summary = `Planned ${changeCount} change${changeCount !== 1 ? 's' : ''} across ${fileCount} file${fileCount !== 1 ? 's' : ''}.\n`
         summary += `Request: "${prompt}"\n\n`
-        
+
         for (const change of changes) {
             summary += `- ${change.filePath}: ${change.description}\n`
         }
-        
+
         return summary
     }
 

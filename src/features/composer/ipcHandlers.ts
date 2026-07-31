@@ -31,7 +31,7 @@ export function setupComposerIpcs() {
         async (_event: IpcMainInvokeEvent, result: ComposerResult) => {
             try {
                 const execution = await composerService.executeChanges(result)
-                
+
                 // Send progress updates
                 _event.sender.send('composer-progress', {
                     requestId: execution.requestId,
@@ -39,7 +39,7 @@ export function setupComposerIpcs() {
                     totalSteps: execution.totalSteps,
                     status: execution.status
                 })
-                
+
                 return { success: true, execution }
             } catch (error) {
                 log.error('Failed to execute changes:', error)
@@ -71,6 +71,20 @@ export function setupComposerIpcs() {
                 return { success: true, cancelled }
             } catch (error) {
                 log.error('Failed to cancel execution:', error)
+                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+            }
+        }
+    )
+
+    // Rollback execution
+    ipcMain.handle(
+        'composer-rollback-execution',
+        async (_event: IpcMainInvokeEvent, requestId: string) => {
+            try {
+                const execution = await composerService.rollbackExecution(requestId)
+                return { success: true, execution }
+            } catch (error) {
+                log.error('Failed to rollback execution:', error)
                 return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
             }
         }
