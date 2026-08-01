@@ -617,7 +617,7 @@ export class LanguageServerPlugin implements LanguageServerPluginInterface {
         if (result == null || stillWaitFutureResult) {
             const resultFuture =
                 new Promise<// LSP.CompletionList | LSP.CompletionItem[] | null
-                LSP.CompletionList | null>(async (resolve, reject) => {
+                LSP.CompletionList | null>((resolve) => {
                     const text = this.getDocText()
                     this.client.sendChange({
                         documentPath: this.getDocPath(),

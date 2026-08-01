@@ -1,10 +1,9 @@
-export function throttleCallback(fn: Function, limit = 300) {
+export function throttleCallback(fn: (...args: any[]) => void, limit = 300) {
     let inThrottle: boolean,
         lastFn: ReturnType<typeof setTimeout>,
         lastTime: number
-    return function (this: any) {
-        const context = this,
-            args = arguments
+    return function (this: any, ...args: any[]) {
+        const context = this
         if (!inThrottle) {
             fn.apply(context, args)
             lastTime = Date.now()
@@ -22,7 +21,7 @@ export function throttleCallback(fn: Function, limit = 300) {
     }
 }
 
-export function normalThrottleCallback(fn: Function, limit = 300) {
+export function normalThrottleCallback(fn: (...args: any[]) => void, limit = 300) {
     let inThrottle: boolean,
         lastFn: ReturnType<typeof setTimeout>,
         lastTime: number

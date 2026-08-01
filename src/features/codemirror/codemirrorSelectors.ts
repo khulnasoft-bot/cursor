@@ -1,5 +1,5 @@
 /*
-* The idea with codemirror views is we actually have 
+* The idea with codemirror views is we actually have
 * multipled different stores
 
 * There is the redux store
@@ -8,7 +8,7 @@
 */
 import { FullCodeMirrorState, getCodeMirrorView } from './codemirrorSlice'
 
-export const getViewId = (tabId: number | null) => (state: {}) => {
+export const getViewId = (tabId: number | null) => (state: unknown) => {
     if (!tabId) return
     const castState = state as FullCodeMirrorState
     if (tabId in castState.codeMirrorState.editorMap) {

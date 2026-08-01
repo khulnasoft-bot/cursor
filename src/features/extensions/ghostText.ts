@@ -116,16 +116,18 @@ export const completionDecoration = StateField.define<CompletionState>({
             } else if (effect.is(typeFirst)) {
                 const numChars = effect.value
                 if (state.ghostText && !state.ghostText.weirdInsert) {
-                    let {
+                    const {
                         text,
-                        displayText,
-                        displayPos,
                         startPos,
                         endPos,
                         endGhostText,
-                        decorations,
                         endReplacement,
                         uuid,
+                    } = state.ghostText
+                    let {
+                        displayText,
+                        displayPos,
+                        decorations,
                     } = state.ghostText
 
                     displayPos += numChars
@@ -420,12 +422,14 @@ const completionRequester = (client: LanguageServerClient) => {
                             return
                         }
 
-                        let {
+                        const {
                             text,
-                            displayText,
-                            range: { start, end },
+                            range: { start },
                             position,
                             uuid,
+                        } = completionResult.completions[0]
+                        let {
+                            displayText,
                         } = completionResult.completions[0]
 
                         const startPos = posToOffset(state.doc, {

@@ -105,6 +105,7 @@ class SocketService {
 
         return new Promise((resolve, reject) => {
             let receivedData = Buffer.alloc(0)
+            // eslint-disable-next-line prefer-const
             let timeoutId: NodeJS.Timeout
 
             const onData = (data: Buffer) => {
@@ -141,12 +142,12 @@ class SocketService {
         })
     }
 
-    async disconnect(connectionId: string): Promise<void> {
-        const connection = this.connections.get(connectionId)
+    async disconnect(_connectionId: string): Promise<void> {
+        const connection = this.connections.get(_connectionId)
         if (connection) {
             connection.socket.destroy()
-            this.connections.delete(connectionId)
-            log.info(`Disconnected socket: ${connectionId}`)
+            this.connections.delete(_connectionId)
+            log.info(`Disconnected socket: ${_connectionId}`)
         }
     }
 

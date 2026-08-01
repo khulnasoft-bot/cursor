@@ -42,10 +42,9 @@ export const regexpLinter = linter((view) => {
                 })
             }
         })
-    let notAIDiagnostics: Diagnostic[]
     const lintField = view.state.field(lintState, false)
     if (!lintField) return diagnostics
-    notAIDiagnostics = getDiagnostics(lintField, view.state).filter(
+    const notAIDiagnostics = getDiagnostics(lintField, view.state).filter(
         (d) => d.severity != 'aiwarning'
     )
     return [...diagnostics, ...notAIDiagnostics]

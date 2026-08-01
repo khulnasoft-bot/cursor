@@ -117,9 +117,10 @@ export class MentionParser {
                 return `@file:${mention.value}`
             case 'directory':
                 return `@dir:${mention.value}`
-            case 'symbol':
+            case 'symbol': {
                 const symbolPart = `@symbol:${mention.symbolName}`
                 return mention.filePath ? `${symbolPart}@${mention.filePath}` : symbolPart
+            }
             case 'codebase':
                 return '@codebase'
             default:

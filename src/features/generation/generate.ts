@@ -196,12 +196,12 @@ export const generationSlice = createSlice({
     name: 'generation',
     initialState,
     reducers: {
-        init(stobj: Object, action: PayloadAction<number>) {
-            const state = <State>stobj
-            const tabId = action.payload
+        init(_stobj: unknown, _action: PayloadAction<number>) {
+            const state = <State>_stobj
+            const tabId = _action.payload
             //state.keyboardBindings['Cmd-e'] = ''
         },
-        pending(stobj: Object, action: PayloadAction<number>) {
+        pending(stobj: unknown, action: PayloadAction<number>) {
             const state = <State>stobj
             const tabId = action.payload
             const tab = state.tabs[tabId]
@@ -214,8 +214,8 @@ export const generationSlice = createSlice({
             state.keyboardBindings['Ctrl-c'] =
                 generationSlice.actions.interrupt(tabId)
         },
-        starting(stobj: Object, action: PayloadAction<number>) {},
-        completed(stobj: Object, action: PayloadAction<number>) {
+        starting(_stobj: unknown, _action: PayloadAction<number>) {},
+        completed(stobj: unknown, action: PayloadAction<number>) {
             const state = <State>stobj
             const tabId = action.payload
 
