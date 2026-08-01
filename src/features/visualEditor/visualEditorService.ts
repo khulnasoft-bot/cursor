@@ -30,6 +30,8 @@ export interface VisualChange {
     newValue?: any
     timestamp: Date
     description: string
+    author?: string
+    tags?: string[]
 }
 
 export interface VisualEditorState {
@@ -96,7 +98,7 @@ export class VisualEditorService {
         return this.state.hoveredElement
     }
 
-    updateElementProperty(elementId: string, property: string, value: any): VisualChange {
+    updateElementProperty(elementId: string, property: string, value: any, author?: string, tags?: string[]): VisualChange {
         const change: VisualChange = {
             id: `change-${++this.changeCounter}`,
             elementId,
@@ -105,7 +107,9 @@ export class VisualEditorService {
             oldValue: this.getElementValue(elementId, property),
             newValue: value,
             timestamp: new Date(),
-            description: `Updated ${property} to ${value}`
+            description: `Updated ${property} to ${value}`,
+            author,
+            tags
         }
 
         this.state.changes.push(change)
@@ -116,7 +120,7 @@ export class VisualEditorService {
         return change
     }
 
-    updateElementStyle(elementId: string, styleProperty: string, value: string): VisualChange {
+    updateElementStyle(elementId: string, styleProperty: string, value: string, author?: string, tags?: string[]): VisualChange {
         const change: VisualChange = {
             id: `change-${++this.changeCounter}`,
             elementId,
@@ -125,7 +129,9 @@ export class VisualEditorService {
             oldValue: this.getElementStyle(elementId, styleProperty),
             newValue: value,
             timestamp: new Date(),
-            description: `Updated style ${styleProperty} to ${value}`
+            description: `Updated style ${styleProperty} to ${value}`,
+            author,
+            tags
         }
 
         this.state.changes.push(change)
@@ -213,6 +219,20 @@ export class VisualEditorService {
         return [...this.state.changes]
     }
 
+    getChangesByAuthor(author: string): VisualChange[] {
+        return this.state.changes.filter(c => c.author === author)
+    }
+
+    getChangesByTag(tag: string): VisualChange[] {
+        return this.state.changes.filter(c => c.tags?.includes(tag))
+    }
+
+    getChangesByTimeRange(start: Date, end: Date): VisualChange[] {
+        return this.state.changes.filter(c =>
+            c.timestamp >= start && c.timestamp <= end
+        )
+    }
+
     clearChanges(): void {
         this.state.changes = []
         this.state.undoStack = []
@@ -224,11 +244,45 @@ export class VisualEditorService {
         total: number
         undoable: number
         redoable: number
+        byAuthor: Record<string, number>
+        byType: Record<string, number>
     } {
+        const byAuthor: Record<string, number> = {}
+        const byType: Record<string, number> = {}
+
+        for (const change of this.state.changes) {
+            if (change.author) {
+                byAuthor[change.author] = (byAuthor[change.author] || 0) + 1
+            }
+            byType[change.type] = (byType[change.type] || 0) + 1
+        }
+
         return {
             total: this.state.changes.length,
             undoable: this.state.undoStack.length,
-            redoable: this.state.redoStack.length
+            redoable: this.state.redoStack.length,
+            byAuthor,
+            byType
+        }
+    }
+
+    exportChanges(): string {
+        return JSON.stringify(this.state.changes, null, 2)
+    }
+
+    importChanges(json: string): number {
+        try {
+            const changes = JSON.parse(json) as VisualChange[]
+            let count = 0
+            for (const change of changes) {
+                this.state.changes.push(change)
+                count++
+            }
+            log.info(`Imported ${count} changes`)
+            return count
+        } catch (error) {
+            log.error('Failed to import changes:', error)
+            return 0
         }
     }
 

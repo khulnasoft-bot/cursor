@@ -7,7 +7,7 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getAIService } from './aiService'
 import { getModelConfigManager } from './modelConfig'
-import type { AIMessage, AIContext, Tool, AIConfig, AIStreamChunk, AIProvider, ModelConfig } from './aiService'
+import type { AIContext, Tool, AIConfig, AIStreamChunk, AIProvider } from './aiService'
 
 export function setupAIServiceIpcs() {
     const aiService = getAIService()
@@ -32,7 +32,7 @@ export function setupAIServiceIpcs() {
         'ai-service-send-message-stream',
         async (_event: IpcMainInvokeEvent, message: string, context?: AIContext, conversationId?: string) => {
             try {
-                let fullResponse = ''
+                const fullResponse = ''
                 const chunks: AIStreamChunk[] = []
 
                 await aiService.sendMessageStream(message, context, conversationId, (chunk) => {

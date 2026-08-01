@@ -98,5 +98,6 @@ export function getPendingDeeplinkAction(): DeeplinkAction | null {
 
 // Extend global type
 declare global {
+    // eslint-disable-next-line no-var
     var deeplinkAction: DeeplinkAction | undefined
 }

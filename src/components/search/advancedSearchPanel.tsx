@@ -3,8 +3,8 @@
  * UI component for advanced codebase search with filters and preview
  */
 
-import React, { useState, useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import React, { useState } from 'react'
+import { useAppDispatch } from '../../app/hooks'
 import type { SearchResult } from '../../main/search/advancedSearch'
 
 interface SearchFilters {

@@ -6,7 +6,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getNDJSONService } from './ndjsonService'
-import type { NDJSONRecord, NDJSONIngestConfig } from './ndjsonService'
+import type { NDJSONIngestConfig } from './ndjsonService'
 
 export function setupNDJSONServiceIpcs() {
     const ndjsonService = getNDJSONService()

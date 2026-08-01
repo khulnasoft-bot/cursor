@@ -27,7 +27,7 @@ class SocketService {
 
     async connect(options: SocketOptions): Promise<string> {
         const connectionId = `conn-${++this.connectionIdCounter}`
-        
+
         return new Promise((resolve, reject) => {
             let socket: net.Socket | tls.TLSSocket
 
@@ -86,7 +86,7 @@ class SocketService {
 
         return new Promise((resolve, reject) => {
             const buffer = Buffer.isBuffer(data) ? data : Buffer.from(data)
-            
+
             connection.socket.write(buffer, (error) => {
                 if (error) {
                     reject(error)

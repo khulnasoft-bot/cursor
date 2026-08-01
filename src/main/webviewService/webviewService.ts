@@ -3,7 +3,6 @@
  * Handles WebView embedding and lifecycle management
  */
 
-import { BrowserWindow, webContents } from 'electron'
 import log from 'electron-log'
 
 export interface WebViewConfig {

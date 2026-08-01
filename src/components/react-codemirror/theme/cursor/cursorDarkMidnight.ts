@@ -1,7 +1,5 @@
 import { tags as t } from '@lezer/highlight'
 import { EditorView } from '@codemirror/view'
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { StyleSpec } from 'style-mod'
 import { createTheme } from '../../../../vscodeTheme'
 
 export function cursorDarkMidnightInit(options?: any) {

@@ -3,8 +3,6 @@
  * Tracks requests and commits for Cursor online metrics
  */
 
-import * as fs from 'fs'
-import * as path from 'path'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import log from 'electron-log'

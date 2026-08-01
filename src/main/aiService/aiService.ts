@@ -4,8 +4,6 @@
  */
 
 import log from 'electron-log'
-import { v4 as uuidv4 } from 'uuid'
-import { getModelConfigManager } from './modelConfig'
 import { getRuleService } from '../rules'
 import nodeFetch from 'node-fetch'
 

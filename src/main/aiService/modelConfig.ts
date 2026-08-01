@@ -5,7 +5,7 @@
 
 import Store from 'electron-store'
 import log from 'electron-log'
-import type { AIProvider, ModelConfig, ProviderConfig } from './aiService'
+import type { AIProvider, ProviderConfig } from './aiService'
 
 export interface ModelSettings {
     preferredModel: string

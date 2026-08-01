@@ -3,9 +3,9 @@
  * Multi-file diff preview UI for coordinated changes
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { getComposerService, getDiffGenerator } from '../../features/composer'
-import type { FileChange, ComposerResult, ComposerExecution, FileDiff } from '../../features/composer'
+import type { ComposerResult, ComposerExecution, FileDiff } from '../../features/composer'
 
 interface ComposerPanelProps {
     isOpen: boolean

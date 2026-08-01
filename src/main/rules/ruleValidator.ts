@@ -3,11 +3,9 @@
  * Validation and testing framework for team rules
  */
 
-import log from 'electron-log'
 import { getRuleParser } from './ruleParser'
 import { getRuleService } from './ruleService'
 import type { Rule } from './ruleParser'
-import type { RuleViolation, RuleApplicationResult } from './ruleService'
 
 export interface TestCodeSample {
     name: string

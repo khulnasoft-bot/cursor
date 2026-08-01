@@ -5,22 +5,8 @@
 
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { ipcRenderer } from 'electron'
-import type { DebugSession, DebugBreakpoint, DebugStackFrame, DebugVariable, DebugThread } from '../../main/debuggerService'
-import {
-    setSessions,
-    addSession,
-    removeSession,
-    setActiveSession,
-    setBreakpoints,
-    addBreakpoint,
-    removeBreakpoint,
-    setStackFrames,
-    setVariables,
-    setThreads,
-    setDebugging,
-    setPaused,
-    clearDebugger
-} from './debuggerSlice'
+
+
 
 export const startDebugSession = createAsyncThunk(
     'debugger/startSession',

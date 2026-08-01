@@ -4,7 +4,7 @@
  */
 
 import log from 'electron-log'
-import { diffLines, diffWords } from 'diff'
+import { diffLines } from 'diff'
 
 export interface DiffHunk {
     oldStart: number

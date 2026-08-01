@@ -6,7 +6,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getSemanticIndexer } from './semanticIndexer'
-import type { SearchQuery, SearchResult, CodeChunk } from './semanticIndexer'
+import type { SearchQuery } from './semanticIndexer'
 
 export function setupSemanticIndexerIpcs() {
     const semanticIndexer = getSemanticIndexer()

@@ -6,7 +6,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getComposerService } from './composerService'
-import type { ComposerRequest, ComposerResult, ComposerExecution } from './composerService'
+import type { ComposerRequest, ComposerResult } from './composerService'
 
 export function setupComposerIpcs() {
     const composerService = getComposerService()

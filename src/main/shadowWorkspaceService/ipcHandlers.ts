@@ -6,7 +6,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getShadowWorkspaceService } from './shadowWorkspaceService'
-import type { ShadowWorkspace } from './shadowWorkspaceService'
 
 export function setupShadowWorkspaceServiceIpcs() {
     const shadowWorkspaceService = getShadowWorkspaceService()

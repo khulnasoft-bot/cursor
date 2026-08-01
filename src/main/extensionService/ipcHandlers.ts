@@ -6,7 +6,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getExtensionService } from './extensionService'
-import type { Extension, ExtensionManifest } from './extensionService'
+import type { ExtensionManifest } from './extensionService'
 
 export function setupExtensionServiceIpcs() {
     const extensionService = getExtensionService()

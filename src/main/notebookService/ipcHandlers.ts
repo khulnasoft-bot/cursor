@@ -6,7 +6,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getNotebookService } from './notebookService'
-import type { Notebook, NotebookCell, NotebookKernel, CellOutput } from './notebookService'
 
 export function setupNotebookServiceIpcs() {
     const notebookService = getNotebookService()

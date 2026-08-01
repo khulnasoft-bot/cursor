@@ -391,12 +391,18 @@ export class FileSystem {
                             if (isDir) callbacks.unlinkDir(filePath)
                             else callbacks.unlink(filePath)
                         }
-                    } catch (err) {}
+                    } catch (err) {
+                        // Ignore errors in event handling
+                    }
                 }
             })
-            childProcess.stderr.on('data', function (data) {})
+            childProcess.stderr.on('data', function (_data) {
+                // Ignore stderr output
+            })
 
-            childProcess.on('exit', function (code) {})
+            childProcess.on('exit', function (_code) {
+                // Handle process exit if needed
+            })
         } else {
             const watcher = new Watcher(rootDir, {
                 ignore,

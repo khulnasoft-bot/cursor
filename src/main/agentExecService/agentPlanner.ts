@@ -5,7 +5,6 @@
 
 import log from 'electron-log'
 import { getToolRegistry } from './toolRegistry'
-import type { AgentTool } from './toolRegistry'
 
 export interface AgentGoal {
     id: string

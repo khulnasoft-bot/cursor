@@ -6,7 +6,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getAdvancedSearchService } from './advancedSearch'
-import type { SearchOptions, SearchResult, SearchIndex } from './advancedSearch'
+import type { SearchOptions } from './advancedSearch'
 
 export function setupSearch() {
     const searchService = getAdvancedSearchService()

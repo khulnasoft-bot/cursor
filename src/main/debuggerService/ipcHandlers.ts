@@ -6,7 +6,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getDebuggerService } from './debuggerService'
-import type { DebugBreakpoint, DebugStackFrame, DebugVariable, DebugThread } from './debuggerService'
 
 export function setupDebuggerServiceIpcs() {
     const debuggerService = getDebuggerService()

@@ -70,7 +70,6 @@ import {
     lintState,
     setActiveLint,
 } from '../linter/lint'
-import { getAgentWorkerManager } from '../../workers'
 
 const getBearerTokenHeader = (getState: () => unknown) => {
     const accessToken = (getState() as FullState).toolState.cursorLogin

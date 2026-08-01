@@ -3,7 +3,7 @@
  * Provides browser automation capabilities for AI agents
  */
 
-import { BrowserWindow, session } from 'electron'
+import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 export interface BrowserAutomationOptions {

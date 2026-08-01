@@ -6,7 +6,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { getAgentExecService } from './agentExecService'
-import type { AgentTask } from './agentExecService'
 
 export function setupAgentExecServiceIpcs() {
     const agentExecService = getAgentExecService()

@@ -5,7 +5,6 @@
 
 import log from 'electron-log'
 import { getAIService } from '../aiService'
-import type { AIContext } from '../aiService'
 import crypto from 'crypto'
 
 export interface CodeChunk {

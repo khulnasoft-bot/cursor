@@ -7,7 +7,6 @@ import log from 'electron-log'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { getRuleParser } from './ruleParser'
-import type { RuleSet } from './ruleParser'
 
 export interface SyncConfig {
     enabled: boolean
