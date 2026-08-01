@@ -15,17 +15,34 @@ import setupAutoUpdater from './setup/autoUpdater'
 import { setupEnv } from './setup/env'
 import setupIpcs from './setup/ipcs'
 import setupLogger from './setup/logger'
-import setupProtocal from './setup/protocal'
+import setupProtocol from './setup/protocol'
 import setupSingleInstance from './setup/singleInstance'
 import setupTerminal from './setup/terminal'
 import { setupStoreHandlers, store } from './storeHandler'
 import { setupTestIndexer } from './testIndexer'
-
-// TODO: Remove this
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+import { setupBrowserAutomationIpcs } from './browserAutomation'
+import { setupFileServiceIpcs } from './fileService'
+import { setupSocketServiceIpcs } from './socketService'
+import { setupExplorerServiceIpcs } from './explorerService'
+import { setupCommitsServiceIpcs } from './commitsService'
+import { setupMCPServiceIpcs } from './mcpService'
+import { setupDebuggerServiceIpcs } from './debuggerService'
+import { setupAIServiceIpcs } from './aiService'
+import { setupExtensionServiceIpcs } from './extensionService'
+import { setupNotebookServiceIpcs } from './notebookService'
+import { setupWebviewServiceIpcs } from './webviewService'
+import { setupResolverServiceIpcs } from './resolverService'
+import { setupShadowWorkspaceServiceIpcs } from './shadowWorkspaceService'
+import { setupTextmateServiceIpcs } from './textmateService'
+import { setupNDJSONServiceIpcs } from './ndjsonService'
+import { setupPolyfillsServiceIpcs } from './polyfillsService'
+import { setupCheckoutServiceIpcs } from './checkoutService'
+import { setupAgentExecServiceIpcs } from './agentExecService'
+import { setupLocalModeServiceIpcs } from './localModeService'
+import { getProductConfig } from './config/productConfig'
 
 setupEnv()
-setupProtocal()
+setupProtocol()
 setupSingleInstance()
 setupAutoUpdater()
 setupLogger()
@@ -37,10 +54,32 @@ app.on('ready', () => {
     mainWindow.load()
     setupMainMenu()
 
+    // Load product configuration
+    getProductConfig()
+
     // Sets up auth stuff here
     authPackage()
     setupApplicationsFolder()
     setupIpcs()
+    setupBrowserAutomationIpcs()
+    setupFileServiceIpcs()
+    setupSocketServiceIpcs()
+    setupExplorerServiceIpcs()
+    setupCommitsServiceIpcs()
+    setupMCPServiceIpcs()
+    setupDebuggerServiceIpcs()
+    setupAIServiceIpcs()
+    setupExtensionServiceIpcs()
+    setupNotebookServiceIpcs()
+    setupWebviewServiceIpcs()
+    setupResolverServiceIpcs()
+    setupShadowWorkspaceServiceIpcs()
+    setupTextmateServiceIpcs()
+    setupNDJSONServiceIpcs()
+    setupPolyfillsServiceIpcs()
+    setupCheckoutServiceIpcs()
+    setupAgentExecServiceIpcs()
+    setupLocalModeServiceIpcs()
     setupLSPs(store)
     setupTerminal()
     setupSearch()

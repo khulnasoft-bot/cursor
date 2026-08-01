@@ -6,7 +6,6 @@
 import log from 'electron-log'
 import { getAutomationService } from './automationService'
 import { getTriggerSystem } from './triggerSystem'
-import type { AutomationWorkflow } from './automationService'
 
 export interface ScheduledTask {
     id: string
@@ -61,18 +60,18 @@ export class AutomationScheduler {
     }
 
     scheduleWorkflow(workflowId: string, schedule: string): ScheduledTask {
-        const taskId = `task-${++this.taskCounter}`
+        const _taskId = `task-${++this.taskCounter}`
         const nextRun = this.calculateNextRun(schedule)
 
         const task: ScheduledTask = {
-            id: taskId,
+            id: _taskId,
             workflowId,
             schedule,
             nextRun,
             enabled: true
         }
 
-        this.scheduledTasks.set(taskId, task)
+        this.scheduledTasks.set(_taskId, task)
         log.info(`Scheduled workflow ${workflowId} with schedule: ${schedule}`)
         return task
     }
@@ -155,7 +154,7 @@ export class AutomationScheduler {
 
         const now = new Date()
 
-        for (const [taskId, task] of this.scheduledTasks) {
+        for (const [_taskId, task] of this.scheduledTasks) {
             if (!task.enabled) continue
 
             if (now >= task.nextRun) {

@@ -3,7 +3,7 @@
  * Component for previewing visual changes before applying them
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import type { VisualChange } from '../../features/visualEditor'
 
 interface ChangePreviewProps {
@@ -30,12 +30,12 @@ export function ChangePreview({
     const [filterType, setFilterType] = useState<'all' | 'property' | 'style' | 'structure' | 'content'>('all')
 
     const filteredChanges = changes.filter(change => {
-        const matchesFilter = filter === '' || 
+        const matchesFilter = filter === '' ||
             change.description.toLowerCase().includes(filter.toLowerCase()) ||
             change.elementId.toLowerCase().includes(filter.toLowerCase())
-        
+
         const matchesType = filterType === 'all' || change.type === filterType
-        
+
         return matchesFilter && matchesType
     })
 

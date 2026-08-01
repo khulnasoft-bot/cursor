@@ -1,0 +1,34 @@
+{
+    "name": "cursor-dev",
+    "dockerFile": "Dockerfile",
+    "context": "..",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20"
+        },
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.cwd": "${containerWorkspaceFolder}",
+                "eslint.validate": [
+                    "javascript",
+                    "typescript",
+                    "typescriptreact"
+                ],
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            },
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-vscode.vscode-typescript-next",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode-remote.remote-containers"
+            ]
+        }
+    },
+    "postCreateCommand": "npm install && ./setup.sh",
+    "remoteUser": "node"
+}

@@ -32,9 +32,11 @@ class MainWindow {
             webPreferences: {
                 // @ts-ignore
                 preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-                // TODO - remove this
-                allowRunningInsecureContent: true,
-                webSecurity: false,
+                allowRunningInsecureContent: false,
+                webSecurity: true,
+                contextIsolation: true,
+                nodeIntegration: false,
+                sandbox: true,
             },
         })
     }
@@ -59,7 +61,7 @@ class MainWindow {
         this.win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
     }
 
-    hasCrated() {
+    hasCreated() {
         return !!this.win
     }
 

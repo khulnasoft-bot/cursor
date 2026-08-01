@@ -10,7 +10,7 @@ export default function setupSingleInstance() {
     } else {
         app.on('second-instance', (_event, commandLine) => {
             // Someone tried to run a second instance, we should focus our window.
-            if (mainWindow.hasCrated()) {
+            if (mainWindow.hasCreated()) {
                 const { win } = mainWindow
                 if (win!.isMinimized()) win!.restore()
                 win!.focus()

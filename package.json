@@ -2,11 +2,11 @@
     "homepage": "https://cursor.so",
     "name": "cursor",
     "author": {
-        "name": "Cursor AI, Inc.",
+        "name": "Anysphere, Inc.",
         "email": "hiring@cursor.so"
     },
     "productName": "Cursor",
-    "version": "0.2.0",
+    "version": "3.9.16",
     "description": "Cursor is an AI-first coding environment.",
     "main": ".webpack/main",
     "scripts": {
@@ -25,6 +25,13 @@
     },
     "keywords": [],
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/getcursor/cursor.git"
+    },
+    "bugs": {
+        "url": "https://github.com/getcursor/cursor/issues"
+    },
     "devDependencies": {
         "@babel/core": "^7.20.5",
         "@babel/preset-env": "^7.20.2",
@@ -51,7 +58,7 @@
         "autoprefixer": "^10.4.13",
         "babel-loader": "^9.1.0",
         "css-loader": "^6.7.2",
-        "electron": "^30.0.0",
+        "electron": "^32.0.0",
         "electron-devtools-installer": "^3.2.0",
         "electron-winstaller": "^5.1.0",
         "eslint": "^8.57.0",
@@ -73,10 +80,10 @@
         "typescript": "^5.5.0"
     },
     "dependencies": {
-        "@codemirror/autocomplete": "^6.18.0",
-        "@codemirror/commands": "^6.6.0",
+        "@codemirror/autocomplete": "^6.18.1",
+        "@codemirror/commands": "^6.6.2",
         "@codemirror/lang-cpp": "^6.0.2",
-        "@codemirror/lang-css": "^6.3.0",
+        "@codemirror/lang-css": "^6.3.1",
         "@codemirror/lang-html": "^6.4.9",
         "@codemirror/lang-java": "^6.0.1",
         "@codemirror/lang-javascript": "^6.2.2",
@@ -86,13 +93,21 @@
         "@codemirror/lang-python": "^6.1.6",
         "@codemirror/lang-rust": "^6.0.1",
         "@codemirror/lang-sql": "^6.8.0",
-        "@codemirror/language": "^6.10.0",
+        "@codemirror/lang-go": "^6.0.0",
+        "@codemirror/lang-ruby": "^6.0.0",
+        "@codemirror/lang-swift": "^6.0.0",
+        "@codemirror/lang-kotlin": "^6.0.0",
+        "@codemirror/lang-csharp": "^6.0.0",
+        "@codemirror/lang-shell": "^6.0.0",
+        "@codemirror/lang-yaml": "^6.0.0",
+        "@codemirror/lang-toml": "^6.0.0",
+        "@codemirror/language": "^6.10.2",
         "@codemirror/language-data": "^6.5.0",
-        "@codemirror/merge": "^6.5.0",
-        "@codemirror/search": "^6.5.5",
-        "@codemirror/state": "^6.4.0",
+        "@codemirror/merge": "^6.6.0",
+        "@codemirror/search": "^6.5.6",
+        "@codemirror/state": "^6.4.1",
         "@codemirror/theme-one-dark": "^6.1.2",
-        "@codemirror/view": "^6.28.0",
+        "@codemirror/view": "^6.29.1",
         "@electron-forge/publisher-github": "^6.0.4",
         "@electron/remote": "^2.0.9",
         "@fortawesome/fontawesome-pro": "^6.2.1",

@@ -6,7 +6,7 @@
 import log from 'electron-log'
 import { EventEmitter } from 'events'
 import { getAutomationService } from './automationService'
-import type { AutomationTrigger, AutomationWorkflow } from './automationService'
+import type { AutomationTrigger } from './automationService'
 
 export interface TriggerEvent {
     type: string
@@ -17,7 +17,7 @@ export interface TriggerEvent {
 export class TriggerSystem extends EventEmitter {
     private automationService = getAutomationService()
     private active: boolean = false
-    private listeners: Map<string, Set<Function>> = new Map()
+    private triggerListeners: Map<string, Set<(...args: any[]) => void>> = new Map()
 
     activate(): void {
         this.active = true
@@ -39,18 +39,18 @@ export class TriggerSystem extends EventEmitter {
         // File system events
         this.on('file-save', this.handleFileSave.bind(this))
         this.on('file-change', this.handleFileChange.bind(this))
-        
+
         // Git events
         this.on('git-commit', this.handleGitCommit.bind(this))
         this.on('git-push', this.handleGitPush.bind(this))
         this.on('git-pull', this.handleGitPull.bind(this))
-        
+
         // Time-based events
         this.on('time-trigger', this.handleTimeTrigger.bind(this))
-        
+
         // Manual events
         this.on('manual-trigger', this.handleManualTrigger.bind(this))
-        
+
         // Custom events
         this.on('custom-event', this.handleCustomEvent.bind(this))
 
@@ -59,24 +59,24 @@ export class TriggerSystem extends EventEmitter {
 
     private teardownEventListeners(): void {
         this.removeAllListeners()
-        this.listeners.clear()
+        this.triggerListeners.clear()
         log.info('Event listeners torn down')
     }
 
-    registerListener(eventType: string, callback: Function): void {
-        if (!this.listeners.has(eventType)) {
-            this.listeners.set(eventType, new Set())
+    registerListener(eventType: string, callback: (...args: any[]) => void): void {
+        if (!this.triggerListeners.has(eventType)) {
+            this.triggerListeners.set(eventType, new Set())
         }
-        this.listeners.get(eventType)!.add(callback)
+        this.triggerListeners.get(eventType)!.add(callback)
         log.info(`Registered listener for event: ${eventType}`)
     }
 
-    unregisterListener(eventType: string, callback: Function): void {
-        const listeners = this.listeners.get(eventType)
+    unregisterListener(eventType: string, callback: (...args: any[]) => void): void {
+        const listeners = this.triggerListeners.get(eventType)
         if (listeners) {
             listeners.delete(callback)
             if (listeners.size === 0) {
-                this.listeners.delete(eventType)
+                this.triggerListeners.delete(eventType)
             }
             log.info(`Unregistered listener for event: ${eventType}`)
         }
@@ -95,12 +95,12 @@ export class TriggerSystem extends EventEmitter {
 
         // Find workflows with matching triggers
         const workflows = this.automationService.getWorkflowsByTrigger(eventType as any)
-        
+
         for (const workflow of workflows) {
             const trigger = workflow.triggers.find(t => t.type === eventType && t.enabled)
             if (trigger && this.matchesTriggerConfig(trigger, data)) {
                 try {
-                    await this.automationService.executeWorkflow(workflow.id, trigger)
+                    await this.automationService.executeWorkflow(workflow.id, trigger, data)
                 } catch (error) {
                     log.error(`Failed to execute workflow ${workflow.name} on trigger ${eventType}:`, error)
                 }
@@ -190,7 +190,7 @@ export class TriggerSystem extends EventEmitter {
         // Parse schedule (cron-like format)
         // For simplicity, this is a placeholder - would need proper cron parsing
         const interval = this.parseSchedule(schedule)
-        
+
         if (interval) {
             const timeout = setInterval(callback, interval)
             this.scheduledTriggers.set(triggerId, timeout)
@@ -214,7 +214,7 @@ export class TriggerSystem extends EventEmitter {
         if (match) {
             const value = parseInt(match[1])
             const unit = match[2].toLowerCase()
-            
+
             switch (unit) {
                 case 'minute':
                     return value * 60 * 1000
@@ -228,7 +228,7 @@ export class TriggerSystem extends EventEmitter {
     }
 
     clearScheduledTriggers(): void {
-        for (const [triggerId, timeout] of this.scheduledTriggers) {
+        for (const [_triggerId, timeout] of this.scheduledTriggers) {
             clearInterval(timeout)
         }
         this.scheduledTriggers.clear()
@@ -236,11 +236,11 @@ export class TriggerSystem extends EventEmitter {
     }
 
     getActiveListeners(): string[] {
-        return Array.from(this.listeners.keys())
+        return Array.from(this.triggerListeners.keys())
     }
 
     getListenerCount(eventType: string): number {
-        return this.listeners.get(eventType)?.size || 0
+        return this.triggerListeners.get(eventType)?.size || 0
     }
 
     getScheduledTriggers(): string[] {

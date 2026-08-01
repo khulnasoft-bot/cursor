@@ -39,8 +39,9 @@ export interface AutomationExecution {
     status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
     startTime: Date
     endTime?: Date
-    results: Array<{ actionId: string; success: boolean; output?: string; error?: string }>
+    results: Array<{ actionId: string; success: boolean; output?: string; error?: string; duration?: number }>
     error?: string
+    context?: Record<string, any>
 }
 
 export class AutomationService {
@@ -71,7 +72,7 @@ export class AutomationService {
         actions: AutomationAction[]
     ): AutomationWorkflow {
         const workflowId = `workflow-${++this.workflowCounter}`
-        
+
         const workflow: AutomationWorkflow = {
             id: workflowId,
             name,
@@ -151,7 +152,7 @@ export class AutomationService {
         )
     }
 
-    async executeWorkflow(workflowId: string, trigger: AutomationTrigger): Promise<AutomationExecution> {
+    async executeWorkflow(workflowId: string, trigger: AutomationTrigger, context?: Record<string, any>): Promise<AutomationExecution> {
         const workflow = this.workflows.get(workflowId)
         if (!workflow) {
             throw new Error(`Workflow not found: ${workflowId}`)
@@ -162,14 +163,15 @@ export class AutomationService {
         }
 
         const executionId = `exec-${++this.executionCounter}`
-        
+
         const execution: AutomationExecution = {
             id: executionId,
             workflowId,
             trigger,
             status: 'pending',
             startTime: new Date(),
-            results: []
+            results: [],
+            context
         }
 
         this.executions.set(executionId, execution)
@@ -182,18 +184,23 @@ export class AutomationService {
             for (const action of workflow.actions) {
                 if (!action.enabled) continue
 
+                const actionStartTime = Date.now()
                 try {
-                    const result = await this.executeAction(action)
+                    const result = await this.executeAction(action, context)
+                    const duration = Date.now() - actionStartTime
                     execution.results.push({
                         actionId: action.id,
                         success: true,
-                        output: result
+                        output: result,
+                        duration
                     })
                 } catch (error) {
+                    const duration = Date.now() - actionStartTime
                     execution.results.push({
                         actionId: action.id,
                         success: false,
-                        error: error instanceof Error ? error.message : 'Unknown error'
+                        error: error instanceof Error ? error.message : 'Unknown error',
+                        duration
                     })
                 }
             }
@@ -214,80 +221,104 @@ export class AutomationService {
         return execution
     }
 
-    private async executeAction(action: AutomationAction): Promise<string> {
+    private async executeAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         switch (action.type) {
             case 'command':
-                return this.executeCommandAction(action)
+                return this.executeCommandAction(action, context)
             case 'script':
-                return this.executeScriptAction(action)
+                return this.executeScriptAction(action, context)
             case 'ai_task':
-                return this.executeAiTaskAction(action)
+                return this.executeAiTaskAction(action, context)
             case 'notification':
-                return this.executeNotificationAction(action)
+                return this.executeNotificationAction(action, context)
             case 'file_operation':
-                return this.executeFileOperationAction(action)
+                return this.executeFileOperationAction(action, context)
             case 'git_operation':
-                return this.executeGitOperationAction(action)
+                return this.executeGitOperationAction(action, context)
             default:
                 throw new Error(`Unknown action type: ${action.type}`)
         }
     }
 
-    private async executeCommandAction(action: AutomationAction): Promise<string> {
+    private async executeCommandAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Execute shell command
         const command = action.config.command
         if (!command) throw new Error('Command not specified')
-        
-        log.info(`Executing command: ${command}`)
+
+        // Substitute context variables in command
+        let finalCommand = command
+        if (context) {
+            for (const [key, value] of Object.entries(context)) {
+                finalCommand = finalCommand.replace(`\${${key}}`, String(value))
+            }
+        }
+
+        log.info(`Executing command: ${finalCommand}`)
         // Placeholder for actual command execution
-        return `Executed: ${command}`
+        return `Executed: ${finalCommand}`
     }
 
-    private async executeScriptAction(action: AutomationAction): Promise<string> {
+    private async executeScriptAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Execute script file
         const scriptPath = action.config.scriptPath
         if (!scriptPath) throw new Error('Script path not specified')
-        
+
         log.info(`Executing script: ${scriptPath}`)
         // Placeholder for actual script execution
         return `Executed script: ${scriptPath}`
     }
 
-    private async executeAiTaskAction(action: AutomationAction): Promise<string> {
+    private async executeAiTaskAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Execute AI task
         const prompt = action.config.prompt
         if (!prompt) throw new Error('Prompt not specified')
-        
-        log.info(`Executing AI task: ${prompt}`)
+
+        // Substitute context variables in prompt
+        let finalPrompt = prompt
+        if (context) {
+            for (const [key, value] of Object.entries(context)) {
+                finalPrompt = finalPrompt.replace(`\${${key}}`, String(value))
+            }
+        }
+
+        log.info(`Executing AI task: ${finalPrompt}`)
         // Placeholder for actual AI task execution
-        return `AI task completed: ${prompt}`
+        return `AI task completed: ${finalPrompt}`
     }
 
-    private async executeNotificationAction(action: AutomationAction): Promise<string> {
+    private async executeNotificationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Send notification
         const message = action.config.message
         if (!message) throw new Error('Message not specified')
-        
-        log.info(`Sending notification: ${message}`)
+
+        // Substitute context variables in message
+        let finalMessage = message
+        if (context) {
+            for (const [key, value] of Object.entries(context)) {
+                finalMessage = finalMessage.replace(`\${${key}}`, String(value))
+            }
+        }
+
+        log.info(`Sending notification: ${finalMessage}`)
         // Placeholder for actual notification
-        return `Notification sent: ${message}`
+        return `Notification sent: ${finalMessage}`
     }
 
-    private async executeFileOperationAction(action: AutomationAction): Promise<string> {
+    private async executeFileOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Execute file operation
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
-        
+
         log.info(`Executing file operation: ${operation}`)
         // Placeholder for actual file operation
         return `File operation completed: ${operation}`
     }
 
-    private async executeGitOperationAction(action: AutomationAction): Promise<string> {
+    private async executeGitOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
         // Execute git operation
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
-        
+
         log.info(`Executing git operation: ${operation}`)
         // Placeholder for actual git operation
         return `Git operation completed: ${operation}`
@@ -325,7 +356,7 @@ export class AutomationService {
     }
 
     clearOldExecutions(olderThan: Date): number {
-        const oldExecutions = this.getExecutions().filter(e => 
+        const oldExecutions = this.getExecutions().filter(e =>
             e.endTime && e.endTime < olderThan
         )
         let count = 0

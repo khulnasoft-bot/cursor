@@ -5,7 +5,6 @@
 
 import log from 'electron-log'
 import { getAutomationService } from './automationService'
-import type { AutomationExecution, AutomationWorkflow } from './automationService'
 
 export interface LogEntry {
     id: string
@@ -188,7 +187,7 @@ export class AutomationLogger {
         lastStatus?: string
     } {
         const executions = this.automationService.getExecutionsByWorkflow(workflowId)
-        const workflow = this.automationService.getWorkflow(workflowId)
+        const _workflow = this.automationService.getWorkflow(workflowId)
 
         const totalRuns = executions.length
         const successfulRuns = executions.filter(e => e.status === 'completed').length

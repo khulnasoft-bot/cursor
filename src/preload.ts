@@ -407,7 +407,6 @@ const electronConnector = {
         }) => void
     ) {
         ipcRenderer.on('updateAuthStatus', (event, data) => {
-            console.log('UPDATING AUTH STATUS', data)
             callback(data)
         })
     },
@@ -420,5 +419,6 @@ const electronConnector = {
 }
 
 contextBridge.exposeInMainWorld('connector', electronConnector)
-type ElectronConnector = typeof electronConnector
-export default ElectronConnector
+
+export type ElectronConnector = typeof electronConnector
+export default electronConnector

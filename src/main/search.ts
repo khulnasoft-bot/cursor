@@ -4,6 +4,11 @@ import { promisify } from 'util'
 
 import { PLATFORM_INFO, rgLoc } from './utils'
 
+const sanitizeShellInput = (input: string): string => {
+    // Remove shell metacharacters to prevent command injection
+    return input.replace(/[;&|`$(){}[\]!#~<>?\\'"*]/g, '')
+}
+
 const searchRipGrep = async (
     event: IpcMainInvokeEvent,
     arg: {
@@ -110,10 +115,15 @@ const searchFilesName = async (
         topResults?: number
     }
 ) => {
+    const sanitizedQuery = sanitizeShellInput(query)
+    const sanitizedTopResults = Math.min(
+        Math.max(1, Math.floor(topResults)),
+        100
+    )
     const cmd =
         process.platform === 'win32'
-            ? `${rgLoc} --iglob "*${query}*" --files '' ./ | head -n ${topResults}`
-            : `find . -type f -iname "*${query}*" | head -n ${topResults}`
+            ? `${rgLoc} --iglob "*${sanitizedQuery}*" --files '' ./ | head -n ${sanitizedTopResults}`
+            : `find . -type f -iname "*${sanitizedQuery}*" | head -n ${sanitizedTopResults}`
     const { stdout } = await promisify(cp.exec)(cmd, { cwd: rootPath })
     return stdout
         .split('\n')
@@ -138,10 +148,15 @@ const searchFilesPath = async (
         topResults?: number
     }
 ) => {
+    const sanitizedQuery = sanitizeShellInput(query)
+    const sanitizedTopResults = Math.min(
+        Math.max(1, Math.floor(topResults)),
+        100
+    )
     const cmd =
         process.platform === 'win32'
-            ? `${rgLoc} --iglob "*${query}*" --files '' ./ | head -n ${topResults}`
-            : `find . -typef -ipath "*${query}*" | head -n ${topResults}`
+            ? `${rgLoc} --iglob "*${sanitizedQuery}*" --files '' ./ | head -n ${sanitizedTopResults}`
+            : `find . -type f -ipath "*${sanitizedQuery}*" | head -n ${sanitizedTopResults}`
     const { stdout } = await promisify(cp.exec)(cmd, { cwd: rootPath })
     return stdout
         .split('\n')
@@ -167,7 +182,12 @@ const searchFilesPathGit = async (
     }
 ) => {
     if (await doesCommandSucceed('git ls-files ffff', rootPath)) {
-        const cmd = `git ls-files | grep "${query}" | head -n ${topResults}`
+        const sanitizedQuery = sanitizeShellInput(query)
+        const sanitizedTopResults = Math.min(
+            Math.max(1, Math.floor(topResults)),
+            100
+        )
+        const cmd = `git ls-files | grep "${sanitizedQuery}" | head -n ${sanitizedTopResults}`
         try {
             const { stdout } = await promisify(cp.exec)(cmd, { cwd: rootPath })
             return stdout
@@ -206,7 +226,12 @@ const searchFilesNameGit = async (
     }
 ) => {
     if (await doesCommandSucceed('git ls-files ffff', rootPath)) {
-        const cmd = `git ls-files | grep -i "${query}[^\\/]*" | grep -v "^node_modules/" | head -n ${topResults}`
+        const sanitizedQuery = sanitizeShellInput(query)
+        const sanitizedTopResults = Math.min(
+            Math.max(1, Math.floor(topResults)),
+            100
+        )
+        const cmd = `git ls-files | grep -i "${sanitizedQuery}[^\\/]*" | grep -v "^node_modules/" | head -n ${sanitizedTopResults}`
         try {
             const { stdout } = await promisify(cp.exec)(cmd, { cwd: rootPath })
             return stdout

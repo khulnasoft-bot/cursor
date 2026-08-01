@@ -6,6 +6,7 @@ import { basicSetup } from './setup'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { getStatistics } from './utils'
 import { ReactCodeMirrorProps } from '.'
+import { cursorDark, cursorLight, cursorDarkMidnight } from './theme/cursor'
 
 import {
     getCodeMirrorView,
@@ -114,6 +115,15 @@ export function useCodeMirror(props: UseCodeMirror) {
             break
         case 'dark':
             getExtensions.push(oneDark)
+            break
+        case 'cursor-dark':
+            getExtensions.push(cursorDark)
+            break
+        case 'cursor-light':
+            getExtensions.push(cursorLight)
+            break
+        case 'cursor-dark-midnight':
+            getExtensions.push(cursorDarkMidnight)
             break
         case 'none':
             break

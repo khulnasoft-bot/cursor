@@ -5,7 +5,6 @@
 
 import log from 'electron-log'
 import { getCloudAgentService } from './cloudAgentService'
-import type { CloudAgentInstance, CloudAgentTask } from './cloudAgentService'
 
 export interface EnvironmentConfig {
     id: string
@@ -29,7 +28,7 @@ export interface EnvironmentConfig {
     }
 }
 
-export interface ExecutionEnvironment {
+export interface EnvironmentInstance {
     id: string
     config: EnvironmentConfig
     status: 'creating' | 'running' | 'stopped' | 'error'
@@ -44,7 +43,7 @@ export interface ExecutionEnvironment {
 
 export class ExecutionEnvironment {
     private cloudAgentService = getCloudAgentService()
-    private environments: Map<string, ExecutionEnvironment> = new Map()
+    private environments: Map<string, EnvironmentInstance> = new Map()
     private environmentCounter = 0
     private active: boolean = false
 
@@ -62,10 +61,10 @@ export class ExecutionEnvironment {
         return this.active
     }
 
-    createEnvironment(config: EnvironmentConfig): ExecutionEnvironment {
+    createEnvironment(config: EnvironmentConfig): EnvironmentInstance {
         const envId = `env-${++this.environmentCounter}`
-        
-        const environment: ExecutionEnvironment = {
+
+        const environment: EnvironmentInstance = {
             id: envId,
             config,
             status: 'creating',
@@ -82,7 +81,7 @@ export class ExecutionEnvironment {
         return environment
     }
 
-    private async provisionEnvironment(environment: ExecutionEnvironment): Promise<void> {
+    private async provisionEnvironment(environment: EnvironmentInstance): Promise<void> {
         // Placeholder for actual environment provisioning
         await new Promise(resolve => setTimeout(resolve, 2000))
 
@@ -127,15 +126,15 @@ export class ExecutionEnvironment {
         return true
     }
 
-    getEnvironment(envId: string): ExecutionEnvironment | undefined {
+    getEnvironment(envId: string): EnvironmentInstance | undefined {
         return this.environments.get(envId)
     }
 
-    getEnvironments(): ExecutionEnvironment[] {
+    getEnvironments(): EnvironmentInstance[] {
         return Array.from(this.environments.values())
     }
 
-    getRunningEnvironments(): ExecutionEnvironment[] {
+    getRunningEnvironments(): EnvironmentInstance[] {
         return this.getEnvironments().filter(e => e.status === 'running')
     }
 
@@ -247,8 +246,8 @@ export class ExecutionEnvironment {
         return JSON.stringify(environment, null, 2)
     }
 
-    importEnvironment(json: string): ExecutionEnvironment {
-        const environment = JSON.parse(json) as ExecutionEnvironment
+    importEnvironment(json: string): EnvironmentInstance {
+        const environment = JSON.parse(json) as EnvironmentInstance
         this.environments.set(environment.id, environment)
         log.info(`Imported environment: ${environment.id}`)
         return environment

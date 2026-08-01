@@ -6,7 +6,6 @@
 import log from 'electron-log'
 import { getCloudAgentService } from './cloudAgentService'
 import { getExecutionEnvironment } from './executionEnvironment'
-import type { CloudAgentInstance, CloudAgentTask } from './cloudAgentService'
 
 export interface ResourceQuota {
     id: string
@@ -22,6 +21,16 @@ export interface ResourceQuota {
         storage: number
         instances: number
         gpu?: number
+    }
+    softLimit?: {
+        cpu?: number
+        memory?: number
+        storage?: number
+    }
+    alertThresholds?: {
+        cpu: number
+        memory: number
+        storage: number
     }
 }
 
@@ -88,7 +97,7 @@ export class ResourceManager {
     // Quota Management
     createQuota(quota: Omit<ResourceQuota, 'id' | 'currentUsage'>): ResourceQuota {
         const quotaId = `quota-${++this.quotaCounter}`
-        
+
         const newQuota: ResourceQuota = {
             ...quota,
             id: quotaId,
@@ -132,23 +141,67 @@ export class ResourceManager {
         return Array.from(this.quotas.values())
     }
 
-    checkQuotaAvailability(quotaId: string, requiredResources: { cpu: number; memory: number; storage: number; gpu?: number }): boolean {
+    checkQuotaAvailability(quotaId: string, requiredResources: { cpu: number; memory: number; storage: number; gpu?: number }): {
+        available: boolean
+        reason?: string
+        warning?: string
+    } {
         const quota = this.quotas.get(quotaId)
-        if (!quota) return false
+        if (!quota) {
+            return { available: false, reason: 'Quota not found' }
+        }
 
-        return (
-            quota.currentUsage.cpu + requiredResources.cpu <= quota.maxCpu &&
-            quota.currentUsage.memory + requiredResources.memory <= quota.maxMemory &&
-            quota.currentUsage.storage + requiredResources.storage <= quota.maxStorage &&
-            quota.currentUsage.instances + 1 <= quota.maxInstances &&
-            (!requiredResources.gpu || !quota.maxGpu || quota.currentUsage.gpu + requiredResources.gpu <= quota.maxGpu)
-        )
+        // Check hard limits
+        if (quota.currentUsage.cpu + requiredResources.cpu > quota.maxCpu) {
+            return { available: false, reason: 'CPU quota exceeded' }
+        }
+        if (quota.currentUsage.memory + requiredResources.memory > quota.maxMemory) {
+            return { available: false, reason: 'Memory quota exceeded' }
+        }
+        if (quota.currentUsage.storage + requiredResources.storage > quota.maxStorage) {
+            return { available: false, reason: 'Storage quota exceeded' }
+        }
+        if (quota.currentUsage.instances + 1 > quota.maxInstances) {
+            return { available: false, reason: 'Instance quota exceeded' }
+        }
+        if (requiredResources.gpu && quota.maxGpu && quota.currentUsage.gpu + requiredResources.gpu > quota.maxGpu) {
+            return { available: false, reason: 'GPU quota exceeded' }
+        }
+
+        // Check soft limits and generate warnings
+        let warning: string | undefined
+        if (quota.softLimit) {
+            if (quota.softLimit.cpu && quota.currentUsage.cpu + requiredResources.cpu > quota.softLimit.cpu) {
+                warning = 'Approaching CPU soft limit'
+            } else if (quota.softLimit.memory && quota.currentUsage.memory + requiredResources.memory > quota.softLimit.memory) {
+                warning = 'Approaching memory soft limit'
+            } else if (quota.softLimit.storage && quota.currentUsage.storage + requiredResources.storage > quota.softLimit.storage) {
+                warning = 'Approaching storage soft limit'
+            }
+        }
+
+        // Check alert thresholds
+        if (quota.alertThresholds && !warning) {
+            const cpuPercent = ((quota.currentUsage.cpu + requiredResources.cpu) / quota.maxCpu) * 100
+            const memoryPercent = ((quota.currentUsage.memory + requiredResources.memory) / quota.maxMemory) * 100
+            const storagePercent = ((quota.currentUsage.storage + requiredResources.storage) / quota.maxStorage) * 100
+
+            if (cpuPercent > quota.alertThresholds.cpu) {
+                warning = `CPU usage at ${cpuPercent.toFixed(1)}%`
+            } else if (memoryPercent > quota.alertThresholds.memory) {
+                warning = `Memory usage at ${memoryPercent.toFixed(1)}%`
+            } else if (storagePercent > quota.alertThresholds.storage) {
+                warning = `Storage usage at ${storagePercent.toFixed(1)}%`
+            }
+        }
+
+        return { available: true, warning }
     }
 
     // Resource Pool Management
     createPool(pool: Omit<ResourcePool, 'id' | 'allocatedResources' | 'instances'>): ResourcePool {
         const poolId = `pool-${++this.poolCounter}`
-        
+
         const newPool: ResourcePool = {
             ...pool,
             id: poolId,
@@ -221,7 +274,7 @@ export class ResourceManager {
         }
 
         const allocationId = `alloc-${++this.allocationCounter}`
-        
+
         const allocation: ResourceAllocation = {
             id: allocationId,
             instanceId,
@@ -231,7 +284,7 @@ export class ResourceManager {
         }
 
         this.allocations.set(allocationId, allocation)
-        
+
         // Update pool allocation
         pool.allocatedResources.cpu += resources.cpu
         pool.allocatedResources.memory += resources.memory
@@ -262,7 +315,7 @@ export class ResourceManager {
             if (allocation.resources.gpu && pool.allocatedResources.gpu !== undefined) {
                 pool.allocatedResources.gpu -= allocation.resources.gpu
             }
-            
+
             const instanceIndex = pool.instances.indexOf(allocation.instanceId)
             if (instanceIndex > -1) {
                 pool.instances.splice(instanceIndex, 1)
@@ -308,7 +361,7 @@ export class ResourceManager {
         }
     } {
         const pools = this.getPools()
-        
+
         let totalCpu = 0
         let totalMemory = 0
         let totalStorage = 0
@@ -323,7 +376,7 @@ export class ResourceManager {
             totalMemory += pool.availableResources.memory
             totalStorage += pool.availableResources.storage
             totalGpu += pool.availableResources.gpu || 0
-            
+
             allocatedCpu += pool.allocatedResources.cpu
             allocatedMemory += pool.allocatedResources.memory
             allocatedStorage += pool.allocatedResources.storage
@@ -374,13 +427,12 @@ export class ResourceManager {
             cpu: pool.availableResources.cpu > 0 ? (pool.allocatedResources.cpu / pool.availableResources.cpu) * 100 : 0,
             memory: pool.availableResources.memory > 0 ? (pool.allocatedResources.memory / pool.availableResources.memory) * 100 : 0,
             storage: pool.availableResources.storage > 0 ? (pool.allocatedResources.storage / pool.availableResources.storage) * 100 : 0,
-            gpu: pool.availableResources.gpu && pool.allocatedResources.gpu !== undefined ? 
+            gpu: pool.availableResources.gpu && pool.allocatedResources.gpu !== undefined ?
                 (pool.allocatedResources.gpu / pool.availableResources.gpu) * 100 : 0
         }
     }
 
     optimizeResourceAllocation(): void {
-        const pools = this.getPools()
         const utilization = this.getResourceUsage()
 
         log.info(`Resource utilization - CPU: ${utilization.utilization.cpu.toFixed(1)}%, Memory: ${utilization.utilization.memory.toFixed(1)}%`)

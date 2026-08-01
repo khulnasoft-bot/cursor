@@ -4,7 +4,6 @@
  */
 
 import log from 'electron-log'
-import * as path from 'path'
 import type { VisualElement, VisualChange } from './visualEditorService'
 
 export interface CodeChange {
@@ -51,22 +50,26 @@ export class VisualCodeMapper {
 
         try {
             switch (change.type) {
-                case 'property':
+                case 'property': {
                     const propChange = this.mapPropertyChange(change, location)
                     if (propChange) codeChanges.push(propChange)
                     break
-                case 'style':
+                }
+                case 'style': {
                     const styleChange = this.mapStyleChange(change, location)
                     if (styleChange) codeChanges.push(styleChange)
                     break
-                case 'structure':
+                }
+                case 'structure': {
                     const structChange = this.mapStructureChange(change, location)
                     if (structChange) codeChanges.push(structChange)
                     break
-                case 'content':
+                }
+                case 'content': {
                     const contentChange = this.mapContentChange(change, location)
                     if (contentChange) codeChanges.push(contentChange)
                     break
+                }
                 default:
                     errors.push(`Unknown change type: ${change.type}`)
             }
@@ -161,7 +164,7 @@ export class VisualCodeMapper {
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i]
-            
+
             // Simple pattern matching for common patterns
             const componentMatch = line.match(/<(\w+)/)
             if (componentMatch) {
@@ -214,12 +217,12 @@ export class VisualCodeMapper {
         for (const element of elements) {
             if (element.type === 'component') {
                 code += `<${element.name}`
-                
+
                 // Add properties as attributes
                 for (const [key, value] of Object.entries(element.properties)) {
                     code += ` ${key}="${value}"`
                 }
-                
+
                 // Add styles as inline style
                 if (Object.keys(element.styles).length > 0) {
                     const styleString = Object.entries(element.styles)
@@ -227,7 +230,7 @@ export class VisualCodeMapper {
                         .join('; ')
                     code += ` style="${styleString}"`
                 }
-                
+
                 code += '>\n'
             }
         }

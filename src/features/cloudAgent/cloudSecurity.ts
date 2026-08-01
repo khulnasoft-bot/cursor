@@ -110,7 +110,7 @@ export class CloudSecurity {
 
         this.apiKeys.set(apiKeyId, apiKey)
         this.logSecurityEvent('authentication', 'info', `API key created: ${name}`)
-        
+
         log.info(`Created API key: ${name}`)
         return apiKey
     }
@@ -150,7 +150,7 @@ export class CloudSecurity {
 
         apiKey.revoked = true
         this.logSecurityEvent('authentication', 'warning', `API key revoked: ${apiKey.name}`)
-        
+
         log.info(`Revoked API key: ${apiKey.name}`)
         return true
     }
@@ -161,7 +161,7 @@ export class CloudSecurity {
 
         this.apiKeys.delete(apiKeyId)
         this.logSecurityEvent('authentication', 'info', `API key deleted: ${apiKey.name}`)
-        
+
         log.info(`Deleted API key: ${apiKey.name}`)
         return true
     }
@@ -189,7 +189,7 @@ export class CloudSecurity {
         this.revokeApiKey(apiKeyId)
 
         this.logSecurityEvent('authentication', 'info', `API key rotated: ${oldApiKey.name}`)
-        
+
         log.info(`Rotated API key: ${oldApiKey.name}`)
         return newApiKey
     }
@@ -212,7 +212,7 @@ export class CloudSecurity {
 
         this.sessions.set(sessionId, session)
         this.logSecurityEvent('authentication', 'info', `Session created for user: ${userId}`)
-        
+
         log.info(`Created session for user: ${userId}`)
         return session
     }
@@ -246,7 +246,7 @@ export class CloudSecurity {
 
         session.active = false
         this.logSecurityEvent('authentication', 'info', `Session invalidated: ${sessionId}`)
-        
+
         log.info(`Invalidated session: ${sessionId}`)
         return true
     }
@@ -264,13 +264,12 @@ export class CloudSecurity {
     }
 
     // Rate Limiting
-    checkRateLimit(identifier: string): { allowed: boolean; remaining: number; resetTime: Date } {
+    private checkRateLimit(identifier: string): { allowed: boolean; remaining: number; resetTime: Date } {
         if (!this.config.rateLimitingEnabled) {
             return { allowed: true, remaining: Infinity, resetTime: new Date() }
         }
 
         const now = new Date()
-        const windowStart = new Date(now.getTime() - 60 * 1000) // 1 minute window
 
         let rateLimit = this.rateLimitMap.get(identifier)
 

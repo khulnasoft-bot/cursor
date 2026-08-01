@@ -3,7 +3,7 @@
  * Pre-built automation templates for common workflows
  */
 
-import type { AutomationWorkflow, AutomationTrigger, AutomationAction } from './automationService'
+import type { AutomationWorkflow } from './automationService'
 
 export interface AutomationTemplate {
     id: string

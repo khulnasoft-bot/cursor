@@ -6,7 +6,7 @@
 import log from 'electron-log'
 import { getCloudAgentService } from './cloudAgentService'
 import { getResourceManager } from './resourceManager'
-import type { CloudAgentInstance, CloudAgentTask } from './cloudAgentService'
+import type { CloudAgentInstance } from './cloudAgentService'
 
 export interface ScalingPolicy {
     id: string
@@ -18,7 +18,10 @@ export interface ScalingPolicy {
     targetMemoryUtilization: number
     scaleUpCooldown: number // seconds
     scaleDownCooldown: number // seconds
+    scaleUpThreshold: number // percentage above target to scale up
+    scaleDownThreshold: number // percentage below target to scale down
     enabled: boolean
+    lastScaleAction?: Date
 }
 
 export interface ScalingEvent {
@@ -90,7 +93,7 @@ export class ScalingManager {
     // Scaling Policy Management
     createScalingPolicy(policy: Omit<ScalingPolicy, 'id'>): ScalingPolicy {
         const policyId = `policy-${++this.policyCounter}`
-        
+
         const newPolicy: ScalingPolicy = {
             ...policy,
             id: policyId
@@ -162,6 +165,14 @@ export class ScalingManager {
 
         const currentInstanceCount = runningInstances.length
 
+        // Check cooldown period
+        if (policy.lastScaleAction) {
+            const cooldownMs = policy.lastScaleAction.getTime() + (policy.scaleUpCooldown * 1000)
+            if (Date.now() < cooldownMs) {
+                return // Still in cooldown period
+            }
+        }
+
         if (currentInstanceCount === 0) {
             // Scale up to minimum
             if (currentInstanceCount < policy.minInstances) {
@@ -178,15 +189,18 @@ export class ScalingManager {
         let action: 'scale_up' | 'scale_down' | 'no_action' = 'no_action'
         let reason = ''
 
+        const scaleUpThreshold = policy.scaleUpThreshold || 10
+        const scaleDownThreshold = policy.scaleDownThreshold || 20
+
         // Check scale up conditions
-        if (cpuUtil > policy.targetCpuUtilization || memUtil > policy.targetMemoryUtilization) {
+        if (cpuUtil > policy.targetCpuUtilization + scaleUpThreshold || memUtil > policy.targetMemoryUtilization + scaleUpThreshold) {
             if (currentInstanceCount < policy.maxInstances) {
                 action = 'scale_up'
                 reason = `High utilization: CPU ${cpuUtil.toFixed(1)}%, Memory ${memUtil.toFixed(1)}%`
             }
         }
         // Check scale down conditions
-        else if (cpuUtil < policy.targetCpuUtilization * 0.5 && memUtil < policy.targetMemoryUtilization * 0.5) {
+        else if (cpuUtil < policy.targetCpuUtilization - scaleDownThreshold && memUtil < policy.targetMemoryUtilization - scaleDownThreshold) {
             if (currentInstanceCount > policy.minInstances) {
                 action = 'scale_down'
                 reason = `Low utilization: CPU ${cpuUtil.toFixed(1)}%, Memory ${memUtil.toFixed(1)}%`
@@ -228,23 +242,25 @@ export class ScalingManager {
         log.info(`Scaling event: ${action} from ${currentCount} to ${newCount} instances`)
     }
 
-    private async scaleUp(policy: ScalingPolicy, count: number, reason: string): Promise<void> {
+    private async scaleUp(policy: ScalingPolicy, count: number, _reason: string): Promise<void> {
         for (let i = 0; i < count; i++) {
             try {
                 await this.cloudAgentService.provisionInstance(policy.configId)
+                policy.lastScaleAction = new Date()
             } catch (error) {
                 log.error(`Failed to scale up: ${error}`)
             }
         }
     }
 
-    private async scaleDown(policy: ScalingPolicy, count: number, reason: string): Promise<void> {
+    private async scaleDown(policy: ScalingPolicy, count: number, _reason: string): Promise<void> {
         const instances = this.cloudAgentService.getInstancesByConfig(policy.configId)
         const runningInstances = instances.filter(i => i.status === 'running')
 
         for (let i = 0; i < count && i < runningInstances.length; i++) {
             try {
                 await this.cloudAgentService.deprovisionInstance(runningInstances[i].id)
+                policy.lastScaleAction = new Date()
             } catch (error) {
                 log.error(`Failed to scale down: ${error}`)
             }
@@ -254,7 +270,7 @@ export class ScalingManager {
     // Load Balancer Management
     createLoadBalancer(config: Omit<LoadBalancerConfig, 'id'>): LoadBalancerConfig {
         const balancerId = `balancer-${++this.balancerCounter}`
-        
+
         const newBalancer: LoadBalancerConfig = {
             ...config,
             id: balancerId
@@ -320,7 +336,7 @@ export class ScalingManager {
     }
 
     private leastConnectionsSelect(instances: CloudAgentInstance[]): string {
-        const instance = instances.reduce((min, current) => 
+        const instance = instances.reduce((min, current) =>
             current.tasks.length < min.tasks.length ? current : min
         )
         return instance.id
@@ -346,7 +362,7 @@ export class ScalingManager {
 
     private weightedSelect(instances: CloudAgentInstance[]): string {
         // Simple weighted selection based on resources
-        const totalResources = instances.reduce((sum, i) => 
+        const totalResources = instances.reduce((sum, i) =>
             sum + i.resources.cpu + i.resources.memory / 1024, 0
         )
 

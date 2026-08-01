@@ -3,7 +3,7 @@
  * Component for inspecting and selecting visual elements
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import type { VisualElement } from '../../features/visualEditor'
 
 interface ElementInspectorProps {
@@ -27,7 +27,7 @@ export function ElementInspector({ elements, selectedElement, onSelectElement, o
         setExpandedElements(newExpanded)
     }
 
-    const filteredElements = elements.filter(el => 
+    const filteredElements = elements.filter(el =>
         el.name.toLowerCase().includes(filter.toLowerCase()) ||
         el.type.toLowerCase().includes(filter.toLowerCase())
     )

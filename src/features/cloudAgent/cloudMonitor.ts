@@ -6,7 +6,6 @@
 import log from 'electron-log'
 import { getCloudAgentService } from './cloudAgentService'
 import { getResourceManager } from './resourceManager'
-import type { CloudAgentInstance, CloudAgentTask } from './cloudAgentService'
 
 export interface MonitorConfig {
     id: string
@@ -106,7 +105,7 @@ export class CloudMonitor {
     // Monitor Config Management
     createMonitorConfig(config: Omit<MonitorConfig, 'id'>): MonitorConfig {
         const configId = `monitor-${++this.configCounter}`
-        
+
         const newConfig: MonitorConfig = {
             ...config,
             id: configId
@@ -171,7 +170,7 @@ export class CloudMonitor {
         }
     }
 
-    private async getInstanceMetrics(instanceId: string): Promise<MetricData['metrics'] | null> {
+    private async getInstanceMetrics(_instanceId: string): Promise<MetricData['metrics'] | null> {
         // Placeholder for actual metrics collection
         return {
             cpu: Math.random() * 100,
@@ -256,11 +255,11 @@ export class CloudMonitor {
 
     getLogs(instanceId?: string, level?: LogEntry['level']): LogEntry[] {
         let filtered = [...this.logs]
-        
+
         if (instanceId) {
             filtered = filtered.filter(l => l.instanceId === instanceId)
         }
-        
+
         if (level) {
             filtered = filtered.filter(l => l.level === level)
         }
@@ -297,14 +296,14 @@ export class CloudMonitor {
     // Alerts
     private async checkAlertThresholds(instanceId: string, metrics: MetricData['metrics']): Promise<void> {
         const configs = this.getMonitorConfigs()
-        
+
         for (const config of configs.values()) {
             if (!config.alertsEnabled) continue
 
             const thresholds = config.alertThresholds
 
             if (metrics.cpu > thresholds.cpuUtilization) {
-                this.createAlert('warning', 'cpu_utilization', instanceId, 
+                this.createAlert('warning', 'cpu_utilization', instanceId,
                     `CPU utilization exceeded threshold: ${metrics.cpu.toFixed(1)}%`,
                     { current: metrics.cpu, threshold: thresholds.cpuUtilization }
                 )

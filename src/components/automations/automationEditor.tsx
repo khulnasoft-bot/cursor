@@ -18,7 +18,7 @@ export function AutomationEditor({
     workflow,
     onSave,
     onCancel,
-    availableTriggers,
+    availableTriggers: _availableTriggers,
     availableActions
 }: AutomationEditorProps) {
     const [name, setName] = useState('')

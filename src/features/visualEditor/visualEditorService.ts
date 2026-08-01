@@ -146,7 +146,7 @@ export class VisualEditorService {
         return element?.styles[styleProperty] || ''
     }
 
-    findElement(elementId: string): VisualElement | undefined {
+    findElement(_elementId: string): VisualElement | undefined {
         // This would search through the parsed code structure
         // For now, return undefined as placeholder
         return undefined
@@ -182,12 +182,12 @@ export class VisualEditorService {
         return change
     }
 
-    private applyChangeUndo(change: VisualChange): void {
+    private applyChangeUndo(_change: VisualChange): void {
         // This would revert the change in the actual code
         // For now, this is a placeholder
     }
 
-    private applyChangeRedo(change: VisualChange): void {
+    private applyChangeRedo(_change: VisualChange): void {
         // This would reapply the change in the actual code
         // For now, this is a placeholder
     }
@@ -232,19 +232,19 @@ export class VisualEditorService {
         }
     }
 
-    parseCodeToElements(code: string, filePath: string): VisualElement[] {
+    parseCodeToElements(_code: string, _filePath: string): VisualElement[] {
         // This would parse the code and extract visual elements
         // For now, return empty array as placeholder
         return []
     }
 
-    generateCodeFromElements(elements: VisualElement[]): string {
+    generateCodeFromElements(_elements: VisualElement[]): string {
         // This would generate code from visual elements
         // For now, return empty string as placeholder
         return ''
     }
 
-    mapVisualToCode(change: VisualChange): {
+    mapVisualToCode(_change: VisualChange): {
         codeChange: {
             filePath: string
             line: number

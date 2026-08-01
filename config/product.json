@@ -1,0 +1,74 @@
+{
+  "name": "Cursor",
+  "version": "3.9.16",
+  "ai": {
+    "defaultModel": "gpt-4",
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "streamingEnabled": true,
+    "temperature": 0.7,
+    "maxTokens": 4096,
+    "rateLimits": {
+      "requestsPerMinute": 60,
+      "tokensPerMinute": 90000
+    }
+  },
+  "analytics": {
+    "statsig": {
+      "enabled": false,
+      "apiKey": ""
+    },
+    "posthog": {
+      "enabled": false,
+      "apiKey": ""
+    }
+  },
+  "extensions": {
+    "replacementMap": {
+      "vscode.python": "cursor-python",
+      "vscode.jupyter": "cursor-jupyter",
+      "vscode.git": "cursor-commits"
+    },
+    "versionConstraints": {
+      "minimumVersion": "1.0.0",
+      "maximumVersion": "2.0.0"
+    },
+    "marketplace": {
+      "enabled": false,
+      "endpoint": ""
+    }
+  },
+  "server": {
+    "tunnel": {
+      "enabled": false,
+      "endpoint": ""
+    },
+    "remote": {
+      "enabled": false,
+      "sshConfigPath": "~/.ssh/config"
+    }
+  },
+  "updates": {
+    "autoUpdate": true,
+    "updateUrl": "https://cursor.so/updates",
+    "channel": "stable"
+  },
+  "licensing": {
+    "enabled": false,
+    "endpoint": "",
+    "trialDays": 30
+  },
+  "features": {
+    "debugger": {
+      "enabled": true,
+      "supportedLanguages": ["node", "node2", "python"]
+    },
+    "notebook": {
+      "enabled": false,
+      "supportedKernels": ["python3"]
+    },
+    "webview": {
+      "enabled": false,
+      "securityPolicy": "strict"
+    }
+  }
+}

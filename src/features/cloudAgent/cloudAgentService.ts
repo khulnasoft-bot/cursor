@@ -50,6 +50,8 @@ export interface CloudAgentTask {
     startedAt?: Date
     completedAt?: Date
     executionTime?: number
+    retryCount?: number
+    maxRetries?: number
 }
 
 export class CloudAgentService {
@@ -118,7 +120,7 @@ export class CloudAgentService {
         }
 
         const instanceId = `instance-${++this.instanceCounter}`
-        
+
         const instance: CloudAgentInstance = {
             id: instanceId,
             configId,
@@ -145,12 +147,12 @@ export class CloudAgentService {
     private async simulateProvisioning(instance: CloudAgentInstance): Promise<void> {
         // Placeholder for actual cloud provisioning
         await new Promise(resolve => setTimeout(resolve, 2000))
-        
+
         instance.status = 'running'
         instance.startedAt = new Date()
         instance.ipAddress = '192.168.1.100'
         instance.endpoint = `https://agent-${instance.id}.cloud.example.com`
-        
+
         log.info(`Cloud agent instance ${instance.id} is now running`)
     }
 
@@ -166,7 +168,7 @@ export class CloudAgentService {
 
         instance.status = 'stopped'
         instance.stoppedAt = new Date()
-        
+
         log.info(`Cloud agent instance ${instanceId} deprovisioned`)
         return true
     }
@@ -187,21 +189,23 @@ export class CloudAgentService {
         return this.getInstances().filter(i => i.status === 'running')
     }
 
-    async submitTask(instanceId: string, payload: any, priority: number = 0): Promise<CloudAgentTask> {
+    async submitTask(instanceId: string, payload: any, priority: number = 0, maxRetries: number = 3): Promise<CloudAgentTask> {
         const instance = this.instances.get(instanceId)
         if (!instance || instance.status !== 'running') {
             throw new Error(`Instance not available: ${instanceId}`)
         }
 
         const taskId = `task-${++this.taskCounter}`
-        
+
         const task: CloudAgentTask = {
             id: taskId,
             instanceId,
             status: 'queued',
             priority,
             payload,
-            createdAt: new Date()
+            createdAt: new Date(),
+            retryCount: 0,
+            maxRetries
         }
 
         this.tasks.set(taskId, task)
@@ -216,18 +220,51 @@ export class CloudAgentService {
     }
 
     private async executeTask(task: CloudAgentTask): Promise<void> {
-        task.status = 'running'
-        task.startedAt = new Date()
+        const maxRetries = task.maxRetries || 3
+        let attempt = 0
+        let lastError: Error | null = null
 
-        // Placeholder for actual task execution
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        while (attempt <= maxRetries) {
+            attempt = (task.retryCount || 0) + 1
+            task.status = 'running'
+            task.startedAt = new Date()
 
-        task.status = 'completed'
-        task.completedAt = new Date()
-        task.executionTime = task.completedAt.getTime() - task.startedAt.getTime()
-        task.result = { success: true, output: 'Task completed' }
+            try {
+                // Placeholder for actual task execution
+                await new Promise(resolve => setTimeout(resolve, 1000))
 
-        log.info(`Task ${task.id} completed in ${task.executionTime}ms`)
+                // Simulate random failure for retry demonstration
+                if (Math.random() < 0.2 && attempt <= maxRetries) {
+                    throw new Error('Simulated task failure')
+                }
+
+                task.status = 'completed'
+                task.completedAt = new Date()
+                task.executionTime = task.completedAt.getTime() - task.startedAt.getTime()
+                task.result = { success: true, output: 'Task completed' }
+
+                log.info(`Task ${task.id} completed in ${task.executionTime}ms (attempt ${attempt})`)
+                return
+            } catch (error) {
+                lastError = error instanceof Error ? error : new Error('Unknown error')
+                task.retryCount = attempt
+                task.error = lastError.message
+
+                log.warn(`Task ${task.id} failed on attempt ${attempt}: ${lastError.message}`)
+
+                if (attempt >= maxRetries) {
+                    task.status = 'failed'
+                    task.completedAt = new Date()
+                    task.executionTime = task.completedAt.getTime() - task.startedAt.getTime()
+                    log.error(`Task ${task.id} failed after ${maxRetries} retries`)
+                    return
+                }
+
+                // Exponential backoff
+                const backoffTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000)
+                await new Promise(resolve => setTimeout(resolve, backoffTime))
+            }
+        }
     }
 
     cancelTask(taskId: string): boolean {

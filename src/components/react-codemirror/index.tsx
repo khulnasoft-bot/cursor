@@ -34,10 +34,10 @@ export interface ReactCodeMirrorProps
     /** Enables a placeholder—a piece of example content to show when the editor is empty. */
     placeholder?: string | HTMLElement
     /**
-     * `light` / `dark` / `Extension` Defaults to `light`.
+     * `light` / `dark` / `cursor-dark` / `cursor-light` / `cursor-dark-midnight` / `none` / `Extension` Defaults to `light`.
      * @default light
      */
-    theme?: 'light' | 'dark' | 'none' | Extension
+    theme?: 'light' | 'dark' | 'cursor-dark' | 'cursor-light' | 'cursor-dark-midnight' | 'none' | Extension
     /**
      * Whether to optional basicSetup by default
      * @default true

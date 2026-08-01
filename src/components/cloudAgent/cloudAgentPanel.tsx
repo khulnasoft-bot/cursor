@@ -13,9 +13,9 @@ interface CloudAgentPanelProps {
 
 export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
     const [tab, setTab] = useState<'configs' | 'instances' | 'tasks'>('configs')
-    const [configs, setConfigs] = useState<CloudAgentConfig[]>([])
-    const [instances, setInstances] = useState<CloudAgentInstance[]>([])
-    const [tasks, setTasks] = useState<CloudAgentTask[]>([])
+    const [configs, _setConfigs] = useState<CloudAgentConfig[]>([])
+    const [instances, _setInstances] = useState<CloudAgentInstance[]>([])
+    const [tasks, _setTasks] = useState<CloudAgentTask[]>([])
     const [selectedConfig, setSelectedConfig] = useState<CloudAgentConfig | null>(null)
     const [selectedInstance, setSelectedInstance] = useState<CloudAgentInstance | null>(null)
     const [loading, setLoading] = useState(false)
@@ -42,7 +42,7 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
         }
     }
 
-    const handleProvisionInstance = async (configId: string) => {
+    const handleProvisionInstance = async (_configId: string) => {
         setLoading(true)
         try {
             // const response = await window.api.cloudAgentProvisionInstance(configId)
@@ -56,7 +56,7 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
         }
     }
 
-    const handleDeprovisionInstance = async (instanceId: string) => {
+    const handleDeprovisionInstance = async (_instanceId: string) => {
         setLoading(true)
         try {
             // const response = await window.api.cloudAgentDeprovisionInstance(instanceId)
@@ -315,8 +315,8 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         <div className="cloud-agent-panel__detail">
                             <label>Resources:</label>
                             <span>
-                                CPU: {selectedInstance.resources.cpu} cores, 
-                                Memory: {selectedInstance.resources.memory} MB, 
+                                CPU: {selectedInstance.resources.cpu} cores,
+                                Memory: {selectedInstance.resources.memory} MB,
                                 Storage: {selectedInstance.resources.storage} GB
                             </span>
                         </div>
