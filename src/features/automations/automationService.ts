@@ -254,8 +254,15 @@ export class AutomationService {
         }
 
         log.info(`Executing command: ${finalCommand}`)
-        // Placeholder for actual command execution
-        return `Executed: ${finalCommand}`
+        try {
+            // Placeholder for actual command execution
+            // TODO: Implement actual command execution with proper error handling
+            return `Executed: ${finalCommand}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Command execution failed: ${errorMsg}`)
+            throw new Error(`Command execution failed: ${errorMsg}`)
+        }
     }
 
     private async executeScriptAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
@@ -264,8 +271,15 @@ export class AutomationService {
         if (!scriptPath) throw new Error('Script path not specified')
 
         log.info(`Executing script: ${scriptPath}`)
-        // Placeholder for actual script execution
-        return `Executed script: ${scriptPath}`
+        try {
+            // Placeholder for actual script execution
+            // TODO: Implement actual script execution with proper error handling
+            return `Executed script: ${scriptPath}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Script execution failed: ${errorMsg}`)
+            throw new Error(`Script execution failed: ${errorMsg}`)
+        }
     }
 
     private async executeAiTaskAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
@@ -282,8 +296,15 @@ export class AutomationService {
         }
 
         log.info(`Executing AI task: ${finalPrompt}`)
-        // Placeholder for actual AI task execution
-        return `AI task completed: ${finalPrompt}`
+        try {
+            // Placeholder for actual AI task execution
+            // TODO: Implement actual AI task execution with proper error handling
+            return `AI task completed: ${finalPrompt}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`AI task execution failed: ${errorMsg}`)
+            throw new Error(`AI task execution failed: ${errorMsg}`)
+        }
     }
 
     private async executeNotificationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
@@ -300,8 +321,15 @@ export class AutomationService {
         }
 
         log.info(`Sending notification: ${finalMessage}`)
-        // Placeholder for actual notification
-        return `Notification sent: ${finalMessage}`
+        try {
+            // Placeholder for actual notification
+            // TODO: Implement actual notification sending with proper error handling
+            return `Notification sent: ${finalMessage}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Notification sending failed: ${errorMsg}`)
+            throw new Error(`Notification sending failed: ${errorMsg}`)
+        }
     }
 
     private async executeFileOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
@@ -310,8 +338,15 @@ export class AutomationService {
         if (!operation) throw new Error('Operation not specified')
 
         log.info(`Executing file operation: ${operation}`)
-        // Placeholder for actual file operation
-        return `File operation completed: ${operation}`
+        try {
+            // Placeholder for actual file operation
+            // TODO: Implement actual file operation with proper error handling
+            return `File operation completed: ${operation}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`File operation failed: ${errorMsg}`)
+            throw new Error(`File operation failed: ${errorMsg}`)
+        }
     }
 
     private async executeGitOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
@@ -320,8 +355,15 @@ export class AutomationService {
         if (!operation) throw new Error('Operation not specified')
 
         log.info(`Executing git operation: ${operation}`)
-        // Placeholder for actual git operation
-        return `Git operation completed: ${operation}`
+        try {
+            // Placeholder for actual git operation
+            // TODO: Implement actual git operation with proper error handling
+            return `Git operation completed: ${operation}`
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Git operation failed: ${errorMsg}`)
+            throw new Error(`Git operation failed: ${errorMsg}`)
+        }
     }
 
     getExecution(executionId: string): AutomationExecution | undefined {
