@@ -409,6 +409,7 @@ export function InnerCommandPalette({
                     }, 100)
                     // setShowing(false)
                 } else {
+                    // Handle other cases if needed
                 }
             }
             // click the hidden combo button
@@ -480,7 +481,7 @@ export function InnerCommandPalette({
         <>
             {openingTrigger && (
                 <div
-                    className="absolute top-2.5 left-1/2 
+                    className="absolute top-2.5 left-1/2
                 transform -translate-x-1/2 z-50"
                     style={{ display: showing ? 'block' : 'none' }}
                     id="fileSearchId"
@@ -488,7 +489,7 @@ export function InnerCommandPalette({
                     <Combobox value={selected} onChange={setSelected}>
                         <div ref={fullComboRef}>
                             <Combobox.Input
-                                className="w-[36rem] bg-neutral-700 rounded-md 
+                                className="w-[36rem] bg-neutral-700 rounded-md
                         text-white py-0.5 px-1 !outline-none"
                                 placeholder="Enter command..."
                                 displayValue={(command: Command) =>
@@ -506,7 +507,7 @@ export function InnerCommandPalette({
                                 ref={comboBtn}
                             ></Combobox.Button>
                             <Combobox.Options
-                                className="absolute mt-1 w-full 
+                                className="absolute mt-1 w-full
                         overflow-auto rounded-md bg-neutral-800 z-[50] command_result_area"
                                 ref={comboOptionsRef}
                             >

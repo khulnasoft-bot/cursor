@@ -23,15 +23,15 @@ import {
     undo,
 } from '@codemirror/commands'
 
-interface Pos {
+interface IPos {
     line: number
     ch: number
 }
 interface CM5Range {
-    anchor: Pos
-    head: Pos
+    anchor: IPos
+    head: IPos
 }
-function indexFromPos(doc: Text, pos: Pos): number {
+function indexFromPos(doc: Text, pos: IPos): number {
     let ch = pos.ch
     let lineNumber = pos.line + 1
     if (lineNumber < 1) {
@@ -45,18 +45,20 @@ function indexFromPos(doc: Text, pos: Pos): number {
     const line = doc.line(lineNumber)
     return Math.min(line.from + Math.max(0, ch), line.to)
 }
-function posFromIndex(doc: Text, offset: number): Pos {
+function posFromIndex(doc: Text, offset: number): IPos {
     const line = doc.lineAt(offset)
     return { line: line.number - 1, ch: offset - line.from }
 }
 class Pos {
+    line: number
+    ch: number
     constructor(line: number, ch: number) {
         this.line = line
         this.ch = ch
     }
 }
 
-function on(emitter: any, type: string, f: Function) {
+function on(emitter: any, type: string, f: (...args: any[]) => void) {
     if (emitter.addEventListener) {
         emitter.addEventListener(type, f, false)
     } else {
@@ -65,7 +67,7 @@ function on(emitter: any, type: string, f: Function) {
     }
 }
 
-function off(emitter: any, type: string, f: Function) {
+function off(emitter: any, type: string, f: (...args: any[]) => void) {
     if (emitter.removeEventListener) {
         emitter.removeEventListener(type, f, false)
     } else {
@@ -128,11 +130,11 @@ try {
 interface Operation {
     $d: number
     isVimOp?: boolean
-    cursorActivityHandlers?: Function[]
+    cursorActivityHandlers?: ((...args: any[]) => void)[]
     cursorActivity?: boolean
     lastChange?: any
     change?: any
-    changeHandlers?: Function[]
+    changeHandlers?: ((...args: any[]) => void)[]
     $changeStart?: number
 }
 
@@ -195,7 +197,7 @@ export class CodeMirror {
             indentSelection(cm.cm6)
         },
     }
-    static defineOption = function (name: string, val: any, setter: Function) {}
+    static defineOption = function (name: string, val: any, setter: (...args: any[]) => void) {}
     static isWordChar = function (ch: string) {
         return wordChar.test(ch)
     }
@@ -276,7 +278,7 @@ export class CodeMirror {
     static lookupKey = function lookupKey(
         key: string,
         map: string,
-        handle: Function
+        handle: (result: any) => void
     ) {
         const result = CodeMirror.keys[key]
         if (result) handle(result)
@@ -287,7 +289,7 @@ export class CodeMirror {
     static signal = signal
 
     // --------------------------
-    openDialog(template: Element, callback: Function, options: any) {
+    openDialog(template: Element, callback: (...args: any[]) => void, options: any) {
         return openDialog(this, template, callback, options)
     }
     openNotification(template: Node, options: NotificationOptions) {
@@ -304,7 +306,7 @@ export class CodeMirror {
         dialog?: Element | null
         vimPlugin?: any
         vim?: any
-        currentNotificationClose?: Function | null
+        currentNotificationClose?: (() => void) | null
         keyMap?: string
         overwrite?: boolean
     } = {}
@@ -319,10 +321,10 @@ export class CodeMirror {
         this.onSelectionChange = this.onSelectionChange.bind(this)
     }
 
-    on(type: string, f: Function) {
+    on(type: string, f: (...args: any[]) => void) {
         on(this, type, f)
     }
-    off(type: string, f: Function) {
+    off(type: string, f: (...args: any[]) => void) {
         off(this, type, f)
     }
     signal(type: string, e: any, handlers?: any) {
@@ -583,6 +585,7 @@ export class CodeMirror {
     }
 
     getSearchCursor(query: RegExp, pos: Pos) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const cm = this
         type CM6Result = { from: number; to: number; match: string[] } | null
         type CM5Result = { from: Pos; to: Pos; match: string[] } | null
@@ -622,7 +625,7 @@ export class CodeMirror {
             const doc = cm.cm6.state.doc
             for (let size = 1; ; size++) {
                 const start = Math.max(from, to - size * ChunkSize)
-                let cursor = rCursor(doc, start, to),
+                const cursor = rCursor(doc, start, to),
                     range: CM6Result = null
                 while (!cursor.next().done) range = cursor.value
                 if (range && (start == from || range.from > start + 10))
@@ -635,7 +638,7 @@ export class CodeMirror {
                 return this.find(false)
             },
             findPrevious: function () {
-                return this.find(true)
+                return this.find(false)
             },
             find: function (back?: boolean): string[] | null | undefined {
                 const doc = cm.cm6.state.doc
@@ -857,11 +860,12 @@ export class CodeMirror {
                 this._handlers['cursorActivity'].slice()
         this.curOp.cursorActivity = true
     }
-    operation(fn: Function) {
+    operation(fn: () => void) {
         if (!this.curOp) this.curOp = { $d: 0 }
         this.curOp.$d++
+        let result: any
         try {
-            var result = fn()
+            result = fn()
         } finally {
             if (this.curOp) {
                 this.curOp.$d--
@@ -961,7 +965,7 @@ export class CodeMirror {
         return !!this.virtualSelection
     }
     virtualSelection: EditorSelection | null = null
-    forEachSelection(command: Function) {
+    forEachSelection(command: (range: any) => void) {
         const selection = this.cm6.state.selection
         this.virtualSelection = EditorSelection.create(
             selection.ranges,
@@ -971,7 +975,7 @@ export class CodeMirror {
             const range = this.virtualSelection.ranges[i]
             if (!range) continue
             this.cm6.dispatch({ selection: EditorSelection.create([range]) })
-            command()
+            command(range)
             ;(this.virtualSelection as any).ranges[i] =
                 this.cm6.state.selection.ranges[0]
         }
@@ -988,7 +992,7 @@ function dialogDiv(cm: CodeMirror, template: Node, bottom?: boolean) {
     return dialog
 }
 
-function closeNotification(cm: CodeMirror, newVal?: Function) {
+function closeNotification(cm: CodeMirror, newVal?: () => void) {
     if (cm.state.currentNotificationClose) cm.state.currentNotificationClose()
     cm.state.currentNotificationClose = newVal
 }
@@ -1055,7 +1059,7 @@ function hideDialog(cm: CodeMirror, dialog: Element) {
 function openDialog(
     me: CodeMirror,
     template: Element,
-    callback: Function,
+    callback: (...args: any[]) => void,
     options: any
 ) {
     if (!options) options = {}
@@ -1080,7 +1084,7 @@ function openDialog(
         }
     }
 
-    var inp = dialog.getElementsByTagName('input')[0]
+    const inp = dialog.getElementsByTagName('input')[0]
     if (inp) {
         if (options.value) {
             inp.value = options.value
@@ -1159,11 +1163,12 @@ function scanForBracket(
         dir > 0
             ? Math.min(where.line + maxScanLines, cm.lastLine() + 1)
             : Math.max(cm.firstLine() - 1, where.line - maxScanLines)
-    for (var lineNo = where.line; lineNo != lineEnd; lineNo += dir) {
+    let lineNo = where.line
+    for (; lineNo != lineEnd; lineNo += dir) {
         const line = cm.getLine(lineNo)
         if (!line) continue
-        let pos = dir > 0 ? 0 : line.length - 1,
-            end = dir > 0 ? line.length : -1
+        let pos = dir > 0 ? 0 : line.length - 1
+        const end = dir > 0 ? line.length : -1
         if (line.length > maxScanLen) continue
         if (lineNo == where.line) pos = where.ch - (dir < 0 ? 1 : 0)
         for (; pos != end; pos += dir) {

@@ -389,6 +389,7 @@ export function customDispatch(view: EditorView, tr: Transaction) {
     const timeTaken = end - start
 
     if (timeTaken > 30) {
+        // Performance threshold exceeded - consider optimization
     }
 }
 
