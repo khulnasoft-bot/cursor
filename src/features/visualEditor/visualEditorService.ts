@@ -56,6 +56,10 @@ export class VisualEditorService {
     }
     private elementCounter = 0
     private changeCounter = 0
+    private changeStats = {
+        byAuthor: new Map<string, number>(),
+        byType: new Map<string, number>()
+    }
 
     activate(): void {
         this.state.active = true
@@ -115,6 +119,7 @@ export class VisualEditorService {
         this.state.changes.push(change)
         this.state.undoStack.push(change)
         this.state.redoStack = []
+        this.invalidateChangeStats(change)
 
         log.info(`Updated element property: ${property} = ${value}`)
         return change
@@ -137,6 +142,7 @@ export class VisualEditorService {
         this.state.changes.push(change)
         this.state.undoStack.push(change)
         this.state.redoStack = []
+        this.invalidateChangeStats(change)
 
         log.info(`Updated element style: ${styleProperty} = ${value}`)
         return change
@@ -150,6 +156,19 @@ export class VisualEditorService {
     private getElementStyle(elementId: string, styleProperty: string): string {
         const element = this.findElement(elementId)
         return element?.styles[styleProperty] || ''
+    }
+
+    private invalidateChangeStats(change: VisualChange): void {
+        if (change.author) {
+            this.changeStats.byAuthor.set(
+                change.author,
+                (this.changeStats.byAuthor.get(change.author) || 0) + 1
+            )
+        }
+        this.changeStats.byType.set(
+            change.type,
+            (this.changeStats.byType.get(change.type) || 0) + 1
+        )
     }
 
     findElement(_elementId: string): VisualElement | undefined {
@@ -237,6 +256,8 @@ export class VisualEditorService {
         this.state.changes = []
         this.state.undoStack = []
         this.state.redoStack = []
+        this.changeStats.byAuthor.clear()
+        this.changeStats.byType.clear()
         log.info('Cleared all changes')
     }
 
@@ -250,11 +271,11 @@ export class VisualEditorService {
         const byAuthor: Record<string, number> = {}
         const byType: Record<string, number> = {}
 
-        for (const change of this.state.changes) {
-            if (change.author) {
-                byAuthor[change.author] = (byAuthor[change.author] || 0) + 1
-            }
-            byType[change.type] = (byType[change.type] || 0) + 1
+        for (const [author, count] of this.changeStats.byAuthor) {
+            byAuthor[author] = count
+        }
+        for (const [type, count] of this.changeStats.byType) {
+            byType[type] = count
         }
 
         return {
