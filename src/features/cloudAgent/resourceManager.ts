@@ -72,8 +72,10 @@ export interface ResourceAllocation {
 export class ResourceManager {
     private cloudAgentService = getCloudAgentService()
     private executionEnvironment = getExecutionEnvironment()
-    private quotas: Map<string, ResourceQuota> = new Map()
-    private pools: Map<string, ResourcePool> = new Map()
+    private quotas = new Map<string, ResourceQuota>()
+    private pools = new Map<string, ResourcePool>()
+    private quotaCache = new Map<string, { timestamp: number; result: ReturnType<typeof this.checkQuotaAvailability> }>()
+    private readonly CACHE_TTL = 1000 // 1 second cache TTL
     private allocations: Map<string, ResourceAllocation> = new Map()
     private quotaCounter = 0
     private poolCounter = 0
@@ -146,6 +148,12 @@ export class ResourceManager {
         reason?: string
         warning?: string
     } {
+        const cacheKey = `${quotaId}:${JSON.stringify(requiredResources)}`
+        const cached = this.quotaCache.get(cacheKey)
+        if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+            return cached.result
+        }
+
         const quota = this.quotas.get(quotaId)
         if (!quota) {
             return { available: false, reason: 'Quota not found' }
@@ -195,7 +203,9 @@ export class ResourceManager {
             }
         }
 
-        return { available: true, warning }
+        const result = { available: true, warning }
+        this.quotaCache.set(cacheKey, { timestamp: Date.now(), result })
+        return result
     }
 
     // Resource Pool Management
