@@ -30,6 +30,8 @@ import { ChatPopup, CommandBar } from './components/markdown'
 import { SettingsPopup } from './components/settingsPane'
 import { FeedbackArea, LeftSide } from './components/search'
 import { ComposerPanel } from './components/composer/composerPanel'
+import { AutomationEditor } from './components/automations/automationEditor'
+import { CloudAgentPanel } from './components/cloudAgent/cloudAgentPanel'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { openComposerPanel, closeComposerPanel } from './features/tools/toolSlice'
 import { WelcomeScreen } from './components/welcomeScreen'
@@ -177,6 +179,9 @@ export function App() {
     const folders = useAppSelector(getFolders)
     const leftSideExpanded = useAppSelector(tsel.getLeftSideExpanded)
     const composerPanelOpen = useAppSelector((state: FullState) => state.toolState.composerPanelOpen)
+
+    const [automationPanelOpen, setAutomationPanelOpen] = useState(false)
+    const [cloudAgentPanelOpen, setCloudAgentPanelOpen] = useState(false)
 
     const paneSplits = useAppSelector(getPaneStateBySplits)
 
@@ -339,6 +344,17 @@ export function App() {
                             isOpen={composerPanelOpen}
                             onClose={() => dispatch(closeComposerPanel())}
                             projectPath={rootPath || ''}
+                        />
+                        <AutomationEditor
+                            workflow={null}
+                            onSave={() => setAutomationPanelOpen(false)}
+                            onCancel={() => setAutomationPanelOpen(false)}
+                            availableTriggers={[]}
+                            availableActions={[]}
+                        />
+                        <CloudAgentPanel
+                            isOpen={cloudAgentPanelOpen}
+                            onClose={() => setCloudAgentPanelOpen(false)}
                         />
                     </>
                 )}
