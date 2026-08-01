@@ -137,23 +137,36 @@ export class CloudAgentService {
         this.instances.set(instanceId, instance)
         log.info(`Provisioning cloud agent instance: ${instanceId}`)
 
-        // Simulate provisioning process
-        instance.status = 'starting'
-        await this.simulateProvisioning(instance)
-
-        return instance
+        try {
+            // Simulate provisioning process
+            instance.status = 'starting'
+            await this.simulateProvisioning(instance)
+            return instance
+        } catch (error) {
+            instance.status = 'failed'
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Failed to provision instance ${instanceId}: ${errorMsg}`)
+            throw new Error(`Instance provisioning failed: ${errorMsg}`)
+        }
     }
 
     private async simulateProvisioning(instance: CloudAgentInstance): Promise<void> {
-        // Placeholder for actual cloud provisioning
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        try {
+            // Placeholder for actual cloud provisioning
+            // TODO: Implement actual cloud provisioning with proper error handling
+            await new Promise(resolve => setTimeout(resolve, 2000))
 
-        instance.status = 'running'
-        instance.startedAt = new Date()
-        instance.ipAddress = '192.168.1.100'
-        instance.endpoint = `https://agent-${instance.id}.cloud.example.com`
+            instance.status = 'running'
+            instance.startedAt = new Date()
+            instance.ipAddress = '192.168.1.100'
+            instance.endpoint = `https://agent-${instance.id}.cloud.example.com`
 
-        log.info(`Cloud agent instance ${instance.id} is now running`)
+            log.info(`Cloud agent instance ${instance.id} is now running`)
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Provisioning simulation failed: ${errorMsg}`)
+            throw error
+        }
     }
 
     async deprovisionInstance(instanceId: string): Promise<boolean> {
@@ -163,14 +176,22 @@ export class CloudAgentService {
         instance.status = 'stopping'
         log.info(`Deprovisioning cloud agent instance: ${instanceId}`)
 
-        // Simulate deprovisioning process
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        try {
+            // Simulate deprovisioning process
+            // TODO: Implement actual deprovisioning with proper error handling
+            await new Promise(resolve => setTimeout(resolve, 1000))
 
-        instance.status = 'stopped'
-        instance.stoppedAt = new Date()
+            instance.status = 'stopped'
+            instance.stoppedAt = new Date()
 
-        log.info(`Cloud agent instance ${instanceId} deprovisioned`)
-        return true
+            log.info(`Cloud agent instance ${instanceId} deprovisioned`)
+            return true
+        } catch (error) {
+            instance.status = 'failed'
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            log.error(`Failed to deprovision instance ${instanceId}: ${errorMsg}`)
+            throw new Error(`Instance deprovisioning failed: ${errorMsg}`)
+        }
     }
 
     getInstance(instanceId: string): CloudAgentInstance | undefined {
