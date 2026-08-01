@@ -1,5 +1,5 @@
-Invoke-WebRequest -Uri https://cursor-github.s3.us-west-1.amazonaws.com/resources.zip -o ./resources.zip
-Invoke-WebRequest -Uri https://cursor-github.s3.us-west-1.amazonaws.com/lsp.zip -o ./lsp.zip
+Invoke-WebRequest -Uri https://github.com/khulnasoft-bot/cursor/releases/download/beta/resources.zip -o ./resources.zip
+Invoke-WebRequest -Uri https://github.com/khulnasoft-bot/cursor/releases/download/beta/lsp.zip -o ./lsp.zip
 
 Expand-Archive -Path ./resources.zip -DestinationPath ./
 Expand-Archive -Path ./lsp.zip -DestinationPath ./
