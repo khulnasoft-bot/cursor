@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm *)",
+      "Bash(git *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(electron *)",
+      "Bash(electron-forge *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(fd *)",
+      "Bash(find *)",
+      "ReadFile(*)",
+      "WriteToFile(*)",
+      "Edit(*)",
+      "MultiEdit(*)",
+      "GrepSearch(*)",
+      "FindByName(*)",
+      "ListDir(*)"
+    ],
+    "prompt": [
+      "Bash(rm *)",
+      "Bash(rmdir *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(chmod *)",
+      "Bash(chown *)",
+      "Bash(sudo *)",
+      "Bash(*) install *",
+      "Bash(*) uninstall *"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/worktree.mts"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "sonnet"
+}

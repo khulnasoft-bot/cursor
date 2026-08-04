@@ -1,0 +1,13 @@
+{
+  "setup-worktree-unix": [
+    "npm ci",
+    "./setup.sh"
+  ],
+  "setup-worktree-windows": [
+    "npm ci",
+    "./setup.ps1"
+  ],
+  "setup-worktree": [
+    "npm ci"
+  ]
+}

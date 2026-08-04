@@ -1,0 +1,35 @@
+{
+  "name": "@cursor/ai-service",
+  "version": "1.0.0",
+  "description": "Multi-provider AI service with streaming, tool calling, and context management",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "cursor",
+    "ai-service",
+    "openai",
+    "anthropic",
+    "gemini",
+    "llm",
+    "artificial-intelligence"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.0.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

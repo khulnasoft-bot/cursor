@@ -1,0 +1,33 @@
+{
+  "name": "@cursor/composer",
+  "version": "1.0.0",
+  "description": "Multi-file editing orchestration engine for coordinated changes across files",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "cursor",
+    "composer",
+    "multi-file",
+    "orchestration",
+    "diff"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.0.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

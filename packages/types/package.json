@@ -1,0 +1,27 @@
+{
+  "name": "@cursor/types",
+  "version": "1.0.0",
+  "description": "TypeScript type definitions for Cursor components",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cursor",
+    "types",
+    "typescript",
+    "definitions"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

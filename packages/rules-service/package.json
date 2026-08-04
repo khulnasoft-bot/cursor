@@ -1,0 +1,33 @@
+{
+  "name": "@cursor/rules-service",
+  "version": "1.0.0",
+  "description": "Code analysis rules engine for team conventions and code quality",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "cursor",
+    "rules",
+    "code-quality",
+    "linting",
+    "conventions"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.0.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

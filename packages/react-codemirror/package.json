@@ -1,0 +1,34 @@
+{
+  "name": "@cursor/react-codemirror",
+  "version": "1.0.0",
+  "description": "React wrapper for CodeMirror 6 with Cursor-specific theming",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cursor",
+    "codemirror",
+    "react",
+    "editor",
+    "code-editor"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.5.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

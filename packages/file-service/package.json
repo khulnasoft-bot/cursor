@@ -1,0 +1,32 @@
+{
+  "name": "@cursor/file-service",
+  "version": "1.0.0",
+  "description": "File indexing and search service with caching and incremental updates",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "cursor",
+    "file-service",
+    "indexing",
+    "search",
+    "file-system"
+  ],
+  "author": "Cursor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

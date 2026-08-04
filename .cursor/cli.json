@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "permissions": {
+    "allow": [
+      "Shell(npm *)",
+      "Shell(git *)",
+      "Shell(node *)",
+      "Shell(npx *)",
+      "Shell(electron *)",
+      "Shell(electron-forge *)",
+      "Shell(ls *)",
+      "Shell(cat *)",
+      "Shell(head *)",
+      "Shell(tail *)",
+      "Shell(grep *)",
+      "Shell(rg *)",
+      "Shell(fd *)",
+      "Shell(find *)",
+      "Shell(mkdir *)",
+      "Shell(test *)",
+      "Shell(echo *)",
+      "Shell(pwd *)",
+      "Shell(cd *)",
+      "ReadFile(*)",
+      "WriteToFile(*)",
+      "Edit(*)",
+      "MultiEdit(*)",
+      "GrepSearch(*)",
+      "FindByName(*)",
+      "ListDir(*)"
+    ],
+    "deny": [
+      "Shell(sudo *)",
+      "Shell(rm -rf *)",
+      "Shell(chmod 777 *)"
+    ]
+  }
+}
