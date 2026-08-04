@@ -6,30 +6,72 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
       - name: Validate packages
         run: ./validate-all-packages.sh
 
-  build:
-    runs-on: ubuntu-latest
+  build-and-test:
     needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      
-      - name: Build packages
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Setup script for macOS/Linux
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: ./setup.sh
+
+      - name: Setup script for Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: pwsh
+        run: ./setup.ps1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and Test Packages
         run: ./build-all-packages.sh
+
+      - name: Package app
+        run: npm run package
+        timeout-minutes: 30
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-binary
+          path: out
+          if-no-files-found: error
