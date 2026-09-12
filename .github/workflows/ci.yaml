@@ -21,7 +21,7 @@ jobs:
 
         steps:
             - name: Checkout source code
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
 
             - name: Setup script for macOS/Linux
               if: ${{ matrix.os != 'windows-latest' }}
