@@ -33,7 +33,7 @@ jobs:
               run: ./setup.ps1
 
             - name: Cache Node modules
-              uses: actions/cache@v6.0.0
+              uses: actions/cache@v6
               with:
                   path: ~/.npm
                   key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
