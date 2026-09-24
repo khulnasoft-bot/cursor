@@ -35,7 +35,7 @@ class SocketService {
                 socket = tls.connect({
                     host: options.host,
                     port: options.port,
-                    rejectUnauthorized: false // Allow self-signed certs
+                    rejectUnauthorized: true // Enforce certificate validation
                 })
             } else {
                 socket = net.connect({
