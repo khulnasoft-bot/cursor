@@ -61,6 +61,16 @@ async function getLatestVersion(githubURL: string) {
     return jsonResponse.tag_name
 }
 
+function assertSafeReleaseTag(tag: string): string {
+    const normalized = tag.trim()
+    // Allow common semver-like tags such as:
+    // v17.0.6, 17.0.6, v17.0.6-rc1, 17.0.6+build.1
+    if (!/^[vV]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(normalized)) {
+        throw new Error(`Unsafe release tag received: ${tag}`)
+    }
+    return normalized
+}
+
 async function downloadFile(url: string, outputPath: string) {
     return await fetch(url)
         .then((x) => x.arrayBuffer())
@@ -440,8 +450,10 @@ class LSPManager {
                 }
             }
             case 'c': {
-                const cVersion = await getLatestVersion(
-                    'https://api.github.com/repos/clangd/clangd/releases/latest'
+                const cVersion = assertSafeReleaseTag(
+                    await getLatestVersion(
+                        'https://api.github.com/repos/clangd/clangd/releases/latest'
+                    )
                 )
                 if (osType === 'Darwin') {
                     remoteUrl = `https://github.com/clangd/clangd/releases/download/${cVersion}/clangd-mac-${cVersion}.zip`
