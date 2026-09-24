@@ -138,13 +138,20 @@ jobs:
         run: |
           set -euo pipefail
 
-          npm run format
+          # Formatting can be non-idempotent when setup scripts or generated
+          # files are involved. Retry the write/check pair so the fixer does
+          # not stop after leaving a partially formatted tree behind.
+          for attempt in 1 2 3; do
+            echo "Formatting attempt $attempt/3"
+            npm run format
 
-          # Verify the exact same script used by CI. The previous workflow
-          # used a write command as its "final verification", which could hide
-          # formatting failures and allowed the matrix job to see an unfixed
-          # tree.
-          npm run format-check
+            if npm run format-check; then
+              exit 0
+            fi
+          done
+
+          echo "::error::Formatting is still invalid after three auto-fix attempts."
+          exit 1
 
       - name: Fail when formatting cannot be auto-fixed
         if: >
