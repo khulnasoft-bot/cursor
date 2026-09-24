@@ -19,22 +19,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ==========================================================================
+  # ========================================================================
   # AUTO FIX
   #
-  # Runs only once on Ubuntu.
-  #
-  # Responsibilities:
-  #   1. Detect package-lock.json mismatch
-  #   2. Regenerate package-lock.json
-  #   3. Detect formatting problems
-  #   4. Run npm run format
-  #   5. Verify formatting
-  #   6. Commit and push fixes
-  #
-  # This job MUST NOT run for fork pull requests because it requires
-  # contents: write.
-  # ==========================================================================
+  # Runs only once on Ubuntu. It repairs the lockfile and formatting, then
+  # commits the resulting changes for branches in this repository.
+  # ========================================================================
 
   auto-fix:
     name: Auto Fix Dependencies and Formatting
@@ -51,29 +41,17 @@ jobs:
       contents: write
 
     steps:
-      # ----------------------------------------------------------------------
-      # Checkout
-      # ----------------------------------------------------------------------
-
       - name: Checkout source code
         uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref || github.ref_name }}
 
-      # ----------------------------------------------------------------------
-      # Node.js
-      # ----------------------------------------------------------------------
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      # ----------------------------------------------------------------------
-      # Project setup
-      # ----------------------------------------------------------------------
 
       - name: Setup script
         run: |
@@ -83,10 +61,6 @@ jobs:
             chmod +x ./setup.sh
             ./setup.sh
           fi
-
-      # ======================================================================
-      # DEPENDENCY CHECK / AUTO FIX
-      # ======================================================================
 
       - name: Check npm ci
         id: npm-ci
@@ -98,42 +72,25 @@ jobs:
 
           if [ "$status" -eq 0 ]; then
             echo "needs_fix=false" >> "$GITHUB_OUTPUT"
-            echo "npm ci passed."
             exit 0
           fi
 
           if grep -q "npm error code EUSAGE" npm-ci.log &&
              grep -q "package.json and package-lock.json" npm-ci.log; then
-
             echo "needs_fix=true" >> "$GITHUB_OUTPUT"
-
             echo "::warning::package.json and package-lock.json are out of sync."
-
             exit 0
           fi
 
           echo "::error::npm ci failed for a reason other than a lockfile mismatch."
-
           exit "$status"
 
       - name: Update package-lock.json
         if: steps.npm-ci.outputs.needs_fix == 'true'
         run: |
           set -euo pipefail
-
-          echo "Updating package-lock.json..."
-
-          npm install \
-            --package-lock-only \
-            --ignore-scripts
-
-          echo "Verifying package-lock.json..."
-
+          npm install --package-lock-only --ignore-scripts
           npm ci
-
-      # ======================================================================
-      # FORMAT SCRIPT DETECTION
-      # ======================================================================
 
       - name: Detect formatting scripts
         id: format-script
@@ -143,29 +100,18 @@ jobs:
           has_format=false
           has_format_check=false
 
-          if node -e "
+          node -e "
             const pkg = require('./package.json');
             process.exit(pkg.scripts?.format ? 0 : 1);
-          "; then
-            has_format=true
-          fi
+          " && has_format=true || true
 
-          if node -e "
+          node -e "
             const pkg = require('./package.json');
             process.exit(pkg.scripts?.['format-check'] ? 0 : 1);
-          "; then
-            has_format_check=true
-          fi
+          " && has_format_check=true || true
 
           echo "has_format=$has_format" >> "$GITHUB_OUTPUT"
           echo "has_format_check=$has_format_check" >> "$GITHUB_OUTPUT"
-
-          echo "format script: $has_format"
-          echo "format-check script: $has_format_check"
-
-      # ======================================================================
-      # FORMAT CHECK
-      # ======================================================================
 
       - name: Check formatting
         id: format-check
@@ -173,23 +119,17 @@ jobs:
         continue-on-error: true
         run: |
           set +e
-
           npm run format-check 2>&1 | tee npm-format.log
           status=${PIPESTATUS[0]}
 
           if [ "$status" -eq 0 ]; then
             echo "format_failed=false" >> "$GITHUB_OUTPUT"
-            echo "Formatting check passed."
           else
             echo "format_failed=true" >> "$GITHUB_OUTPUT"
             echo "::warning::Formatting check failed."
           fi
 
           exit 0
-
-      # ======================================================================
-      # FORMAT AUTO FIX
-      # ======================================================================
 
       - name: Auto-fix formatting
         if: >
@@ -198,27 +138,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "=========================================="
-          echo "Formatting issues detected"
-          echo "=========================================="
-
-          echo "Running npm run format..."
-
           npm run format
 
-          echo
-          echo "Checking for formatter changes..."
-
-          git status --short
-
-          echo
-          echo "Verifying formatting..."
-
+          # Verify the exact same script used by CI. The previous workflow
+          # used a write command as its "final verification", which could hide
+          # formatting failures and allowed the matrix job to see an unfixed
+          # tree.
           npm run format-check
-
-      # ======================================================================
-      # FORMAT FIX FAILURE
-      # ======================================================================
 
       - name: Fail when formatting cannot be auto-fixed
         if: >
@@ -226,27 +152,11 @@ jobs:
           steps.format-script.outputs.has_format != 'true'
         run: |
           echo "::error::Formatting check failed, but package.json has no 'format' script."
-          echo "::error::Add a 'format' script to package.json."
           exit 1
-
-      # ======================================================================
-      # FINAL FORMAT VERIFICATION
-      #
-      # Run one more check after all modifications.
-      # ======================================================================
 
       - name: Final formatting verification
         if: steps.format-script.outputs.has_format_check == 'true'
-        run: |
-          set -euo pipefail
-
-          echo "Final formatting verification..."
-
-          npm run format
-
-      # ======================================================================
-      # SHOW CHANGES
-      # ======================================================================
+        run: npm run format-check
 
       - name: Show auto-fix changes
         id: changes
@@ -260,21 +170,8 @@ jobs:
           fi
 
           echo "changed=true" >> "$GITHUB_OUTPUT"
-
-          echo "=========================================="
-          echo "Automatic fixes:"
-          echo "=========================================="
-
           git status --short
-
-          echo
-          echo "Change summary:"
-
           git diff --stat
-
-      # ======================================================================
-      # COMMIT + PUSH
-      # ======================================================================
 
       - name: Commit and push auto-fixes
         if: steps.changes.outputs.changed == 'true'
@@ -283,7 +180,6 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add -A
 
           if git diff --cached --quiet; then
@@ -291,64 +187,29 @@ jobs:
             exit 0
           fi
 
-          echo "Files being committed:"
-
-          git diff --cached --name-only
-
-          # --------------------------------------------------------------
-          # Determine commit message.
-          # --------------------------------------------------------------
-
           lockfile_changed=false
           format_changed=false
 
-          if git diff --cached --quiet -- package-lock.json; then
-            lockfile_changed=false
-          else
+          if ! git diff --cached --quiet -- package-lock.json; then
             lockfile_changed=true
           fi
 
-          if git diff --cached --quiet -- ':!package-lock.json'; then
-            format_changed=false
-          else
+          if ! git diff --cached --quiet -- ':!package-lock.json'; then
             format_changed=true
           fi
 
           if [ "$lockfile_changed" = true ] && [ "$format_changed" = true ]; then
-
-            git commit \
-              -m "chore: auto-fix CI issues" \
-              -m "Synchronize dependencies and formatting."
-
+            git commit -m "chore: auto-fix CI issues" -m "Synchronize dependencies and formatting."
           elif [ "$lockfile_changed" = true ]; then
-
-            git commit \
-              -m "fix: sync package-lock.json" \
-              -m "Automatically regenerated by the CI dependency fixer."
-
+            git commit -m "fix: sync package-lock.json" -m "Automatically regenerated by the CI dependency fixer."
           elif [ "$format_changed" = true ]; then
-
-            git commit \
-              -m "style: auto-format code" \
-              -m "Automatically formatted files detected by CI."
-
+            git commit -m "style: auto-format code" -m "Automatically formatted files detected by CI."
           fi
-
-          echo "Pushing automatic fixes..."
 
           git push
 
-  # ==========================================================================
-  # CROSS-PLATFORM BUILD / TEST
-  #
-  # This job DOES NOT modify the repository.
-  #
-  # It only checks the resulting source tree.
-  # ==========================================================================
-
   all:
     name: Cross-platform Build and Test
-
     needs: auto-fix
 
     if: >
@@ -360,7 +221,6 @@ jobs:
 
     strategy:
       fail-fast: false
-
       matrix:
         os:
           - ubuntu-latest
@@ -370,25 +230,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      # ----------------------------------------------------------------------
-      # Checkout
-      # ----------------------------------------------------------------------
-
       - name: Checkout source code
         uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref || github.ref_name }}
 
-      # ----------------------------------------------------------------------
-      # Setup
-      # ----------------------------------------------------------------------
-
       - name: Setup script for macOS/Linux
         if: matrix.os != 'windows-latest'
         run: |
           set -euo pipefail
-
           chmod +x ./setup.sh
           ./setup.sh
 
@@ -397,28 +248,14 @@ jobs:
         shell: pwsh
         run: ./setup.ps1
 
-      # ----------------------------------------------------------------------
-      # Node.js
-      # ----------------------------------------------------------------------
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      # ----------------------------------------------------------------------
-      # Dependencies
-      # ----------------------------------------------------------------------
-
       - name: Install dependencies
         run: npm ci
-
-      # ----------------------------------------------------------------------
-      # Formatting verification only
-      #
-      # Auto-fixing happens in auto-fix.
-      # ----------------------------------------------------------------------
 
       - name: Check formatting
         run: |
@@ -428,27 +265,14 @@ jobs:
             const pkg = require('./package.json');
             process.exit(pkg.scripts?.['format-check'] ? 0 : 1);
           "; then
-
-            npm run format
-
+            npm run format-check
           else
-
             echo "::warning::No format-check script configured."
-            echo "Skipping formatting verification."
-
           fi
-
-      # ----------------------------------------------------------------------
-      # Package
-      # ----------------------------------------------------------------------
 
       - name: Package app
         run: npm run package
         timeout-minutes: 30
-
-      # ----------------------------------------------------------------------
-      # Artifacts
-      # ----------------------------------------------------------------------
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7.0.0
