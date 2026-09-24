@@ -242,7 +242,7 @@ jobs:
 
           echo "Final formatting verification..."
 
-          npm run format-check
+          npm run format
 
       # ======================================================================
       # SHOW CHANGES
@@ -429,7 +429,7 @@ jobs:
             process.exit(pkg.scripts?.['format-check'] ? 0 : 1);
           "; then
 
-            npm run format-check
+            npm run format
 
           else
 
