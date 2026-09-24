@@ -10,3 +10,6 @@
 
 # Extracted binary resources
 /resources/**
+
+# Workflow files require explicit review and cannot be modified by GITHUB_TOKEN
+/.github/workflows/**
