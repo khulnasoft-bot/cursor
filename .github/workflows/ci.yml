@@ -165,6 +165,15 @@ jobs:
         if: steps.format-script.outputs.has_format_check == 'true'
         run: npm run format-check
 
+      - name: Exclude workflow files from auto-fix commit
+        run: |
+          set -euo pipefail
+
+          # GITHUB_TOKEN cannot push changes to .github/workflows. Keep
+          # workflow files out of the automated formatter's commit; workflow
+          # changes must be reviewed and pushed separately with workflow scope.
+          git restore --worktree -- .github/workflows
+
       - name: Show auto-fix changes
         id: changes
         run: |
