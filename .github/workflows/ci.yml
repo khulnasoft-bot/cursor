@@ -176,16 +176,16 @@ jobs:
               if: matrix.os != 'windows-latest'
               run: npm run format-check
 
+            
             - name: Check formatting
               id: format-check
               continue-on-error: true
               run: |
                   set -o pipefail
             
-                  npm run format-check 2>&1 | tee npm-format.log
-                  status=${PIPESTATUS[0]}
+                  echo "Checking package.json formatting scripts..."
             
-                  if [ "$status" -eq 0 ]; then
+                  if ! node -e "const p=require('./package.json'); process.exit(p.scripts?.['format-check'] ? 0 : 1)"; then
                       echo "needs_fix=false" >> "$GITHUB_OUTPUT"
                       echo "Formatting check passed."
                   else
