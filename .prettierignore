@@ -1,3 +1,12 @@
 /.webpack
 /lsp
 /out
+
+# Archive and macOS metadata
+**/__MACOSX/**
+**/.DS_Store
+**/._*
+**/*.DS_Store
+
+# Extracted binary resources
+/resources/**
