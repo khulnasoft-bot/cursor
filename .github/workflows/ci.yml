@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -186,4 +185,3 @@ jobs:
                   name: ${{ matrix.os }}-binary
                   path: out
                   if-no-files-found: error
-```
