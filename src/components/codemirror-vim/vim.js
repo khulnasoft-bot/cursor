@@ -6992,7 +6992,11 @@ export function initVim(CodeMirror) {
                         regexPart = regexPart + '/' + flagsPart
                     } else {
                         regexPart =
-                            regexPart.replace(/\//g, '\\/') + '/' + flagsPart
+                            regexPart
+                                .replace(/\\/g, '\\\\')
+                                .replace(/\//g, '\\/') +
+                            '/' +
+                            flagsPart
                     }
                 }
             }
