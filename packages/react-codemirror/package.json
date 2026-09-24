@@ -24,8 +24,8 @@
     "@codemirror/view": "^6.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.3.0",
-    "typescript": "^5.5.0"
+    "@types/react": "^18.0.0",
+    "typescript": "^7.0.2"
   },
   "files": [
     "dist",
