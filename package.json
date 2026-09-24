@@ -10,8 +10,8 @@
         "validate": "./validate-all-packages.sh",
         "build": "./build-all-packages.sh",
         "test": "./test-basic-integration.sh",
-        "format": "prettier --write .",
-        "format-check": "prettier --check .",
+        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,jsonc,md,yml,yaml}\"",
+        "format-check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,jsonc,md,yml,yaml}\"",
         "publish:all": "./publish-all.sh",
         "clean": "rm -rf packages/*/dist"
     },
