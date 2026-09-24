@@ -12,6 +12,8 @@
         "test": "./test-basic-integration.sh",
         "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,jsonc,md,yml,yaml}\"",
         "format-check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,jsonc,md,yml,yaml}\"",
+        "package": "npm run build && npm pack --workspaces",
+        "package:dry-run": "npm pack --workspaces --dry-run",
         "publish:all": "./publish-all.sh",
         "clean": "rm -rf packages/*/dist"
     },
