@@ -28,7 +28,7 @@ function logError(error: any) {
             'utf8'
         )
         const body = {
-            name: app.getPath('userData').replace(/ /g, '\\ '),
+            name: encodeURIComponent(app.getPath('userData')),
             log: encodeURIComponent(logFile),
             error: error.toString(),
         }
