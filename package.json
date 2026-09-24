@@ -11,7 +11,7 @@
     "build": "./build-all-packages.sh",
     "test": "./test-basic-integration.sh",
     "format": "prettier --write .",
-    "format-check": "prettier --check .",
+    "format-check": "prettier --check ."
     "publish:all": "./publish-all.sh",
     "clean": "rm -rf packages/*/dist"
   },
