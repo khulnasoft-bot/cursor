@@ -99,7 +99,7 @@ export class MemoryLogger implements Logger {
                 level,
                 message,
                 args,
-                timestamp: new Date()
+                timestamp: new Date(),
             })
         }
     }
@@ -128,7 +128,9 @@ export class MemoryLogger implements Logger {
         this.logs = []
     }
 
-    getLogsByLevel(level: LogLevel): Array<{ level: LogLevel; message: string; args: any[]; timestamp: Date }> {
-        return this.logs.filter(log => log.level === level)
+    getLogsByLevel(
+        level: LogLevel
+    ): Array<{ level: LogLevel; message: string; args: any[]; timestamp: Date }> {
+        return this.logs.filter((log) => log.level === level)
     }
 }
