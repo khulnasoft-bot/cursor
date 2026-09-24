@@ -14,13 +14,26 @@ export function setupNDJSONServiceIpcs() {
     // Ingest from file
     ipcMain.handle(
         'ndjson-service-ingest-file',
-        async (_event: IpcMainInvokeEvent, filePath: string, config?: Partial<NDJSONIngestConfig>) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            filePath: string,
+            config?: Partial<NDJSONIngestConfig>
+        ) => {
             try {
-                const count = await ndjsonService.ingestFromFile(filePath, config)
+                const count = await ndjsonService.ingestFromFile(
+                    filePath,
+                    config
+                )
                 return { success: true, count }
             } catch (error) {
                 log.error('Failed to ingest NDJSON file:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -28,30 +41,43 @@ export function setupNDJSONServiceIpcs() {
     // Ingest from string
     ipcMain.handle(
         'ndjson-service-ingest-string',
-        async (_event: IpcMainInvokeEvent, ndjsonString: string, source?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            ndjsonString: string,
+            source?: string
+        ) => {
             try {
-                const count = await ndjsonService.ingestFromString(ndjsonString, source)
+                const count = await ndjsonService.ingestFromString(
+                    ndjsonString,
+                    source
+                )
                 return { success: true, count }
             } catch (error) {
                 log.error('Failed to ingest NDJSON string:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get records
-    ipcMain.handle(
-        'ndjson-service-get-records',
-        async () => {
-            try {
-                const records = ndjsonService.getRecords()
-                return { success: true, records }
-            } catch (error) {
-                log.error('Failed to get NDJSON records:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('ndjson-service-get-records', async () => {
+        try {
+            const records = ndjsonService.getRecords()
+            return { success: true, records }
+        } catch (error) {
+            log.error('Failed to get NDJSON records:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get records by source
     ipcMain.handle(
@@ -62,7 +88,13 @@ export function setupNDJSONServiceIpcs() {
                 return { success: true, records }
             } catch (error) {
                 log.error('Failed to get NDJSON records by source:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,24 +108,30 @@ export function setupNDJSONServiceIpcs() {
                 return { success: true, records }
             } catch (error) {
                 log.error('Failed to get NDJSON records by date range:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Clear records
-    ipcMain.handle(
-        'ndjson-service-clear',
-        async () => {
-            try {
-                ndjsonService.clearRecords()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to clear NDJSON records:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('ndjson-service-clear', async () => {
+        try {
+            ndjsonService.clearRecords()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to clear NDJSON records:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Clear records by source
     ipcMain.handle(
@@ -104,7 +142,13 @@ export function setupNDJSONServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to clear NDJSON records by source:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -118,38 +162,44 @@ export function setupNDJSONServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to export NDJSON:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get config
-    ipcMain.handle(
-        'ndjson-service-get-config',
-        async () => {
-            try {
-                const config = ndjsonService.getConfig()
-                return { success: true, config }
-            } catch (error) {
-                log.error('Failed to get NDJSON config:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('ndjson-service-get-config', async () => {
+        try {
+            const config = ndjsonService.getConfig()
+            return { success: true, config }
+        } catch (error) {
+            log.error('Failed to get NDJSON config:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if processing
-    ipcMain.handle(
-        'ndjson-service-is-processing',
-        async () => {
-            try {
-                const processing = ndjsonService.isProcessing()
-                return { success: true, processing }
-            } catch (error) {
-                log.error('Failed to check processing status:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('ndjson-service-is-processing', async () => {
+        try {
+            const processing = ndjsonService.isProcessing()
+            return { success: true, processing }
+        } catch (error) {
+            log.error('Failed to check processing status:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('NDJSON service IPC handlers registered')
 }

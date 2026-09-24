@@ -20,7 +20,13 @@ export function setupComposerIpcs() {
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to plan changes:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -37,13 +43,19 @@ export function setupComposerIpcs() {
                     requestId: execution.requestId,
                     currentStep: execution.currentStep,
                     totalSteps: execution.totalSteps,
-                    status: execution.status
+                    status: execution.status,
                 })
 
                 return { success: true, execution }
             } catch (error) {
                 log.error('Failed to execute changes:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -57,7 +69,13 @@ export function setupComposerIpcs() {
                 return { success: true, execution }
             } catch (error) {
                 log.error('Failed to get execution:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -71,7 +89,13 @@ export function setupComposerIpcs() {
                 return { success: true, cancelled }
             } catch (error) {
                 log.error('Failed to cancel execution:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -81,28 +105,35 @@ export function setupComposerIpcs() {
         'composer-rollback-execution',
         async (_event: IpcMainInvokeEvent, requestId: string) => {
             try {
-                const execution = await composerService.rollbackExecution(requestId)
+                const execution =
+                    await composerService.rollbackExecution(requestId)
                 return { success: true, execution }
             } catch (error) {
                 log.error('Failed to rollback execution:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get active executions
-    ipcMain.handle(
-        'composer-get-active-executions',
-        async () => {
-            try {
-                const executions = composerService.getActiveExecutions()
-                return { success: true, executions }
-            } catch (error) {
-                log.error('Failed to get active executions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('composer-get-active-executions', async () => {
+        try {
+            const executions = composerService.getActiveExecutions()
+            return { success: true, executions }
+        } catch (error) {
+            log.error('Failed to get active executions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('Composer IPC handlers registered')
 }

@@ -170,11 +170,11 @@ export type LSPRequestMap = {
     'textDocument/hover': [LSP.HoverParams, LSP.Hover]
     'textDocument/completion': [
         LSPCustomCompletionParams,
-        LSP.CompletionItem[] | LSP.CompletionList | null
+        LSP.CompletionItem[] | LSP.CompletionList | null,
     ]
     'textDocument/documentSymbol': [
         LSP.DocumentSymbolParams,
-        LSP.DocumentSymbol[]
+        LSP.DocumentSymbol[],
     ]
 
     notifyAccepted: [CopilotAcceptCompletionParams, any]
@@ -182,17 +182,17 @@ export type LSPRequestMap = {
     // Back to text document types
     'textDocument/definition': [
         LSP.DefinitionParams,
-        LSP.Location | LSP.Location[] | LSP.LocationLink[] | null
+        LSP.Location | LSP.Location[] | LSP.LocationLink[] | null,
     ]
     'textDocument/references': [LSP.ReferenceParams, LSP.Location[]]
     'textDocument/documentHighlight': [
         LSP.DocumentHighlightParams,
-        LSP.DocumentHighlight[]
+        LSP.DocumentHighlight[],
     ]
     'textDocument/symbol': [LSP.DocumentSymbolParams, LSP.SymbolInformation[]]
     'textDocument/codeAction': [
         LSP.CodeActionParams,
-        (LSP.CodeAction | LSP.Command)[]
+        (LSP.CodeAction | LSP.Command)[],
     ]
     'textDocument/documentLink': [LSP.DocumentLinkParams, LSP.DocumentLink[]]
 
@@ -208,15 +208,15 @@ export type LSPRequestMap = {
     getCompletions: [CopilotGetCompletionsParams, CopilotGetCompletionsResult]
     'textDocument/semanticTokens/full': [
         LSP.SemanticTokensParams,
-        LSP.SemanticTokens
+        LSP.SemanticTokens,
     ]
     'textDocument/semanticTokens/full/delta': [
         LSP.SemanticTokensDeltaParams,
-        LSP.SemanticTokensDelta
+        LSP.SemanticTokensDelta,
     ]
     'textDocument/semanticTokens': [
         LSP.SemanticTokensParams,
-        LSP.SemanticTokens
+        LSP.SemanticTokens,
     ]
     'completionItem/resolve': [LSP.CompletionItem, LSP.CompletionItem]
 }
@@ -587,8 +587,7 @@ export class LanguageServerClient {
                 request.params.registrations.forEach((registration) => {
                     // First we split the method name into the plugin name and the method
                     const method = registration.method as
-                        | keyof LSPNotifyMap
-                        | keyof LSPRequestMap
+                        keyof LSPNotifyMap | keyof LSPRequestMap
                     switch (method) {
                         case 'textDocument/semanticTokens':
                             this.capabilities.semanticTokensProvider =

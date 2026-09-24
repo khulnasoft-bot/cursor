@@ -8,7 +8,7 @@ export {
     RuleService,
     getRuleService,
     destroyRuleService,
-    createRuleService
+    createRuleService,
 } from './ruleService'
 
 // Types
@@ -22,7 +22,7 @@ export type {
     RuleApplicationResult,
     RuleValidationResult,
     RuleStatistics,
-    RuleServiceConfig
+    RuleServiceConfig,
 } from './types'
 
 // Rule Parser
@@ -30,7 +30,7 @@ export {
     RuleParser,
     getRuleParser,
     destroyRuleParser,
-    createRuleParser
+    createRuleParser,
 } from './parser/ruleParser'
 
 // Rule Validator
@@ -38,13 +38,8 @@ export {
     RuleValidator,
     getRuleValidator,
     destroyRuleValidator,
-    createRuleValidator
+    createRuleValidator,
 } from './validator/ruleValidator'
 
 // Logger
-export {
-    Logger,
-    LogLevel,
-    ConsoleLogger,
-    NoOpLogger
-} from './logger'
+export { Logger, LogLevel, ConsoleLogger, NoOpLogger } from './logger'

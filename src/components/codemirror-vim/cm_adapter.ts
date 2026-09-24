@@ -163,7 +163,7 @@ function runHistoryCommand(cm: CodeMirror, revert: boolean) {
     if (cm.curOp) {
         cm.curOp.$changeStart = undefined
     }
-    (revert ? undo : redo)(cm.cm6)
+    ;(revert ? undo : redo)(cm.cm6)
     const changeStartIndex = cm.curOp?.$changeStart
     // vim mode expects the changed text to be either selected or cursor placed at the start
     if (changeStartIndex != null) {
@@ -197,7 +197,11 @@ export class CodeMirror {
             indentSelection(cm.cm6)
         },
     }
-    static defineOption = function (name: string, val: any, setter: (...args: any[]) => void) {}
+    static defineOption = function (
+        name: string,
+        val: any,
+        setter: (...args: any[]) => void
+    ) {}
     static isWordChar = function (ch: string) {
         return wordChar.test(ch)
     }
@@ -289,7 +293,11 @@ export class CodeMirror {
     static signal = signal
 
     // --------------------------
-    openDialog(template: Element, callback: (...args: any[]) => void, options: any) {
+    openDialog(
+        template: Element,
+        callback: (...args: any[]) => void,
+        options: any
+    ) {
         return openDialog(this, template, callback, options)
     }
     openNotification(template: Node, options: NotificationOptions) {
@@ -381,12 +389,12 @@ export class CodeMirror {
             p == 'head' || !p
                 ? sel.head
                 : p == 'anchor'
-                ? sel.anchor
-                : p == 'start'
-                ? sel.from
-                : p == 'end'
-                ? sel.to
-                : null
+                  ? sel.anchor
+                  : p == 'start'
+                    ? sel.from
+                    : p == 'end'
+                      ? sel.to
+                      : null
         if (offset == null) throw new Error('Invalid cursor type')
         return this.posFromIndex(offset)
     }
@@ -570,7 +578,7 @@ export class CodeMirror {
             caseSensitive: !/i/.test(query.flags),
         })
         if (cm6Query.valid) {
-            (cm6Query as any).forVim = true
+            ;(cm6Query as any).forVim = true
             this.cm6Query = cm6Query
             const effect = setSearchQuery.of(cm6Query)
             this.cm6.dispatch({ effects: effect })
@@ -787,7 +795,7 @@ export class CodeMirror {
         this.refresh()
     }
     refresh() {
-        (this.cm6 as any).measure()
+        ;(this.cm6 as any).measure()
     }
 
     // event listeners

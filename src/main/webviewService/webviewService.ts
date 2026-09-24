@@ -29,7 +29,7 @@ class WebViewService {
 
     async createWebView(config: Partial<WebViewConfig>): Promise<string> {
         const webViewId = `webview-${++this.webViewIdCounter}`
-        
+
         try {
             const webViewConfig: WebViewConfig = {
                 id: webViewId,
@@ -40,7 +40,7 @@ class WebViewService {
                 allowpopups: config.allowpopups || false,
                 webSecurity: config.webSecurity !== false,
                 nodeIntegration: config.nodeIntegration || false,
-                contextIsolation: config.contextIsolation !== false
+                contextIsolation: config.contextIsolation !== false,
             }
 
             this.webViews.set(webViewId, webViewConfig)
@@ -109,7 +109,11 @@ class WebViewService {
         return null
     }
 
-    async sendMessage(webViewId: string, channel: string, data: any): Promise<void> {
+    async sendMessage(
+        webViewId: string,
+        channel: string,
+        data: any
+    ): Promise<void> {
         const webView = this.webViews.get(webViewId)
         if (!webView) {
             throw new Error(`WebView not found: ${webViewId}`)
@@ -137,7 +141,11 @@ class WebViewService {
         log.info(`Setting zoom level in webview ${webViewId}: ${level}`)
     }
 
-    async findInPage(webViewId: string, text: string, options?: any): Promise<number> {
+    async findInPage(
+        webViewId: string,
+        text: string,
+        options?: any
+    ): Promise<number> {
         const webView = this.webViews.get(webViewId)
         if (!webView) {
             throw new Error(`WebView not found: ${webViewId}`)

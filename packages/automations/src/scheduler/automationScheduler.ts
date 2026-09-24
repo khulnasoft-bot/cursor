@@ -72,11 +72,13 @@ export class AutomationScheduler {
             workflow,
             schedule,
             recurring,
-            enabled: true
+            enabled: true,
         }
 
         this.scheduledTasks.set(taskId, task)
-        this.logger.info(`Scheduled workflow: ${workflow.name} at ${schedule.toISOString()}`)
+        this.logger.info(
+            `Scheduled workflow: ${workflow.name} at ${schedule.toISOString()}`
+        )
 
         return taskId
     }
@@ -89,7 +91,7 @@ export class AutomationScheduler {
 
         return this.scheduleWorkflow(workflow, schedule, {
             type: 'interval',
-            config: { intervalMs }
+            config: { intervalMs },
         })
     }
 
@@ -102,7 +104,7 @@ export class AutomationScheduler {
 
         return this.scheduleWorkflow(workflow, schedule, {
             type: 'daily',
-            config: { hour, minute }
+            config: { hour, minute },
         })
     }
 
@@ -116,7 +118,7 @@ export class AutomationScheduler {
 
         return this.scheduleWorkflow(workflow, schedule, {
             type: 'weekly',
-            config: { dayOfWeek, hour, minute }
+            config: { dayOfWeek, hour, minute },
         })
     }
 
@@ -130,7 +132,7 @@ export class AutomationScheduler {
 
         return this.scheduleWorkflow(workflow, schedule, {
             type: 'monthly',
-            config: { dayOfMonth, hour, minute }
+            config: { dayOfMonth, hour, minute },
         })
     }
 
@@ -146,7 +148,11 @@ export class AutomationScheduler {
         return schedule
     }
 
-    private getNextWeeklySchedule(dayOfWeek: number, hour: number, minute: number): Date {
+    private getNextWeeklySchedule(
+        dayOfWeek: number,
+        hour: number,
+        minute: number
+    ): Date {
         const now = new Date()
         const schedule = new Date()
         schedule.setHours(hour, minute, 0, 0)
@@ -163,7 +169,11 @@ export class AutomationScheduler {
         return schedule
     }
 
-    private getNextMonthlySchedule(dayOfMonth: number, hour: number, minute: number): Date {
+    private getNextMonthlySchedule(
+        dayOfMonth: number,
+        hour: number,
+        minute: number
+    ): Date {
         const now = new Date()
         const schedule = new Date()
         schedule.setHours(hour, minute, 0, 0)
@@ -216,7 +226,7 @@ export class AutomationScheduler {
                 id: `trigger-${taskId}`,
                 type: 'time',
                 config: { scheduledTime: task.schedule },
-                enabled: true
+                enabled: true,
             }
 
             // The actual execution would be handled by the automation service
@@ -244,7 +254,10 @@ export class AutomationScheduler {
                 return new Date(now.getTime() + intervalMs)
 
             case 'daily':
-                return this.getNextDailySchedule(recurring.config.hour, recurring.config.minute)
+                return this.getNextDailySchedule(
+                    recurring.config.hour,
+                    recurring.config.minute
+                )
 
             case 'weekly':
                 return this.getNextWeeklySchedule(
@@ -279,7 +292,9 @@ export class AutomationScheduler {
     }
 
     getTasksByWorkflow(workflowId: string): ScheduledTask[] {
-        return this.getScheduledTasks().filter(t => t.workflowId === workflowId)
+        return this.getScheduledTasks().filter(
+            (t) => t.workflowId === workflowId
+        )
     }
 
     reset(): void {
@@ -293,7 +308,10 @@ export class AutomationScheduler {
 // Singleton instance
 let automationScheduler: AutomationScheduler | null = null
 
-export function getAutomationScheduler(checkIntervalMs?: number, logger?: Logger): AutomationScheduler {
+export function getAutomationScheduler(
+    checkIntervalMs?: number,
+    logger?: Logger
+): AutomationScheduler {
     if (!automationScheduler) {
         automationScheduler = new AutomationScheduler(checkIntervalMs, logger)
     }
@@ -307,6 +325,9 @@ export function destroyAutomationScheduler(): void {
     }
 }
 
-export function createAutomationScheduler(checkIntervalMs?: number, logger?: Logger): AutomationScheduler {
+export function createAutomationScheduler(
+    checkIntervalMs?: number,
+    logger?: Logger
+): AutomationScheduler {
     return new AutomationScheduler(checkIntervalMs, logger)
 }

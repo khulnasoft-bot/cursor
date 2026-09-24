@@ -34,7 +34,11 @@ export class DecisionEngine {
     private learningRate: number
     private maxRetries: number
 
-    constructor(logger?: Logger, learningRate: number = 0.1, maxRetries: number = 3) {
+    constructor(
+        logger?: Logger,
+        learningRate: number = 0.1,
+        maxRetries: number = 3
+    ) {
         this.logger = logger || new ConsoleLogger()
         this.learningRate = learningRate
         this.maxRetries = maxRetries
@@ -50,21 +54,21 @@ export class DecisionEngine {
         if (analysis.shouldAbort) {
             return {
                 action: 'abort',
-                reasoning: analysis.reasoning
+                reasoning: analysis.reasoning,
             }
         }
 
         if (analysis.shouldRetry && this.canRetry(step, history)) {
             return {
                 action: 'retry',
-                reasoning: analysis.reasoning
+                reasoning: analysis.reasoning,
             }
         }
 
         if (analysis.shouldSkip) {
             return {
                 action: 'skip',
-                reasoning: analysis.reasoning
+                reasoning: analysis.reasoning,
             }
         }
 
@@ -73,13 +77,13 @@ export class DecisionEngine {
             return {
                 action: 'adapt',
                 reasoning: analysis.reasoning,
-                adaptedStep
+                adaptedStep,
             }
         }
 
         return {
             action: 'continue',
-            reasoning: 'Step appears viable, continuing execution'
+            reasoning: 'Step appears viable, continuing execution',
         }
     }
 
@@ -93,14 +97,16 @@ export class DecisionEngine {
         const { step, plan, history } = context
 
         // Check for repeated failures
-        const recentFailures = history.filter(h => h.outcome === 'failure' && h.stepId === step.id)
+        const recentFailures = history.filter(
+            (h) => h.outcome === 'failure' && h.stepId === step.id
+        )
         if (recentFailures.length >= this.maxRetries) {
             return {
                 shouldAbort: true,
                 shouldRetry: false,
                 shouldSkip: false,
                 shouldAdapt: false,
-                reasoning: `Step ${step.id} has failed ${recentFailures.length} times, aborting`
+                reasoning: `Step ${step.id} has failed ${recentFailures.length} times, aborting`,
             }
         }
 
@@ -112,7 +118,7 @@ export class DecisionEngine {
                 shouldRetry: false,
                 shouldSkip: false,
                 shouldAdapt: false,
-                reasoning: `Step ${step.id} has failed dependencies: ${dependencyFailures.join(', ')}`
+                reasoning: `Step ${step.id} has failed dependencies: ${dependencyFailures.join(', ')}`,
             }
         }
 
@@ -123,7 +129,7 @@ export class DecisionEngine {
                 shouldRetry: false,
                 shouldSkip: true,
                 shouldAdapt: false,
-                reasoning: `Step ${step.id} is marked as optional, skipping`
+                reasoning: `Step ${step.id} is marked as optional, skipping`,
             }
         }
 
@@ -135,7 +141,7 @@ export class DecisionEngine {
                 shouldRetry: false,
                 shouldSkip: false,
                 shouldAdapt: true,
-                reasoning: adaptationNeeded.reasoning
+                reasoning: adaptationNeeded.reasoning,
             }
         }
 
@@ -145,15 +151,18 @@ export class DecisionEngine {
             shouldRetry: false,
             shouldSkip: false,
             shouldAdapt: false,
-            reasoning: 'No issues detected, continuing execution'
+            reasoning: 'No issues detected, continuing execution',
         }
     }
 
-    private checkDependencyFailures(step: AgentStep, plan: AgentPlan): string[] {
+    private checkDependencyFailures(
+        step: AgentStep,
+        plan: AgentPlan
+    ): string[] {
         const failedDeps: string[] = []
 
         for (const depId of step.dependencies) {
-            const depStep = plan.steps.find(s => s.id === depId)
+            const depStep = plan.steps.find((s) => s.id === depId)
             if (depStep && depStep.status === 'failed') {
                 failedDeps.push(depId)
             }
@@ -163,46 +172,58 @@ export class DecisionEngine {
     }
 
     private canRetry(step: AgentStep, history: DecisionHistory[]): boolean {
-        const attempts = history.filter(h => h.stepId === step.id).length
+        const attempts = history.filter((h) => h.stepId === step.id).length
         return attempts < this.maxRetries
     }
 
     private isStepSkippable(step: AgentStep, plan: AgentPlan): boolean {
         // A step is skippable if it has no dependents and is not critical
-        const hasDependents = plan.steps.some(s => s.dependencies.includes(step.id))
-        const isCritical = step.toolName === 'write_file' || step.toolName === 'delete_file'
+        const hasDependents = plan.steps.some((s) =>
+            s.dependencies.includes(step.id)
+        )
+        const isCritical =
+            step.toolName === 'write_file' || step.toolName === 'delete_file'
         return !hasDependents && !isCritical
     }
 
-    private checkAdaptationNeed(step: AgentStep, history: DecisionHistory[]): {
-    needsAdaptation: boolean
-    reasoning: string
-} {
+    private checkAdaptationNeed(
+        step: AgentStep,
+        history: DecisionHistory[]
+    ): {
+        needsAdaptation: boolean
+        reasoning: string
+    } {
         // Check if previous attempts with similar steps succeeded with different parameters
-        const similarSteps = history.filter(h => 
-            h.step.toolName === step.toolName && 
-            h.outcome === 'success'
+        const similarSteps = history.filter(
+            (h) => h.step.toolName === step.toolName && h.outcome === 'success'
         )
 
         if (similarSteps.length > 0) {
             const lastSuccess = similarSteps[similarSteps.length - 1]
-            const successfulParams = lastSuccess.decision.adaptedStep?.toolParams || {}
-            
-            if (JSON.stringify(successfulParams) !== JSON.stringify(step.toolParams)) {
+            const successfulParams =
+                lastSuccess.decision.adaptedStep?.toolParams || {}
+
+            if (
+                JSON.stringify(successfulParams) !==
+                JSON.stringify(step.toolParams)
+            ) {
                 return {
                     needsAdaptation: true,
-                    reasoning: `Previous success with different parameters: ${JSON.stringify(successfulParams)}`
+                    reasoning: `Previous success with different parameters: ${JSON.stringify(successfulParams)}`,
                 }
             }
         }
 
         return {
             needsAdaptation: false,
-            reasoning: 'No adaptation needed'
+            reasoning: 'No adaptation needed',
         }
     }
 
-    private generateAdaptation(step: AgentStep, analysis: { reasoning: string }): Partial<AgentStep> {
+    private generateAdaptation(
+        step: AgentStep,
+        analysis: { reasoning: string }
+    ): Partial<AgentStep> {
         // Generate an adaptation based on the analysis
         const adaptedStep: Partial<AgentStep> = {}
 
@@ -217,7 +238,10 @@ export class DecisionEngine {
         return adaptedStep
     }
 
-    recordDecision(decision: Decision, outcome: 'success' | 'failure' | 'skip'): void {
+    recordDecision(
+        decision: Decision,
+        outcome: 'success' | 'failure' | 'skip'
+    ): void {
         // In a full implementation, this would store decisions for learning
         this.logger.info(`Recorded decision: ${decision.action} -> ${outcome}`)
     }
@@ -239,7 +263,11 @@ export class DecisionEngine {
 // Singleton instance
 let decisionEngine: DecisionEngine | null = null
 
-export function getDecisionEngine(logger?: Logger, learningRate?: number, maxRetries?: number): DecisionEngine {
+export function getDecisionEngine(
+    logger?: Logger,
+    learningRate?: number,
+    maxRetries?: number
+): DecisionEngine {
     if (!decisionEngine) {
         decisionEngine = new DecisionEngine(logger, learningRate, maxRetries)
     }
@@ -253,6 +281,10 @@ export function destroyDecisionEngine(): void {
     }
 }
 
-export function createDecisionEngine(logger?: Logger, learningRate?: number, maxRetries?: number): DecisionEngine {
+export function createDecisionEngine(
+    logger?: Logger,
+    learningRate?: number,
+    maxRetries?: number
+): DecisionEngine {
     return new DecisionEngine(logger, learningRate, maxRetries)
 }

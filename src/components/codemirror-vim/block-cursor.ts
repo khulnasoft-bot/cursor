@@ -61,7 +61,10 @@ export class BlockCursorPlugin {
     cursorLayer: HTMLElement
     cm: CodeMirror
 
-    constructor(readonly view: EditorView, cm: CodeMirror) {
+    constructor(
+        readonly view: EditorView,
+        cm: CodeMirror
+    ) {
         this.cm = cm
         this.measureReq = {
             read: this.readPos.bind(this),

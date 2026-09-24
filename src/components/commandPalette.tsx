@@ -32,10 +32,7 @@ const commandKey = connector.PLATFORM_META_KEY + ''
 
 type AICommandIds = 'edit' | 'generate' | 'freeform' | 'freeform_select'
 type splitPaneCommandIds =
-    | 'splitPaneRight'
-    | 'splitPaneLeft'
-    | 'splitPaneUp'
-    | 'splitPaneDown'
+    'splitPaneRight' | 'splitPaneLeft' | 'splitPaneUp' | 'splitPaneDown'
 type MainCommandIds =
     | 'terminal'
     | 'ssh'

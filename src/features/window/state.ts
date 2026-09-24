@@ -273,12 +273,7 @@ export type Message = UserMessage | BotMessage
 /// edit - the response type is some edit in the current file
 /// chat_diff - the respone type is some edit in the current_file started from the chat
 export type ResponseType =
-    | 'idk'
-    | 'freeform'
-    | 'generate'
-    | 'edit'
-    | 'chat_edit'
-    | 'lsp_edit'
+    'idk' | 'freeform' | 'generate' | 'edit' | 'chat_edit' | 'lsp_edit'
 
 export interface ChatState {
     generating: boolean

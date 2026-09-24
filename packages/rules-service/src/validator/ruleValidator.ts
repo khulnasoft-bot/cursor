@@ -21,7 +21,9 @@ export class RuleValidator {
         if (!rule.id || rule.id.trim() === '') {
             errors.push('Rule ID is required')
         } else if (!/^[a-z0-9-]+$/.test(rule.id)) {
-            errors.push('Rule ID must contain only lowercase letters, numbers, and hyphens')
+            errors.push(
+                'Rule ID must contain only lowercase letters, numbers, and hyphens'
+            )
         }
 
         if (!rule.name || rule.name.trim() === '') {
@@ -50,20 +52,39 @@ export class RuleValidator {
         }
 
         // Category validation
-        const validCategories: Rule['category'][] = ['style', 'naming', 'architecture', 'security', 'performance', 'testing', 'custom']
+        const validCategories: Rule['category'][] = [
+            'style',
+            'naming',
+            'architecture',
+            'security',
+            'performance',
+            'testing',
+            'custom',
+        ]
         if (!validCategories.includes(rule.category)) {
-            errors.push(`Invalid category: ${rule.category}. Must be one of: ${validCategories.join(', ')}`)
+            errors.push(
+                `Invalid category: ${rule.category}. Must be one of: ${validCategories.join(', ')}`
+            )
         }
 
         // Severity validation
-        const validSeverities: Rule['severity'][] = ['error', 'warning', 'suggestion', 'info']
+        const validSeverities: Rule['severity'][] = [
+            'error',
+            'warning',
+            'suggestion',
+            'info',
+        ]
         if (!validSeverities.includes(rule.severity)) {
-            errors.push(`Invalid severity: ${rule.severity}. Must be one of: ${validSeverities.join(', ')}`)
+            errors.push(
+                `Invalid severity: ${rule.severity}. Must be one of: ${validSeverities.join(', ')}`
+            )
         }
 
         // Warnings
         if (rule.exceptions && rule.exceptions.length > 10) {
-            warnings.push('Large number of exceptions may reduce rule effectiveness')
+            warnings.push(
+                'Large number of exceptions may reduce rule effectiveness'
+            )
         }
 
         if (rule.patterns && rule.patterns.length > 20) {
@@ -75,17 +96,24 @@ export class RuleValidator {
         }
 
         if (rule.language && rule.language.length === 0) {
-            warnings.push('Empty language array - rule will apply to all languages')
+            warnings.push(
+                'Empty language array - rule will apply to all languages'
+            )
         }
 
         return {
             valid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         }
     }
 
-    validateRuleSet(ruleSet: { name: string; description: string; version: string; rules: Rule[] }): RuleValidationResult {
+    validateRuleSet(ruleSet: {
+        name: string
+        description: string
+        version: string
+        rules: Rule[]
+    }): RuleValidationResult {
         const errors: string[] = []
         const warnings: string[] = []
 
@@ -100,18 +128,22 @@ export class RuleValidator {
         if (!ruleSet.version || ruleSet.version.trim() === '') {
             errors.push('Rule set version is required')
         } else if (!/^\d+\.\d+\.\d+$/.test(ruleSet.version)) {
-            errors.push('Rule set version must be in semantic versioning format (e.g., 1.0.0)')
+            errors.push(
+                'Rule set version must be in semantic versioning format (e.g., 1.0.0)'
+            )
         }
 
         if (!ruleSet.rules || ruleSet.rules.length === 0) {
             warnings.push('Rule set contains no rules')
         } else {
             const ruleIds = new Set<string>()
-            
+
             for (const rule of ruleSet.rules) {
                 const validation = this.validateRule(rule)
-                errors.push(...validation.errors.map(e => `${rule.id}: ${e}`))
-                warnings.push(...validation.warnings.map(w => `${rule.id}: ${w}`))
+                errors.push(...validation.errors.map((e) => `${rule.id}: ${e}`))
+                warnings.push(
+                    ...validation.warnings.map((w) => `${rule.id}: ${w}`)
+                )
 
                 // Check for duplicate rule IDs
                 if (ruleIds.has(rule.id)) {
@@ -125,14 +157,14 @@ export class RuleValidator {
         return {
             valid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         }
     }
 
     validateRuleJSON(json: string): RuleValidationResult {
         try {
             const parsed = JSON.parse(json)
-            
+
             if (Array.isArray(parsed)) {
                 // Array of rules
                 let allValid = true
@@ -151,7 +183,7 @@ export class RuleValidator {
                 return {
                     valid: allValid,
                     errors: allErrors,
-                    warnings: allWarnings
+                    warnings: allWarnings,
                 }
             } else if (parsed.rules && Array.isArray(parsed.rules)) {
                 // Rule set
@@ -164,13 +196,16 @@ export class RuleValidator {
             return {
                 valid: false,
                 errors: ['Invalid JSON format'],
-                warnings: []
+                warnings: [],
             }
         }
     }
 
-    checkRuleConflicts(rules: Rule[]): Array<{ rule1: Rule; rule2: Rule; conflict: string }> {
-        const conflicts: Array<{ rule1: Rule; rule2: Rule; conflict: string }> = []
+    checkRuleConflicts(
+        rules: Rule[]
+    ): Array<{ rule1: Rule; rule2: Rule; conflict: string }> {
+        const conflicts: Array<{ rule1: Rule; rule2: Rule; conflict: string }> =
+            []
 
         for (let i = 0; i < rules.length; i++) {
             for (let j = i + 1; j < rules.length; j++) {
@@ -184,18 +219,21 @@ export class RuleValidator {
                             conflicts.push({
                                 rule1,
                                 rule2,
-                                conflict: `Duplicate pattern: ${pattern1}`
+                                conflict: `Duplicate pattern: ${pattern1}`,
                             })
                         }
                     }
                 }
 
                 // Check for contradictory severities
-                if (rule1.id === rule2.id && rule1.severity !== rule2.severity) {
+                if (
+                    rule1.id === rule2.id &&
+                    rule1.severity !== rule2.severity
+                ) {
                     conflicts.push({
                         rule1,
                         rule2,
-                        conflict: 'Contradictory severity for same rule ID'
+                        conflict: 'Contradictory severity for same rule ID',
                     })
                 }
             }
@@ -208,15 +246,24 @@ export class RuleValidator {
         const suggestions: string[] = []
 
         if (!rule.fix) {
-            suggestions.push('Add a fix suggestion to help users resolve violations')
+            suggestions.push(
+                'Add a fix suggestion to help users resolve violations'
+            )
         }
 
-        if (rule.exceptions.length === 0 && rule.patterns.some(p => p.includes('\\b'))) {
-            suggestions.push('Consider adding exceptions for common false positives')
+        if (
+            rule.exceptions.length === 0 &&
+            rule.patterns.some((p) => p.includes('\\b'))
+        ) {
+            suggestions.push(
+                'Consider adding exceptions for common false positives'
+            )
         }
 
         if (!rule.language || rule.language.length === 0) {
-            suggestions.push('Specify target languages to avoid false positives')
+            suggestions.push(
+                'Specify target languages to avoid false positives'
+            )
         }
 
         if (!rule.filePatterns || rule.filePatterns.length === 0) {
@@ -224,11 +271,19 @@ export class RuleValidator {
         }
 
         if (rule.patterns.length === 1 && rule.patterns[0].length < 5) {
-            suggestions.push('Pattern may be too generic - consider making it more specific')
+            suggestions.push(
+                'Pattern may be too generic - consider making it more specific'
+            )
         }
 
-        if (rule.severity === 'error' && !rule.description.includes('must') && !rule.description.includes('required')) {
-            suggestions.push('Error-level rules should use stronger language in description')
+        if (
+            rule.severity === 'error' &&
+            !rule.description.includes('must') &&
+            !rule.description.includes('required')
+        ) {
+            suggestions.push(
+                'Error-level rules should use stronger language in description'
+            )
         }
 
         return suggestions

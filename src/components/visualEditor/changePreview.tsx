@@ -23,14 +23,19 @@ export function ChangePreview({
     onApplyAll,
     onRejectAll,
     previewMode,
-    onTogglePreview
+    onTogglePreview,
 }: ChangePreviewProps) {
-    const [selectedChange, setSelectedChange] = useState<VisualChange | null>(null)
+    const [selectedChange, setSelectedChange] = useState<VisualChange | null>(
+        null
+    )
     const [filter, setFilter] = useState('')
-    const [filterType, setFilterType] = useState<'all' | 'property' | 'style' | 'structure' | 'content'>('all')
+    const [filterType, setFilterType] = useState<
+        'all' | 'property' | 'style' | 'structure' | 'content'
+    >('all')
 
-    const filteredChanges = changes.filter(change => {
-        const matchesFilter = filter === '' ||
+    const filteredChanges = changes.filter((change) => {
+        const matchesFilter =
+            filter === '' ||
             change.description.toLowerCase().includes(filter.toLowerCase()) ||
             change.elementId.toLowerCase().includes(filter.toLowerCase())
 
@@ -40,10 +45,10 @@ export function ChangePreview({
     })
 
     const groupedChanges = {
-        property: filteredChanges.filter(c => c.type === 'property'),
-        style: filteredChanges.filter(c => c.type === 'style'),
-        structure: filteredChanges.filter(c => c.type === 'structure'),
-        content: filteredChanges.filter(c => c.type === 'content')
+        property: filteredChanges.filter((c) => c.type === 'property'),
+        style: filteredChanges.filter((c) => c.type === 'style'),
+        structure: filteredChanges.filter((c) => c.type === 'structure'),
+        content: filteredChanges.filter((c) => c.type === 'content'),
     }
 
     return (
@@ -84,74 +89,104 @@ export function ChangePreview({
             <div className="change-preview__list">
                 {filteredChanges.length === 0 ? (
                     <div className="change-preview__empty">
-                        {filter || filterType !== 'all' ? 'No changes match filter' : 'No changes to preview'}
+                        {filter || filterType !== 'all'
+                            ? 'No changes match filter'
+                            : 'No changes to preview'}
                     </div>
                 ) : (
                     <>
-                        {Object.entries(groupedChanges).map(([type, typeChanges]) => (
-                            typeChanges.length > 0 && (
-                                <div key={type} className="change-preview__group">
-                                    <h4 className="change-preview__group-title">
-                                        {type.charAt(0).toUpperCase() + type.slice(1)} ({typeChanges.length})
-                                    </h4>
-                                    {typeChanges.map(change => (
-                                        <div
-                                            key={change.id}
-                                            className={`change-preview__item ${selectedChange?.id === change.id ? 'selected' : ''}`}
-                                            onClick={() => setSelectedChange(change)}
-                                        >
-                                            <div className="change-preview__item-header">
-                                                <span className={`change-preview__type change-preview__type--${change.type}`}>
-                                                    {change.type}
-                                                </span>
-                                                <span className="change-preview__timestamp">
-                                                    {change.timestamp.toLocaleTimeString()}
-                                                </span>
+                        {Object.entries(groupedChanges).map(
+                            ([type, typeChanges]) =>
+                                typeChanges.length > 0 && (
+                                    <div
+                                        key={type}
+                                        className="change-preview__group"
+                                    >
+                                        <h4 className="change-preview__group-title">
+                                            {type.charAt(0).toUpperCase() +
+                                                type.slice(1)}{' '}
+                                            ({typeChanges.length})
+                                        </h4>
+                                        {typeChanges.map((change) => (
+                                            <div
+                                                key={change.id}
+                                                className={`change-preview__item ${selectedChange?.id === change.id ? 'selected' : ''}`}
+                                                onClick={() =>
+                                                    setSelectedChange(change)
+                                                }
+                                            >
+                                                <div className="change-preview__item-header">
+                                                    <span
+                                                        className={`change-preview__type change-preview__type--${change.type}`}
+                                                    >
+                                                        {change.type}
+                                                    </span>
+                                                    <span className="change-preview__timestamp">
+                                                        {change.timestamp.toLocaleTimeString()}
+                                                    </span>
+                                                </div>
+                                                <div className="change-preview__description">
+                                                    {change.description}
+                                                </div>
+                                                <div className="change-preview__diff">
+                                                    {change.oldValue !==
+                                                        undefined && (
+                                                        <div className="change-preview__old">
+                                                            <span className="change-preview__label">
+                                                                Old:
+                                                            </span>
+                                                            <code>
+                                                                {String(
+                                                                    change.oldValue
+                                                                )}
+                                                            </code>
+                                                        </div>
+                                                    )}
+                                                    {change.newValue !==
+                                                        undefined && (
+                                                        <div className="change-preview__new">
+                                                            <span className="change-preview__label">
+                                                                New:
+                                                            </span>
+                                                            <code>
+                                                                {String(
+                                                                    change.newValue
+                                                                )}
+                                                            </code>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="change-preview__actions">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            onApplyChange(
+                                                                change
+                                                            )
+                                                        }}
+                                                        className="change-preview__apply"
+                                                        title="Apply change"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            onRejectChange(
+                                                                change
+                                                            )
+                                                        }}
+                                                        className="change-preview__reject"
+                                                        title="Reject change"
+                                                    >
+                                                        ✗
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="change-preview__description">
-                                                {change.description}
-                                            </div>
-                                            <div className="change-preview__diff">
-                                                {change.oldValue !== undefined && (
-                                                    <div className="change-preview__old">
-                                                        <span className="change-preview__label">Old:</span>
-                                                        <code>{String(change.oldValue)}</code>
-                                                    </div>
-                                                )}
-                                                {change.newValue !== undefined && (
-                                                    <div className="change-preview__new">
-                                                        <span className="change-preview__label">New:</span>
-                                                        <code>{String(change.newValue)}</code>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="change-preview__actions">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        onApplyChange(change)
-                                                    }}
-                                                    className="change-preview__apply"
-                                                    title="Apply change"
-                                                >
-                                                    ✓
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        onRejectChange(change)
-                                                    }}
-                                                    className="change-preview__reject"
-                                                    title="Reject change"
-                                                >
-                                                    ✗
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )
-                        ))}
+                                        ))}
+                                    </div>
+                                )
+                        )}
                     </>
                 )}
             </div>
@@ -177,7 +212,9 @@ export function ChangePreview({
                 <div className="change-preview__details">
                     <div className="change-preview__details-header">
                         <h4>Change Details</h4>
-                        <button onClick={() => setSelectedChange(null)}>×</button>
+                        <button onClick={() => setSelectedChange(null)}>
+                            ×
+                        </button>
                     </div>
                     <div className="change-preview__details-content">
                         <div className="change-preview__detail">
@@ -204,7 +241,9 @@ export function ChangePreview({
                         </div>
                         <div className="change-preview__detail">
                             <label>Timestamp:</label>
-                            <span>{selectedChange.timestamp.toLocaleString()}</span>
+                            <span>
+                                {selectedChange.timestamp.toLocaleString()}
+                            </span>
                         </div>
                         {selectedChange.oldValue !== undefined && (
                             <div className="change-preview__detail">

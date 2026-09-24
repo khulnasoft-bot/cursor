@@ -34,12 +34,22 @@ class ExplorerService {
         log.info(`Workspace root set to: ${rootPath}`)
     }
 
-    async getDirectoryTree(dirPath: string, options: ExplorerOptions = {}): Promise<ExplorerNode> {
+    async getDirectoryTree(
+        dirPath: string,
+        options: ExplorerOptions = {}
+    ): Promise<ExplorerNode> {
         const defaultOptions: ExplorerOptions = {
             showHiddenFiles: false,
-            excludePatterns: ['node_modules', '.git', '.webpack', 'dist', 'build', 'out'],
+            excludePatterns: [
+                'node_modules',
+                '.git',
+                '.webpack',
+                'dist',
+                'build',
+                'out',
+            ],
             maxDepth: 10,
-            ...options
+            ...options,
         }
 
         return this.buildTree(dirPath, dirPath, 0, defaultOptions)
@@ -62,7 +72,7 @@ class ExplorerService {
                 type: 'file',
                 size: stats.size,
                 lastModified: stats.mtimeMs,
-                language: this.detectLanguage(currentPath)
+                language: this.detectLanguage(currentPath),
             }
         }
 
@@ -73,11 +83,13 @@ class ExplorerService {
                     name,
                     path: currentPath,
                     type: 'directory',
-                    children: []
+                    children: [],
                 }
             }
 
-            const entries = await fs.promises.readdir(currentPath, { withFileTypes: true })
+            const entries = await fs.promises.readdir(currentPath, {
+                withFileTypes: true,
+            })
             const children: ExplorerNode[] = []
 
             for (const entry of entries) {
@@ -87,14 +99,24 @@ class ExplorerService {
                 }
 
                 // Skip excluded patterns
-                if (options.excludePatterns?.some(pattern => 
-                    entry.name.includes(pattern) || currentPath.includes(pattern))) {
+                if (
+                    options.excludePatterns?.some(
+                        (pattern) =>
+                            entry.name.includes(pattern) ||
+                            currentPath.includes(pattern)
+                    )
+                ) {
                     continue
                 }
 
                 const fullPath = path.join(currentPath, entry.name)
                 try {
-                    const childNode = await this.buildTree(fullPath, path.join(relativePath, entry.name), depth + 1, options)
+                    const childNode = await this.buildTree(
+                        fullPath,
+                        path.join(relativePath, entry.name),
+                        depth + 1,
+                        options
+                    )
                     children.push(childNode)
                 } catch (error) {
                     log.warn(`Failed to build tree for ${fullPath}:`, error)
@@ -114,7 +136,7 @@ class ExplorerService {
                 name,
                 path: currentPath,
                 type: 'directory',
-                children
+                children,
             }
         }
 
@@ -152,12 +174,15 @@ class ExplorerService {
             '.yml': 'yaml',
             '.md': 'markdown',
             '.sql': 'sql',
-            '.sh': 'shell'
+            '.sh': 'shell',
         }
         return languageMap[ext] || 'plaintext'
     }
 
-    async searchNodes(query: string, rootNode: ExplorerNode): Promise<ExplorerNode[]> {
+    async searchNodes(
+        query: string,
+        rootNode: ExplorerNode
+    ): Promise<ExplorerNode[]> {
         const results: ExplorerNode[] = []
         const lowerQuery = query.toLowerCase()
 
@@ -177,7 +202,10 @@ class ExplorerService {
         return results
     }
 
-    async getNodeByPath(targetPath: string, rootNode: ExplorerNode): Promise<ExplorerNode | null> {
+    async getNodeByPath(
+        targetPath: string,
+        rootNode: ExplorerNode
+    ): Promise<ExplorerNode | null> {
         if (rootNode.path === targetPath) {
             return rootNode
         }

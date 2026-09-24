@@ -28,7 +28,12 @@ class AgentExecService {
     private taskIdCounter = 0
     private toolRegistry = getToolRegistry()
 
-    async executeAgent(command: string, args: string[] = [], cwd?: string, env?: Record<string, string>): Promise<string> {
+    async executeAgent(
+        command: string,
+        args: string[] = [],
+        cwd?: string,
+        env?: Record<string, string>
+    ): Promise<string> {
         const taskId = `agent-task-${++this.taskIdCounter}`
 
         const task: AgentTask = {
@@ -38,7 +43,7 @@ class AgentExecService {
             cwd,
             env,
             status: 'pending',
-            output: ''
+            output: '',
         }
 
         this.tasks.set(taskId, task)
@@ -47,7 +52,7 @@ class AgentExecService {
             const childProcess = spawn(command, args, {
                 cwd: cwd || process.cwd(),
                 env: { ...process.env, ...env },
-                stdio: ['pipe', 'pipe', 'pipe']
+                stdio: ['pipe', 'pipe', 'pipe'],
             })
 
             this.processes.set(taskId, childProcess)
@@ -81,18 +86,26 @@ class AgentExecService {
             return taskId
         } catch (error) {
             task.status = 'failed'
-            task.error = error instanceof Error ? error.message : 'Unknown error'
+            task.error =
+                error instanceof Error ? error.message : 'Unknown error'
             task.endTime = new Date()
             log.error('Failed to execute agent:', error)
             throw error
         }
     }
 
-    async executeAgentScript(scriptPath: string, args: string[] = [], cwd?: string): Promise<string> {
+    async executeAgentScript(
+        scriptPath: string,
+        args: string[] = [],
+        cwd?: string
+    ): Promise<string> {
         return this.executeAgent(scriptPath, args, cwd)
     }
 
-    async executeAgentCommand(commandString: string, cwd?: string): Promise<string> {
+    async executeAgentCommand(
+        commandString: string,
+        cwd?: string
+    ): Promise<string> {
         const parts = commandString.split(' ')
         const command = parts[0]
         const args = parts.slice(1)
@@ -108,15 +121,15 @@ class AgentExecService {
     }
 
     getRunningTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'running')
+        return this.getTasks().filter((t) => t.status === 'running')
     }
 
     getCompletedTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'completed')
+        return this.getTasks().filter((t) => t.status === 'completed')
     }
 
     getFailedTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'failed')
+        return this.getTasks().filter((t) => t.status === 'failed')
     }
 
     async stopTask(taskId: string): Promise<void> {
@@ -182,7 +195,10 @@ class AgentExecService {
         return task ? task.error || null : null
     }
 
-    async executeTool(toolName: string, params: Record<string, any>): Promise<string> {
+    async executeTool(
+        toolName: string,
+        params: Record<string, any>
+    ): Promise<string> {
         const taskId = `tool-task-${++this.taskIdCounter}`
 
         const task: AgentTask = {
@@ -192,7 +208,7 @@ class AgentExecService {
             status: 'pending',
             output: '',
             toolName,
-            toolParams: params
+            toolParams: params,
         }
 
         this.tasks.set(taskId, task)
@@ -212,7 +228,8 @@ class AgentExecService {
             return taskId
         } catch (error) {
             task.status = 'failed'
-            task.error = error instanceof Error ? error.message : 'Unknown error'
+            task.error =
+                error instanceof Error ? error.message : 'Unknown error'
             task.endTime = new Date()
             log.error(`Tool task ${taskId} error:`, error)
             throw error

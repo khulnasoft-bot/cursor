@@ -7,11 +7,14 @@ import { AgentTask, AgentResponse } from './agentWorker'
 
 export class AgentWorkerManager {
     private worker: Worker | null = null
-    private pendingTasks: Map<string, {
-        resolve: (value: any) => void
-        reject: (error: Error) => void
-        onProgress?: (progress: number) => void
-    }> = new Map()
+    private pendingTasks: Map<
+        string,
+        {
+            resolve: (value: any) => void
+            reject: (error: Error) => void
+            onProgress?: (progress: number) => void
+        }
+    > = new Map()
 
     constructor() {
         this.initializeWorker()
@@ -24,17 +27,19 @@ export class AgentWorkerManager {
             const workerCode = `
                 ${require('./agentWorker.ts')}
             `
-            
+
             // For now, we'll use a Blob approach for development
-            const blob = new Blob([workerCode], { type: 'application/javascript' })
+            const blob = new Blob([workerCode], {
+                type: 'application/javascript',
+            })
             const workerUrl = URL.createObjectURL(blob)
-            
+
             this.worker = new Worker(workerUrl)
-            
+
             this.worker.onmessage = (event: MessageEvent<AgentResponse>) => {
                 this.handleWorkerMessage(event.data)
             }
-            
+
             this.worker.onerror = (error) => {
                 console.error('Agent worker error:', error)
             }
@@ -89,7 +94,7 @@ export class AgentWorkerManager {
             {
                 type: 'completion',
                 id: taskId,
-                data: { file, content, pos }
+                data: { file, content, pos },
             },
             onProgress
         )
@@ -105,7 +110,7 @@ export class AgentWorkerManager {
             {
                 type: 'chat',
                 id: taskId,
-                data: { messages, context }
+                data: { messages, context },
             },
             onProgress
         )
@@ -121,7 +126,7 @@ export class AgentWorkerManager {
             {
                 type: 'analysis',
                 id: taskId,
-                data: { code, language }
+                data: { code, language },
             },
             onProgress
         )
@@ -138,7 +143,7 @@ export class AgentWorkerManager {
             {
                 type: 'fix',
                 id: taskId,
-                data: { code, errors, language }
+                data: { code, errors, language },
             },
             onProgress
         )

@@ -4,7 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import type { CloudAgentConfig, CloudAgentInstance, CloudAgentTask } from '../../features/cloudAgent'
+import type {
+    CloudAgentConfig,
+    CloudAgentInstance,
+    CloudAgentTask,
+} from '../../features/cloudAgent'
 
 interface CloudAgentPanelProps {
     isOpen: boolean
@@ -16,8 +20,10 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
     const [configs, _setConfigs] = useState<CloudAgentConfig[]>([])
     const [instances, _setInstances] = useState<CloudAgentInstance[]>([])
     const [tasks, _setTasks] = useState<CloudAgentTask[]>([])
-    const [selectedConfig, setSelectedConfig] = useState<CloudAgentConfig | null>(null)
-    const [selectedInstance, setSelectedInstance] = useState<CloudAgentInstance | null>(null)
+    const [selectedConfig, setSelectedConfig] =
+        useState<CloudAgentConfig | null>(null)
+    const [selectedInstance, setSelectedInstance] =
+        useState<CloudAgentInstance | null>(null)
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -76,7 +82,9 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
         <div className="cloud-agent-panel">
             <div className="cloud-agent-panel__header">
                 <h2>Cloud Agent Platform</h2>
-                <button onClick={onClose} className="cloud-agent-panel__close">×</button>
+                <button onClick={onClose} className="cloud-agent-panel__close">
+                    ×
+                </button>
             </div>
 
             <div className="cloud-agent-panel__tabs">
@@ -110,33 +118,50 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         </div>
 
                         {loading ? (
-                            <div className="cloud-agent-panel__loading">Loading...</div>
+                            <div className="cloud-agent-panel__loading">
+                                Loading...
+                            </div>
                         ) : configs.length === 0 ? (
-                            <div className="cloud-agent-panel__empty">No configurations</div>
+                            <div className="cloud-agent-panel__empty">
+                                No configurations
+                            </div>
                         ) : (
                             <div className="cloud-agent-panel__list">
-                                {configs.map(config => (
+                                {configs.map((config) => (
                                     <div
                                         key={config.id}
                                         className={`cloud-agent-panel__item ${selectedConfig?.id === config.id ? 'selected' : ''}`}
-                                        onClick={() => setSelectedConfig(config)}
+                                        onClick={() =>
+                                            setSelectedConfig(config)
+                                        }
                                     >
                                         <div className="cloud-agent-panel__item-header">
-                                            <span className="cloud-agent-panel__item-name">{config.name}</span>
-                                            <span className={`cloud-agent-panel__provider provider-${config.provider}`}>
+                                            <span className="cloud-agent-panel__item-name">
+                                                {config.name}
+                                            </span>
+                                            <span
+                                                className={`cloud-agent-panel__provider provider-${config.provider}`}
+                                            >
                                                 {config.provider}
                                             </span>
                                         </div>
                                         <div className="cloud-agent-panel__item-details">
                                             <span>Region: {config.region}</span>
-                                            <span>Type: {config.instanceType}</span>
-                                            <span>Max Agents: {config.maxConcurrentAgents}</span>
+                                            <span>
+                                                Type: {config.instanceType}
+                                            </span>
+                                            <span>
+                                                Max Agents:{' '}
+                                                {config.maxConcurrentAgents}
+                                            </span>
                                         </div>
                                         <div className="cloud-agent-panel__item-actions">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation()
-                                                    handleProvisionInstance(config.id)
+                                                    handleProvisionInstance(
+                                                        config.id
+                                                    )
                                                 }}
                                                 className="cloud-agent-panel__action"
                                             >
@@ -159,35 +184,58 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         </div>
 
                         {loading ? (
-                            <div className="cloud-agent-panel__loading">Loading...</div>
+                            <div className="cloud-agent-panel__loading">
+                                Loading...
+                            </div>
                         ) : instances.length === 0 ? (
-                            <div className="cloud-agent-panel__empty">No instances running</div>
+                            <div className="cloud-agent-panel__empty">
+                                No instances running
+                            </div>
                         ) : (
                             <div className="cloud-agent-panel__list">
-                                {instances.map(instance => (
+                                {instances.map((instance) => (
                                     <div
                                         key={instance.id}
                                         className={`cloud-agent-panel__item ${selectedInstance?.id === instance.id ? 'selected' : ''}`}
-                                        onClick={() => setSelectedInstance(instance)}
+                                        onClick={() =>
+                                            setSelectedInstance(instance)
+                                        }
                                     >
                                         <div className="cloud-agent-panel__item-header">
-                                            <span className="cloud-agent-panel__item-name">{instance.id}</span>
-                                            <span className={`cloud-agent-panel__status status-${instance.status}`}>
+                                            <span className="cloud-agent-panel__item-name">
+                                                {instance.id}
+                                            </span>
+                                            <span
+                                                className={`cloud-agent-panel__status status-${instance.status}`}
+                                            >
                                                 {instance.status}
                                             </span>
                                         </div>
                                         <div className="cloud-agent-panel__item-details">
-                                            <span>IP: {instance.ipAddress || 'N/A'}</span>
-                                            <span>Tasks: {instance.tasks.length}</span>
-                                            <span>CPU: {instance.resources.cpu} cores</span>
-                                            <span>Memory: {instance.resources.memory} MB</span>
+                                            <span>
+                                                IP:{' '}
+                                                {instance.ipAddress || 'N/A'}
+                                            </span>
+                                            <span>
+                                                Tasks: {instance.tasks.length}
+                                            </span>
+                                            <span>
+                                                CPU: {instance.resources.cpu}{' '}
+                                                cores
+                                            </span>
+                                            <span>
+                                                Memory:{' '}
+                                                {instance.resources.memory} MB
+                                            </span>
                                         </div>
                                         <div className="cloud-agent-panel__item-actions">
                                             {instance.status === 'running' && (
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation()
-                                                        handleDeprovisionInstance(instance.id)
+                                                        handleDeprovisionInstance(
+                                                            instance.id
+                                                        )
                                                     }}
                                                     className="cloud-agent-panel__action cloud-agent-panel__action--danger"
                                                 >
@@ -211,24 +259,42 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         </div>
 
                         {loading ? (
-                            <div className="cloud-agent-panel__loading">Loading...</div>
+                            <div className="cloud-agent-panel__loading">
+                                Loading...
+                            </div>
                         ) : tasks.length === 0 ? (
-                            <div className="cloud-agent-panel__empty">No tasks</div>
+                            <div className="cloud-agent-panel__empty">
+                                No tasks
+                            </div>
                         ) : (
                             <div className="cloud-agent-panel__list">
-                                {tasks.map(task => (
-                                    <div key={task.id} className="cloud-agent-panel__item">
+                                {tasks.map((task) => (
+                                    <div
+                                        key={task.id}
+                                        className="cloud-agent-panel__item"
+                                    >
                                         <div className="cloud-agent-panel__item-header">
-                                            <span className="cloud-agent-panel__item-name">{task.id}</span>
-                                            <span className={`cloud-agent-panel__status status-${task.status}`}>
+                                            <span className="cloud-agent-panel__item-name">
+                                                {task.id}
+                                            </span>
+                                            <span
+                                                className={`cloud-agent-panel__status status-${task.status}`}
+                                            >
                                                 {task.status}
                                             </span>
                                         </div>
                                         <div className="cloud-agent-panel__item-details">
-                                            <span>Instance: {task.instanceId}</span>
-                                            <span>Priority: {task.priority}</span>
+                                            <span>
+                                                Instance: {task.instanceId}
+                                            </span>
+                                            <span>
+                                                Priority: {task.priority}
+                                            </span>
                                             {task.executionTime && (
-                                                <span>Duration: {task.executionTime}ms</span>
+                                                <span>
+                                                    Duration:{' '}
+                                                    {task.executionTime}ms
+                                                </span>
                                             )}
                                         </div>
                                         {task.error && (
@@ -248,7 +314,9 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                 <div className="cloud-agent-panel__details">
                     <div className="cloud-agent-panel__details-header">
                         <h4>Config Details: {selectedConfig.name}</h4>
-                        <button onClick={() => setSelectedConfig(null)}>×</button>
+                        <button onClick={() => setSelectedConfig(null)}>
+                            ×
+                        </button>
                     </div>
                     <div className="cloud-agent-panel__details-content">
                         <div className="cloud-agent-panel__detail">
@@ -269,11 +337,19 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         </div>
                         <div className="cloud-agent-panel__detail">
                             <label>Auto Scaling:</label>
-                            <span>{selectedConfig.autoScaling ? 'Enabled' : 'Disabled'}</span>
+                            <span>
+                                {selectedConfig.autoScaling
+                                    ? 'Enabled'
+                                    : 'Disabled'}
+                            </span>
                         </div>
                         <div className="cloud-agent-panel__detail">
                             <label>Security:</label>
-                            <span>{selectedConfig.securityEnabled ? 'Enabled' : 'Disabled'}</span>
+                            <span>
+                                {selectedConfig.securityEnabled
+                                    ? 'Enabled'
+                                    : 'Disabled'}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -283,7 +359,9 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                 <div className="cloud-agent-panel__details">
                     <div className="cloud-agent-panel__details-header">
                         <h4>Instance Details: {selectedInstance.id}</h4>
-                        <button onClick={() => setSelectedInstance(null)}>×</button>
+                        <button onClick={() => setSelectedInstance(null)}>
+                            ×
+                        </button>
                     </div>
                     <div className="cloud-agent-panel__details-content">
                         <div className="cloud-agent-panel__detail">
@@ -292,12 +370,16 @@ export function CloudAgentPanel({ isOpen, onClose }: CloudAgentPanelProps) {
                         </div>
                         <div className="cloud-agent-panel__detail">
                             <label>Created:</label>
-                            <span>{selectedInstance.createdAt.toLocaleString()}</span>
+                            <span>
+                                {selectedInstance.createdAt.toLocaleString()}
+                            </span>
                         </div>
                         {selectedInstance.startedAt && (
                             <div className="cloud-agent-panel__detail">
                                 <label>Started:</label>
-                                <span>{selectedInstance.startedAt.toLocaleString()}</span>
+                                <span>
+                                    {selectedInstance.startedAt.toLocaleString()}
+                                </span>
                             </div>
                         )}
                         {selectedInstance.ipAddress && (

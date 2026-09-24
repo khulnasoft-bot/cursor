@@ -16,20 +16,24 @@ export interface CheckoutOptions {
 }
 
 class CheckoutService {
-    async checkoutBranch(repoPath: string, branchName: string, options?: CheckoutOptions): Promise<void> {
+    async checkoutBranch(
+        repoPath: string,
+        branchName: string,
+        options?: CheckoutOptions
+    ): Promise<void> {
         try {
             let command = `git checkout`
-            
+
             if (options?.createBranch) {
                 command += ` -b ${branchName}`
             } else {
                 command += ` ${branchName}`
             }
-            
+
             if (options?.force) {
                 command += ` --force`
             }
-            
+
             if (options?.track) {
                 command += ` --track`
             }
@@ -64,7 +68,10 @@ class CheckoutService {
 
     async getCurrentBranch(repoPath: string): Promise<string> {
         try {
-            const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD', { cwd: repoPath })
+            const { stdout } = await execAsync(
+                'git rev-parse --abbrev-ref HEAD',
+                { cwd: repoPath }
+            )
             return stdout.trim()
         } catch (error) {
             log.error('Failed to get current branch:', error)
@@ -74,7 +81,9 @@ class CheckoutService {
 
     async getCurrentCommit(repoPath: string): Promise<string> {
         try {
-            const { stdout } = await execAsync('git rev-parse HEAD', { cwd: repoPath })
+            const { stdout } = await execAsync('git rev-parse HEAD', {
+                cwd: repoPath,
+            })
             return stdout.trim()
         } catch (error) {
             log.error('Failed to get current commit:', error)
@@ -84,20 +93,29 @@ class CheckoutService {
 
     async getBranches(repoPath: string): Promise<string[]> {
         try {
-            const { stdout } = await execAsync('git branch -a', { cwd: repoPath })
-            return stdout.trim().split('\n').map(b => b.replace(/^\*?\s*/, '').trim())
+            const { stdout } = await execAsync('git branch -a', {
+                cwd: repoPath,
+            })
+            return stdout
+                .trim()
+                .split('\n')
+                .map((b) => b.replace(/^\*?\s*/, '').trim())
         } catch (error) {
             log.error('Failed to get branches:', error)
             throw error
         }
     }
 
-    async createBranch(repoPath: string, branchName: string, startPoint?: string): Promise<void> {
+    async createBranch(
+        repoPath: string,
+        branchName: string,
+        startPoint?: string
+    ): Promise<void> {
         try {
-            const command = startPoint 
+            const command = startPoint
                 ? `git branch ${branchName} ${startPoint}`
                 : `git branch ${branchName}`
-            
+
             await execAsync(command, { cwd: repoPath })
             log.info(`Created branch: ${branchName}`)
         } catch (error) {
@@ -106,12 +124,16 @@ class CheckoutService {
         }
     }
 
-    async deleteBranch(repoPath: string, branchName: string, force: boolean = false): Promise<void> {
+    async deleteBranch(
+        repoPath: string,
+        branchName: string,
+        force: boolean = false
+    ): Promise<void> {
         try {
-            const command = force 
+            const command = force
                 ? `git branch -D ${branchName}`
                 : `git branch -d ${branchName}`
-            
+
             await execAsync(command, { cwd: repoPath })
             log.info(`Deleted branch: ${branchName}`)
         } catch (error) {
@@ -122,10 +144,10 @@ class CheckoutService {
 
     async discardChanges(repoPath: string, filePath?: string): Promise<void> {
         try {
-            const command = filePath 
+            const command = filePath
                 ? `git checkout -- ${filePath}`
                 : `git checkout -- .`
-            
+
             await execAsync(command, { cwd: repoPath })
             log.info(`Discarded changes${filePath ? ` for ${filePath}` : ''}`)
         } catch (error) {
@@ -136,10 +158,10 @@ class CheckoutService {
 
     async stashChanges(repoPath: string, message?: string): Promise<string> {
         try {
-            const command = message 
+            const command = message
                 ? `git stash push -m "${message}"`
                 : `git stash`
-            
+
             const { stdout } = await execAsync(command, { cwd: repoPath })
             log.info('Stashed changes')
             return stdout.trim()
@@ -151,10 +173,10 @@ class CheckoutService {
 
     async stashPop(repoPath: string, stashRef?: string): Promise<void> {
         try {
-            const command = stashRef 
+            const command = stashRef
                 ? `git stash pop ${stashRef}`
                 : `git stash pop`
-            
+
             await execAsync(command, { cwd: repoPath })
             log.info('Popped stashed changes')
         } catch (error) {

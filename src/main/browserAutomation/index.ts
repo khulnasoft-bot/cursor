@@ -1,3 +1,11 @@
-export { getBrowserAutomation, cleanupBrowserAutomation } from './browserAutomation'
+export {
+    getBrowserAutomation,
+    cleanupBrowserAutomation,
+} from './browserAutomation'
 export { setupBrowserAutomationIpcs } from './ipcHandlers'
-export type { BrowserAutomationOptions, NavigationOptions, PageInteraction, BrowserSession } from './browserAutomation'
+export type {
+    BrowserAutomationOptions,
+    NavigationOptions,
+    PageInteraction,
+    BrowserSession,
+} from './browserAutomation'

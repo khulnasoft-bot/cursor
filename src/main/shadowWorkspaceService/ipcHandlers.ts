@@ -15,11 +15,20 @@ export function setupShadowWorkspaceServiceIpcs() {
         'shadow-workspace-create',
         async (_event: IpcMainInvokeEvent, originalPath: string) => {
             try {
-                const workspaceId = await shadowWorkspaceService.createShadowWorkspace(originalPath)
+                const workspaceId =
+                    await shadowWorkspaceService.createShadowWorkspace(
+                        originalPath
+                    )
                 return { success: true, workspaceId }
             } catch (error) {
                 log.error('Failed to create shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -33,7 +42,13 @@ export function setupShadowWorkspaceServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to sync to shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -47,7 +62,13 @@ export function setupShadowWorkspaceServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to sync from shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -61,7 +82,13 @@ export function setupShadowWorkspaceServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to delete shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -71,28 +98,35 @@ export function setupShadowWorkspaceServiceIpcs() {
         'shadow-workspace-get',
         async (_event: IpcMainInvokeEvent, workspaceId: string) => {
             try {
-                const workspace = shadowWorkspaceService.getWorkspace(workspaceId)
+                const workspace =
+                    shadowWorkspaceService.getWorkspace(workspaceId)
                 return { success: true, workspace }
             } catch (error) {
                 log.error('Failed to get shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get all workspaces
-    ipcMain.handle(
-        'shadow-workspace-get-all',
-        async () => {
-            try {
-                const workspaces = shadowWorkspaceService.getWorkspaces()
-                return { success: true, workspaces }
-            } catch (error) {
-                log.error('Failed to get shadow workspaces:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('shadow-workspace-get-all', async () => {
+        try {
+            const workspaces = shadowWorkspaceService.getWorkspaces()
+            return { success: true, workspaces }
+        } catch (error) {
+            log.error('Failed to get shadow workspaces:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Activate workspace
     ipcMain.handle(
@@ -103,7 +137,13 @@ export function setupShadowWorkspaceServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to activate shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -117,7 +157,13 @@ export function setupShadowWorkspaceServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to deactivate shadow workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

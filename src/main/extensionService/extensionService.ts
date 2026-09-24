@@ -52,30 +52,46 @@ class ExtensionService {
                 return
             }
 
-            const extensionDirs = fs.readdirSync(this.extensionsPath, { withFileTypes: true })
-            
+            const extensionDirs = fs.readdirSync(this.extensionsPath, {
+                withFileTypes: true,
+            })
+
             for (const dir of extensionDirs) {
                 if (dir.isDirectory()) {
-                    const extensionPath = path.join(this.extensionsPath, dir.name)
-                    const manifestPath = path.join(extensionPath, 'package.json')
-                    
+                    const extensionPath = path.join(
+                        this.extensionsPath,
+                        dir.name
+                    )
+                    const manifestPath = path.join(
+                        extensionPath,
+                        'package.json'
+                    )
+
                     if (fs.existsSync(manifestPath)) {
                         try {
-                            const manifestData = fs.readFileSync(manifestPath, 'utf8')
-                            const manifest = JSON.parse(manifestData) as ExtensionManifest
-                            
+                            const manifestData = fs.readFileSync(
+                                manifestPath,
+                                'utf8'
+                            )
+                            const manifest = JSON.parse(
+                                manifestData
+                            ) as ExtensionManifest
+
                             const extension: Extension = {
                                 id: manifest.name,
                                 manifest,
                                 path: extensionPath,
                                 enabled: true,
-                                installed: true
+                                installed: true,
                             }
-                            
+
                             this.extensions.set(extension.id, extension)
                             log.info(`Loaded extension: ${manifest.name}`)
                         } catch (error) {
-                            log.error(`Failed to load extension ${dir.name}:`, error)
+                            log.error(
+                                `Failed to load extension ${dir.name}:`,
+                                error
+                            )
                         }
                     }
                 }
@@ -98,7 +114,9 @@ class ExtensionService {
 
             // Check if already installed
             if (this.extensions.has(manifest.name)) {
-                throw new Error(`Extension ${manifest.name} is already installed`)
+                throw new Error(
+                    `Extension ${manifest.name} is already installed`
+                )
             }
 
             // Copy extension to extensions directory
@@ -114,7 +132,7 @@ class ExtensionService {
                 manifest,
                 path: targetPath,
                 enabled: true,
-                installed: true
+                installed: true,
             }
 
             this.extensions.set(extension.id, extension)
@@ -176,13 +194,15 @@ class ExtensionService {
     }
 
     getEnabledExtensions(): Extension[] {
-        return this.getExtensions().filter(ext => ext.enabled)
+        return this.getExtensions().filter((ext) => ext.enabled)
     }
 
     async loadExtension(extensionId: string): Promise<void> {
         const extension = this.extensions.get(extensionId)
         if (!extension || !extension.enabled) {
-            throw new Error(`Extension not found or not enabled: ${extensionId}`)
+            throw new Error(
+                `Extension not found or not enabled: ${extensionId}`
+            )
         }
 
         try {

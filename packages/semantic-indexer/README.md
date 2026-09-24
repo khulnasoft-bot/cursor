@@ -16,7 +16,7 @@ import { createSemanticIndexer } from '@cursor/semantic-indexer'
 // Create semantic indexer
 const indexer = createSemanticIndexer({
     chunkSize: 500,
-    chunkOverlap: 50
+    chunkOverlap: 50,
 })
 
 // Index a file
@@ -26,11 +26,13 @@ await indexer.indexFile('./src/main.ts', fileContent, 'typescript')
 const results = await indexer.search({
     query: 'How to handle authentication',
     limit: 10,
-    threshold: 0.7
+    threshold: 0.7,
 })
 
-results.forEach(result => {
-    console.log(`${result.filePath}:${result.lineRange.start}-${result.lineRange.end}`)
+results.forEach((result) => {
+    console.log(
+        `${result.filePath}:${result.lineRange.start}-${result.lineRange.end}`
+    )
     console.log(`Similarity: ${result.similarity.toFixed(2)}`)
     console.log(result.chunk.content)
 })
@@ -39,30 +41,35 @@ results.forEach(result => {
 ## Features
 
 ### Semantic Indexing
+
 - Embedding-based code understanding
 - Configurable chunking with overlap
 - Support for multiple programming languages
 - Efficient caching of embeddings
 
 ### Semantic Search
+
 - Cosine similarity-based search
 - Hybrid search (semantic + text)
 - File and language filtering
 - Configurable similarity thresholds
 
 ### Relationship Mapping
+
 - Import/export dependency analysis
 - File relationship graph
 - Related file discovery
 - Similar file detection
 
 ### Index Management
+
 - Incremental index updates
 - Snapshot and rollback support
 - Index validation and optimization
 - Persistent storage support
 
 ### Search Engine
+
 - High-performance search with caching
 - Near-context search
 - Similar code discovery
@@ -73,6 +80,7 @@ results.forEach(result => {
 ### SemanticIndexer
 
 #### Configuration
+
 ```typescript
 interface IndexerConfig {
     chunkSize: number
@@ -85,16 +93,19 @@ interface IndexerConfig {
 ```
 
 #### Indexing
+
 - `indexFile(filePath, content, language)` - Index a single file
 - `indexDirectory(directoryPath, fileExtensions, ignorePatterns)` - Index a directory
 - `reindexFile(filePath, content, language)` - Re-index a file
 - `removeFile(filePath)` - Remove a file from index
 
 #### Search
+
 - `search(query)` - Semantic search
 - `searchByFile(filePath, query, limit)` - Search within a file
 
 #### Index Management
+
 - `getIndexStats()` - Get index statistics
 - `clearIndex()` - Clear the entire index
 - `getChunk(chunkId)` - Get a specific chunk
@@ -103,6 +114,7 @@ interface IndexerConfig {
 ### EmbeddingGenerator
 
 #### Configuration
+
 ```typescript
 interface EmbeddingConfig {
     dimension: number
@@ -113,27 +125,32 @@ interface EmbeddingConfig {
 ```
 
 #### Embedding Generation
+
 - `generateEmbedding(text)` - Generate embedding for text
 - `generateBatchEmbeddings(texts)` - Generate embeddings for multiple texts
 - `cosineSimilarity(a, b)` - Calculate cosine similarity
 - `euclideanDistance(a, b)` - Calculate Euclidean distance
 
 #### Cache Management
+
 - `clearCache()` - Clear embedding cache
 - `getCacheStats()` - Get cache statistics
 
 ### RelationshipMapper
 
 #### Analysis
+
 - `analyzeFile(filePath, content, language)` - Analyze file relationships
 - `getDependents(filePath)` - Get files that depend on this file
 - `getDependencies(filePath)` - Get files this file depends on
 - `getRelatedFiles(filePath, maxDepth)` - Get related files
 
 #### Similarity
+
 - `findSimilarFiles(filePath, threshold)` - Find similar files
 
 #### Graph Management
+
 - `getGraph()` - Get the relationship graph
 - `getGraphStats()` - Get graph statistics
 - `clearGraph()` - Clear the graph
@@ -141,6 +158,7 @@ interface EmbeddingConfig {
 ### SearchEngine
 
 #### Configuration
+
 ```typescript
 interface SearchOptions {
     enableHybridSearch?: boolean
@@ -151,39 +169,46 @@ interface SearchOptions {
 ```
 
 #### Search
+
 - `search(chunks, query)` - Perform semantic search
 - `hybridSearch(chunks, query, textResults)` - Hybrid semantic + text search
 - `searchNear(chunks, filePath, line, radius)` - Search near a specific line
 - `searchSimilar(chunks, referenceChunk, limit)` - Find similar code
 
 #### Cache Management
+
 - `clearCache()` - Clear search cache
 - `getCacheStats()` - Get cache statistics
 
 ### IndexManager
 
 #### Index Operations
+
 - `addChunk(chunk)` - Add a chunk to the index
 - `removeChunk(chunkId)` - Remove a chunk from the index
 - `removeFile(filePath)` - Remove all chunks for a file
 - `updateChunk(chunkId, updates)` - Update a chunk
 
 #### Snapshot Management
+
 - `createSnapshot()` - Create an index snapshot
 - `restoreSnapshot(snapshotId)` - Restore from a snapshot
 - `pruneOldSnapshots(olderThan)` - Prune old snapshots
 
 #### Persistence
+
 - `saveIndex(path)` - Save index to disk
 - `loadIndex(path)` - Load index from disk
 
 #### Optimization
+
 - `optimizeIndex()` - Optimize index for memory
 - `validateIndex()` - Validate index integrity
 
 ## Examples
 
 ### Basic Semantic Search
+
 ```typescript
 import { createSemanticIndexer } from '@cursor/semantic-indexer'
 
@@ -197,15 +222,18 @@ await indexer.indexFile('./src/user.ts', userContent, 'typescript')
 const results = await indexer.search({
     query: 'user authentication logic',
     limit: 5,
-    threshold: 0.7
+    threshold: 0.7,
 })
 
-results.forEach(result => {
-    console.log(`Found in ${result.filePath} (similarity: ${result.similarity.toFixed(2)})`)
+results.forEach((result) => {
+    console.log(
+        `Found in ${result.filePath} (similarity: ${result.similarity.toFixed(2)})`
+    )
 })
 ```
 
 ### Relationship Analysis
+
 ```typescript
 import { createRelationshipMapper } from '@cursor/semantic-indexer'
 
@@ -217,7 +245,10 @@ mapper.analyzeFile('./src/utils.ts', utilsContent, 'typescript')
 
 // Get dependencies
 const deps = mapper.getDependencies('./src/main.ts')
-console.log('Dependencies:', deps.map(d => d.targetFile))
+console.log(
+    'Dependencies:',
+    deps.map((d) => d.targetFile)
+)
 
 // Get related files
 const related = mapper.getRelatedFiles('./src/main.ts', 2)
@@ -225,13 +256,17 @@ console.log('Related files:', related)
 ```
 
 ### Advanced Search
+
 ```typescript
-import { createSearchEngine, createEmbeddingGenerator } from '@cursor/semantic-indexer'
+import {
+    createSearchEngine,
+    createEmbeddingGenerator,
+} from '@cursor/semantic-indexer'
 
 const embeddingGen = createEmbeddingGenerator()
 const searchEngine = createSearchEngine(embeddingGen, {
     enableHybridSearch: true,
-    enableCache: true
+    enableCache: true,
 })
 
 // Hybrid search
@@ -251,12 +286,13 @@ const nearResults = await searchEngine.searchNear(
 ```
 
 ### Index Management
+
 ```typescript
 import { createIndexManager } from '@cursor/semantic-indexer'
 
 const manager = createIndexManager({
     enablePersistence: true,
-    maxIndexSize: 100000
+    maxIndexSize: 100000,
 })
 
 // Create snapshot before changes
@@ -277,6 +313,7 @@ manager.optimizeIndex()
 ```
 
 ### Custom Embedding Service
+
 ```typescript
 import { createEmbeddingGenerator } from '@cursor/semantic-indexer'
 
@@ -295,24 +332,28 @@ embeddingGen.setEmbeddingService(new CustomEmbeddingService())
 ## Best Practices
 
 ### Indexing
+
 - Use appropriate chunk sizes for your codebase
 - Enable caching for better performance
 - Re-index files after changes
 - Monitor index size and prune if needed
 
 ### Searching
+
 - Use specific queries for better results
 - Adjust similarity thresholds based on needs
 - Use file/language filters for faster searches
 - Enable hybrid search for better recall
 
 ### Performance
+
 - Enable caching for repeated queries
 - Use batch embedding for multiple texts
 - Optimize index periodically
 - Set appropriate index size limits
 
 ### Memory Management
+
 - Monitor embedding cache size
 - Prune old embeddings when needed
 - Use index size limits for large codebases
@@ -337,7 +378,7 @@ embeddingGen.setEmbeddingService({
             { model: 'text-embedding-3-small' }
         )
         return JSON.parse(response)
-    }
+    },
 })
 ```
 
@@ -360,16 +401,19 @@ try {
 ## Performance
 
 ### Indexing Performance
+
 - ~500 chunks/second for typical code
 - Caching reduces repeated embedding generation
 - Batch processing for multiple files
 
 ### Search Performance
+
 - <100ms for typical queries with caching
 - <500ms for uncached queries
 - Hybrid search adds ~50ms overhead
 
 ### Memory Usage
+
 - ~1KB per chunk (excluding embeddings)
 - ~6KB per chunk with 1536-dim embeddings
 - Cache size configurable (default: 10,000 entries)

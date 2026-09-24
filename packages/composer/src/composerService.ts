@@ -10,7 +10,7 @@ import {
     ComposerResult,
     ComposerExecution,
     ExecutionStatus,
-    ComposerConfig
+    ComposerConfig,
 } from './types'
 import { Logger, ConsoleLogger } from './logger'
 
@@ -33,7 +33,7 @@ export class ComposerService {
             defaultMaxFiles: 10,
             enableRollback: true,
             logLevel: 'info',
-            ...config
+            ...config,
         }
         this.logger = logger || new ConsoleLogger()
     }
@@ -57,23 +57,32 @@ export class ComposerService {
             throw new Error('AI service not set. Call setAIService() first.')
         }
 
-        this.logger.info('Planning multi-file changes for prompt:', request.prompt)
+        this.logger.info(
+            'Planning multi-file changes for prompt:',
+            request.prompt
+        )
 
         // Build AI context with all relevant files
         const aiContext = {
             files: Array.from(request.context.files.keys()),
             projectPath: request.context.projectPath,
-            language: request.context.language
+            language: request.context.language,
         }
 
         // Build prompt for AI to generate coordinated changes
         const planningPrompt = this.buildPlanningPrompt(request)
 
         try {
-            const response = await this.aiService.sendMessage(planningPrompt, aiContext)
+            const response = await this.aiService.sendMessage(
+                planningPrompt,
+                aiContext
+            )
 
             // Parse the AI response to extract file changes
-            const changes = this.parseChangesResponse(response, request.context.files)
+            const changes = this.parseChangesResponse(
+                response,
+                request.context.files
+            )
 
             // Validate constraints
             this.validateConstraints(changes, request.constraints)
@@ -92,7 +101,7 @@ export class ComposerService {
                 summary,
                 estimatedTime: this.estimateExecutionTime(changes),
                 dependencies,
-                executionOrder
+                executionOrder,
             }
         } catch (error) {
             this.logger.error('Failed to plan changes:', error)
@@ -114,7 +123,7 @@ export class ComposerService {
             startTime: new Date(),
             appliedChanges: new Map(),
             rollbackData: new Map(),
-            canRollback: this.config.enableRollback ?? true
+            canRollback: this.config.enableRollback ?? true,
         }
 
         this.activeExecutions.set(requestId, execution)
@@ -126,19 +135,27 @@ export class ComposerService {
             for (const changeId of result.executionOrder) {
                 execution.currentStep++
 
-                const change = result.changes.find(c => c.filePath === changeId)
+                const change = result.changes.find(
+                    (c) => c.filePath === changeId
+                )
                 if (!change) {
                     throw new Error(`Change not found: ${changeId}`)
                 }
 
                 // Store original content for rollback
                 if (execution.canRollback && execution.rollbackData) {
-                    execution.rollbackData.set(change.filePath, change.originalContent)
+                    execution.rollbackData.set(
+                        change.filePath,
+                        change.originalContent
+                    )
                 }
 
                 // Apply the change (placeholder - would integrate with file system)
                 await this.executeSingleChange(change)
-                execution.appliedChanges.set(change.filePath, change.proposedContent)
+                execution.appliedChanges.set(
+                    change.filePath,
+                    change.proposedContent
+                )
                 execution.executedChanges.push(changeId)
             }
 
@@ -146,7 +163,8 @@ export class ComposerService {
             this.logger.info(`Composer execution completed: ${requestId}`)
         } catch (error) {
             execution.status = 'failed'
-            execution.error = error instanceof Error ? error.message : 'Unknown error'
+            execution.error =
+                error instanceof Error ? error.message : 'Unknown error'
             this.logger.error(`Composer execution failed: ${requestId}`, error)
         } finally {
             execution.endTime = new Date()
@@ -166,7 +184,9 @@ export class ComposerService {
         }
 
         if (!execution.rollbackData || execution.rollbackData.size === 0) {
-            throw new Error(`No rollback data available for execution: ${requestId}`)
+            throw new Error(
+                `No rollback data available for execution: ${requestId}`
+            )
         }
 
         this.logger.info(`Rolling back execution: ${requestId}`)
@@ -187,7 +207,10 @@ export class ComposerService {
             execution.canRollback = false
             this.logger.info(`Rollback completed for execution: ${requestId}`)
         } catch (error) {
-            this.logger.error(`Rollback failed for execution ${requestId}:`, error)
+            this.logger.error(
+                `Rollback failed for execution ${requestId}:`,
+                error
+            )
             throw error
         }
 
@@ -197,8 +220,10 @@ export class ComposerService {
     private async executeSingleChange(change: FileChange): Promise<void> {
         // This would integrate with the file system to apply changes
         // For now, this is a placeholder
-        this.logger.info(`Executing change for ${change.filePath}: ${change.description}`)
-        
+        this.logger.info(
+            `Executing change for ${change.filePath}: ${change.description}`
+        )
+
         // In a real implementation, this would:
         // 1. Read the current file content
         // 2. Apply the change based on changeType
@@ -206,10 +231,13 @@ export class ComposerService {
         // 4. Handle merge conflicts if they arise
     }
 
-    private async restoreFileContent(filePath: string, content: string): Promise<void> {
+    private async restoreFileContent(
+        filePath: string,
+        content: string
+    ): Promise<void> {
         // This would integrate with the file system to restore content
         this.logger.info(`Restoring content for ${filePath}`)
-        
+
         // In a real implementation, this would:
         // 1. Write the original content back to the file
         // 2. Verify the restoration was successful
@@ -221,12 +249,14 @@ export class ComposerService {
         prompt += `Available files:\n`
 
         for (const [filePath, content] of request.context.files) {
-            const preview = content.substring(0, 500) + (content.length > 500 ? '...' : '')
+            const preview =
+                content.substring(0, 500) + (content.length > 500 ? '...' : '')
             prompt += `- ${filePath}\n`
             prompt += `  Preview: ${preview}\n\n`
         }
 
-        const maxFiles = request.constraints?.maxFiles || this.config.defaultMaxFiles
+        const maxFiles =
+            request.constraints?.maxFiles || this.config.defaultMaxFiles
         prompt += `\nGenerate a plan of changes needed to fulfill the user's request.\n`
         prompt += `Limit changes to at most ${maxFiles} files.\n`
         prompt += `For each change, specify:\n`
@@ -242,7 +272,10 @@ export class ComposerService {
         return prompt
     }
 
-    private parseChangesResponse(response: string, files: Map<string, string>): FileChange[] {
+    private parseChangesResponse(
+        response: string,
+        files: Map<string, string>
+    ): FileChange[] {
         const changes: FileChange[] = []
 
         // Parse the AI response to extract file changes
@@ -253,7 +286,10 @@ export class ComposerService {
         for (const line of lines) {
             if (line.startsWith('File:')) {
                 if (currentChange) {
-                    if (currentChange.filePath && currentChange.originalContent !== undefined) {
+                    if (
+                        currentChange.filePath &&
+                        currentChange.originalContent !== undefined
+                    ) {
                         changes.push(currentChange as FileChange)
                     }
                 }
@@ -266,7 +302,7 @@ export class ComposerService {
                     lineRange: { start: 0, end: 0 },
                     description: '',
                     dependencies: [],
-                    dependents: []
+                    dependents: [],
                 }
             } else if (line.startsWith('Type:') && currentChange) {
                 currentChange.changeType = line.substring(5).trim() as any
@@ -274,43 +310,65 @@ export class ComposerService {
                 const range = line.substring(6).trim().split('-')
                 currentChange.lineRange = {
                     start: parseInt(range[0]) || 0,
-                    end: parseInt(range[1]) || 0
+                    end: parseInt(range[1]) || 0,
                 }
             } else if (line.startsWith('Description:') && currentChange) {
                 currentChange.description = line.substring(12).trim()
             } else if (line.startsWith('Dependencies:') && currentChange) {
-                currentChange.dependencies = line.substring(13).trim().split(',').map(s => s.trim()).filter(s => s.length > 0)
+                currentChange.dependencies = line
+                    .substring(13)
+                    .trim()
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter((s) => s.length > 0)
             }
         }
 
-        if (currentChange && currentChange.filePath && currentChange.originalContent !== undefined) {
+        if (
+            currentChange &&
+            currentChange.filePath &&
+            currentChange.originalContent !== undefined
+        ) {
             changes.push(currentChange as FileChange)
         }
 
         return changes
     }
 
-    private validateConstraints(changes: FileChange[], constraints?: ComposerRequest['constraints']): void {
+    private validateConstraints(
+        changes: FileChange[],
+        constraints?: ComposerRequest['constraints']
+    ): void {
         if (!constraints) return
 
         if (constraints.maxFiles && changes.length > constraints.maxFiles) {
-            throw new Error(`Too many files: ${changes.length} (max: ${constraints.maxFiles})`)
+            throw new Error(
+                `Too many files: ${changes.length} (max: ${constraints.maxFiles})`
+            )
         }
 
         if (constraints.allowedPaths) {
             for (const change of changes) {
-                const allowed = constraints.allowedPaths.some(path => change.filePath.startsWith(path))
+                const allowed = constraints.allowedPaths.some((path) =>
+                    change.filePath.startsWith(path)
+                )
                 if (!allowed) {
-                    throw new Error(`File not in allowed paths: ${change.filePath}`)
+                    throw new Error(
+                        `File not in allowed paths: ${change.filePath}`
+                    )
                 }
             }
         }
 
         if (constraints.forbiddenPaths) {
             for (const change of changes) {
-                const forbidden = constraints.forbiddenPaths.some(path => change.filePath.startsWith(path))
+                const forbidden = constraints.forbiddenPaths.some((path) =>
+                    change.filePath.startsWith(path)
+                )
                 if (forbidden) {
-                    throw new Error(`File in forbidden paths: ${change.filePath}`)
+                    throw new Error(
+                        `File in forbidden paths: ${change.filePath}`
+                    )
                 }
             }
         }
@@ -337,14 +395,19 @@ export class ComposerService {
         return dependencies
     }
 
-    private topologicalSort(changes: FileChange[], dependencies: Map<string, string[]>): string[] {
+    private topologicalSort(
+        changes: FileChange[],
+        dependencies: Map<string, string[]>
+    ): string[] {
         const visited = new Set<string>()
         const temp = new Set<string>()
         const order: string[] = []
 
         const visit = (node: string) => {
             if (temp.has(node)) {
-                throw new Error(`Circular dependency detected involving ${node}`)
+                throw new Error(
+                    `Circular dependency detected involving ${node}`
+                )
             }
             if (visited.has(node)) {
                 return
@@ -373,7 +436,7 @@ export class ComposerService {
 
     private generateSummary(changes: FileChange[], prompt: string): string {
         const changeCount = changes.length
-        const fileCount = new Set(changes.map(c => c.filePath)).size
+        const fileCount = new Set(changes.map((c) => c.filePath)).size
 
         let summary = `Planned ${changeCount} change${changeCount !== 1 ? 's' : ''} across ${fileCount} file${fileCount !== 1 ? 's' : ''}.\n`
         summary += `Request: "${prompt}"\n\n`
@@ -400,7 +463,11 @@ export class ComposerService {
 
     cancelExecution(requestId: string): boolean {
         const execution = this.activeExecutions.get(requestId)
-        if (execution && (execution.status === 'pending' || execution.status === 'in_progress')) {
+        if (
+            execution &&
+            (execution.status === 'pending' ||
+                execution.status === 'in_progress')
+        ) {
             execution.status = 'cancelled'
             this.logger.info(`Cancelled composer execution: ${requestId}`)
             return true
@@ -410,7 +477,7 @@ export class ComposerService {
 
     getActiveExecutions(): ComposerExecution[] {
         return Array.from(this.activeExecutions.values()).filter(
-            e => e.status === 'pending' || e.status === 'in_progress'
+            (e) => e.status === 'pending' || e.status === 'in_progress'
         )
     }
 
@@ -429,7 +496,10 @@ export class ComposerService {
 // Singleton instance
 let composerService: ComposerService | null = null
 
-export function getComposerService(config?: ComposerConfig, logger?: Logger): ComposerService {
+export function getComposerService(
+    config?: ComposerConfig,
+    logger?: Logger
+): ComposerService {
     if (!composerService) {
         composerService = new ComposerService(config, logger)
     }
@@ -443,6 +513,9 @@ export function destroyComposerService(): void {
     }
 }
 
-export function createComposerService(config?: ComposerConfig, logger?: Logger): ComposerService {
+export function createComposerService(
+    config?: ComposerConfig,
+    logger?: Logger
+): ComposerService {
     return new ComposerService(config, logger)
 }

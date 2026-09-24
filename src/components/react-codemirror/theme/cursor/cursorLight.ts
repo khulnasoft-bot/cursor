@@ -94,11 +94,7 @@ export function cursorLightInit(options?: any) {
                 color: '#CF2D56',
             },
             {
-                tag: [
-                    t.special(t.string),
-                    t.string,
-                    t.inserted,
-                ],
+                tag: [t.special(t.string), t.string, t.inserted],
                 color: '#1F8A65',
             },
             { tag: [t.angleBracket], color: '#206595' },

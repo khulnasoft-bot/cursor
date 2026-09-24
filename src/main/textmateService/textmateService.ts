@@ -38,15 +38,22 @@ class TextMateService {
                     try {
                         const data = fs.readFileSync(grammarPath, 'utf8')
                         const grammar = JSON.parse(data)
-                        
+
                         if (grammar.scopeName) {
                             const textMateGrammar: TextMateGrammar = {
                                 scopeName: grammar.scopeName,
                                 path: grammarPath,
-                                language: grammar.scopeName.split('.')[0] || 'unknown'
+                                language:
+                                    grammar.scopeName.split('.')[0] ||
+                                    'unknown',
                             }
-                            this.grammars.set(grammar.scopeName, textMateGrammar)
-                            log.info(`Loaded TextMate grammar: ${grammar.scopeName}`)
+                            this.grammars.set(
+                                grammar.scopeName,
+                                textMateGrammar
+                            )
+                            log.info(
+                                `Loaded TextMate grammar: ${grammar.scopeName}`
+                            )
                         }
                     } catch (error) {
                         log.error(`Failed to load grammar ${file}:`, error)
@@ -77,19 +84,19 @@ class TextMateService {
     }
 
     getGrammarByLanguage(language: string): TextMateGrammar[] {
-        return this.getGrammars().filter(g => g.language === language)
+        return this.getGrammars().filter((g) => g.language === language)
     }
 
     async loadGrammarFromFile(filePath: string): Promise<void> {
         try {
             const data = fs.readFileSync(filePath, 'utf8')
             const grammar = JSON.parse(data)
-            
+
             if (grammar.scopeName) {
                 const textMateGrammar: TextMateGrammar = {
                     scopeName: grammar.scopeName,
                     path: filePath,
-                    language: grammar.scopeName.split('.')[0] || 'unknown'
+                    language: grammar.scopeName.split('.')[0] || 'unknown',
                 }
                 this.registerGrammar(textMateGrammar)
             }

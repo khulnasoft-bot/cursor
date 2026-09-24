@@ -1,35 +1,35 @@
 {
-  "name": "@cursor/ai-service",
-  "version": "1.0.0",
-  "description": "Multi-provider AI service with streaming, tool calling, and context management",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
-  },
-  "keywords": [
-    "cursor",
-    "ai-service",
-    "openai",
-    "anthropic",
-    "gemini",
-    "llm",
-    "artificial-intelligence"
-  ],
-  "author": "Cursor Team",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
-    "jest": "^30.5.2",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {},
-  "files": [
-    "dist",
-    "README.md"
-  ]
+    "name": "@cursor/ai-service",
+    "version": "1.0.0",
+    "description": "Multi-provider AI service with streaming, tool calling, and context management",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "prepublishOnly": "npm run build",
+        "test": "jest"
+    },
+    "keywords": [
+        "cursor",
+        "ai-service",
+        "openai",
+        "anthropic",
+        "gemini",
+        "llm",
+        "artificial-intelligence"
+    ],
+    "author": "Cursor Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.0.0",
+        "jest": "^30.5.2",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {},
+    "files": [
+        "dist",
+        "README.md"
+    ]
 }

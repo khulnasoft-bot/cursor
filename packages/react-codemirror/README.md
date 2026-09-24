@@ -83,6 +83,7 @@ interface ReactCodeMirrorRef {
 ## Themes
 
 ### Cursor Dark
+
 ```typescript
 import { cursorDark } from '@cursor/react-codemirror/theme'
 
@@ -90,6 +91,7 @@ import { cursorDark } from '@cursor/react-codemirror/theme'
 ```
 
 ### Cursor Light
+
 ```typescript
 import { cursorLight } from '@cursor/react-codemirror/theme'
 
@@ -97,6 +99,7 @@ import { cursorLight } from '@cursor/react-codemirror/theme'
 ```
 
 ### Cursor Midnight
+
 ```typescript
 import { cursorMidnight } from '@cursor/react-codemirror/theme'
 
@@ -104,6 +107,7 @@ import { cursorMidnight } from '@cursor/react-codemirror/theme'
 ```
 
 ### Custom Theme
+
 ```typescript
 import { EditorView } from '@codemirror/view'
 
@@ -118,6 +122,7 @@ const customTheme = EditorView.theme({
 ## Examples
 
 ### Basic Editor
+
 ```typescript
 import ReactCodeMirror from '@cursor/react-codemirror'
 
@@ -132,6 +137,7 @@ function App() {
 ```
 
 ### Controlled Component
+
 ```typescript
 import React, { useState } from 'react'
 import ReactCodeMirror from '@cursor/react-codemirror'
@@ -150,6 +156,7 @@ function App() {
 ```
 
 ### With Custom Theme
+
 ```typescript
 import ReactCodeMirror from '@cursor/react-codemirror'
 import { cursorDark } from '@cursor/react-codemirror/theme'
@@ -166,6 +173,7 @@ function App() {
 ```
 
 ### With Ref Access
+
 ```typescript
 import React, { useRef } from 'react'
 import ReactCodeMirror, { ReactCodeMirrorRef } from '@cursor/react-codemirror'
@@ -191,6 +199,7 @@ function App() {
 ```
 
 ### With Image Support
+
 ```typescript
 import ReactCodeMirror from '@cursor/react-codemirror'
 
@@ -206,6 +215,7 @@ function App() {
 ```
 
 ### With Custom Extensions
+
 ```typescript
 import ReactCodeMirror from '@cursor/react-codemirror'
 import { lineNumbers } from '@codemirror/view'
@@ -256,6 +266,7 @@ const MyEditor = React.forwardRef<ReactCodeMirrorRef, ReactCodeMirrorProps>(
 ## Browser Support
 
 The component supports all modern browsers that support:
+
 - React 18+
 - ES2020+
 - CodeMirror 6
@@ -288,6 +299,7 @@ This component is extracted from Cursor's editor and maintains API compatibility
 ```
 
 The main differences:
+
 - `viewKey` and `tabId` are no longer required
 - Themes are imported separately
 - Some Cursor-specific features are simplified

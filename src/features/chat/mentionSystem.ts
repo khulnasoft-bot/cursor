@@ -56,7 +56,7 @@ export class MentionParser {
         return {
             text: message,
             mentions,
-            cleanedText
+            cleanedText,
         }
     }
 
@@ -66,7 +66,7 @@ export class MentionParser {
             return {
                 type: 'file',
                 value: value.substring(5),
-                range: { start: index, end: index + value.length + 1 }
+                range: { start: index, end: index + value.length + 1 },
             }
         }
 
@@ -75,7 +75,7 @@ export class MentionParser {
             return {
                 type: 'directory',
                 value: value.substring(4),
-                range: { start: index, end: index + value.length + 1 }
+                range: { start: index, end: index + value.length + 1 },
             }
         }
 
@@ -90,7 +90,7 @@ export class MentionParser {
                 value: symbolName,
                 symbolName,
                 filePath,
-                range: { start: index, end: index + value.length + 1 }
+                range: { start: index, end: index + value.length + 1 },
             }
         }
 
@@ -99,7 +99,7 @@ export class MentionParser {
             return {
                 type: 'codebase',
                 value: 'codebase',
-                range: { start: index, end: index + value.length + 1 }
+                range: { start: index, end: index + value.length + 1 },
             }
         }
 
@@ -107,7 +107,7 @@ export class MentionParser {
         return {
             type: 'file',
             value,
-            range: { start: index, end: index + value.length + 1 }
+            range: { start: index, end: index + value.length + 1 },
         }
     }
 
@@ -119,7 +119,9 @@ export class MentionParser {
                 return `@dir:${mention.value}`
             case 'symbol': {
                 const symbolPart = `@symbol:${mention.symbolName}`
-                return mention.filePath ? `${symbolPart}@${mention.filePath}` : symbolPart
+                return mention.filePath
+                    ? `${symbolPart}@${mention.filePath}`
+                    : symbolPart
             }
             case 'codebase':
                 return '@codebase'
@@ -141,7 +143,7 @@ export class MentionResolver {
             files: [],
             symbols: [],
             directories: [],
-            codebase: false
+            codebase: false,
         }
 
         for (const mention of mentions) {
@@ -157,7 +159,7 @@ export class MentionResolver {
                         context.symbols.push({
                             name: mention.symbolName,
                             type: mention.symbolType || 'function',
-                            filePath: mention.filePath
+                            filePath: mention.filePath,
                         })
                     }
                     break
@@ -170,7 +172,10 @@ export class MentionResolver {
         return context
     }
 
-    async suggestMentions(partial: string, type?: Mention['type']): Promise<Mention[]> {
+    async suggestMentions(
+        partial: string,
+        type?: Mention['type']
+    ): Promise<Mention[]> {
         const suggestions: Mention[] = []
 
         // This would integrate with the file system and symbol index
@@ -210,7 +215,10 @@ export class MentionAutocomplete {
         this.resolver = new MentionResolver(projectPath)
     }
 
-    async getSuggestions(query: string, cursorPosition: number): Promise<Mention[]> {
+    async getSuggestions(
+        query: string,
+        cursorPosition: number
+    ): Promise<Mention[]> {
         // Extract the partial mention before cursor
         const beforeCursor = query.substring(0, cursorPosition)
         const lastAtIndex = beforeCursor.lastIndexOf('@')
@@ -255,6 +263,8 @@ export function getMentionResolver(projectPath: string): MentionResolver {
     return mentionResolver
 }
 
-export function getMentionAutocomplete(projectPath: string): MentionAutocomplete {
+export function getMentionAutocomplete(
+    projectPath: string
+): MentionAutocomplete {
     return new MentionAutocomplete(projectPath)
 }

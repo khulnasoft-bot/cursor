@@ -4,7 +4,11 @@
  */
 
 // Main component
-export { ReactCodeMirror, type ReactCodeMirrorProps, type ReactCodeMirrorRef } from './ReactCodeMirror'
+export {
+    ReactCodeMirror,
+    type ReactCodeMirrorProps,
+    type ReactCodeMirrorRef,
+} from './ReactCodeMirror'
 export { default } from './ReactCodeMirror'
 
 // Themes
@@ -15,5 +19,5 @@ export {
     cursorLightTheme,
     cursorMidnight,
     cursorMidnightTheme,
-    type Theme
+    type Theme,
 } from './theme'

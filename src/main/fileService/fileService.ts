@@ -44,11 +44,17 @@ class FileService {
     private indexCachePath: string
 
     constructor() {
-        this.indexCachePath = path.join(process.env.HOME || '.', '.cursor-file-index.json')
+        this.indexCachePath = path.join(
+            process.env.HOME || '.',
+            '.cursor-file-index.json'
+        )
         this.loadIndexFromCache()
     }
 
-    async indexDirectory(directoryPath: string, options: IndexingOptions = {}): Promise<void> {
+    async indexDirectory(
+        directoryPath: string,
+        options: IndexingOptions = {}
+    ): Promise<void> {
         if (this.indexingInProgress) {
             log.warn('Indexing already in progress')
             return
@@ -60,14 +66,22 @@ class FileService {
         try {
             const defaultOptions: IndexingOptions = {
                 includePatterns: ['*'],
-                excludePatterns: ['node_modules', '.git', '.webpack', 'dist', 'build'],
+                excludePatterns: [
+                    'node_modules',
+                    '.git',
+                    '.webpack',
+                    'dist',
+                    'build',
+                ],
                 maxFileSize: 1024 * 1024, // 1MB
-                ...options
+                ...options,
             }
 
             await this.walkDirectory(directoryPath, defaultOptions)
             await this.saveIndexToCache()
-            log.info(`Indexing complete. Total files indexed: ${this.index.size}`)
+            log.info(
+                `Indexing complete. Total files indexed: ${this.index.size}`
+            )
         } catch (error) {
             log.error('Error during indexing:', error)
         } finally {
@@ -75,15 +89,26 @@ class FileService {
         }
     }
 
-    private async walkDirectory(dirPath: string, options: IndexingOptions): Promise<void> {
-        const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+    private async walkDirectory(
+        dirPath: string,
+        options: IndexingOptions
+    ): Promise<void> {
+        const entries = await fs.promises.readdir(dirPath, {
+            withFileTypes: true,
+        })
 
         for (const entry of entries) {
             const fullPath = path.join(dirPath, entry.name)
 
             // Skip excluded directories
-            if (entry.isDirectory() && options.excludePatterns?.some(pattern => 
-                entry.name.includes(pattern) || fullPath.includes(pattern))) {
+            if (
+                entry.isDirectory() &&
+                options.excludePatterns?.some(
+                    (pattern) =>
+                        entry.name.includes(pattern) ||
+                        fullPath.includes(pattern)
+                )
+            ) {
                 continue
             }
 
@@ -95,10 +120,13 @@ class FileService {
         }
     }
 
-    private async indexFile(filePath: string, options: IndexingOptions): Promise<void> {
+    private async indexFile(
+        filePath: string,
+        options: IndexingOptions
+    ): Promise<void> {
         try {
             const stats = await fs.promises.stat(filePath)
-            
+
             // Skip files larger than max size
             if (options.maxFileSize && stats.size > options.maxFileSize) {
                 return
@@ -118,7 +146,7 @@ class FileService {
                 content,
                 lastModified: stats.mtimeMs,
                 size: stats.size,
-                language
+                language,
             })
         } catch (error) {
             log.warn(`Failed to index file ${filePath}:`, error)
@@ -154,27 +182,38 @@ class FileService {
             '.md': 'markdown',
             '.sql': 'sql',
             '.sh': 'shell',
-            '.ps1': 'powershell'
+            '.ps1': 'powershell',
         }
         return languageMap[ext] || 'plaintext'
     }
 
     async search(options: SearchOptions): Promise<SearchResult[]> {
         const results: SearchResult[] = []
-        const query = options.caseSensitive ? options.query : options.query.toLowerCase()
+        const query = options.caseSensitive
+            ? options.query
+            : options.query.toLowerCase()
 
         for (const [filePath, fileIndex] of this.index) {
-            if (options.fileTypes && !options.fileTypes.includes(fileIndex.language)) {
+            if (
+                options.fileTypes &&
+                !options.fileTypes.includes(fileIndex.language)
+            ) {
                 continue
             }
 
-            const content = options.caseSensitive ? fileIndex.content : fileIndex.content.toLowerCase()
-            const matches = this.findMatches(content, query, options.regex || false)
+            const content = options.caseSensitive
+                ? fileIndex.content
+                : fileIndex.content.toLowerCase()
+            const matches = this.findMatches(
+                content,
+                query,
+                options.regex || false
+            )
 
             if (matches.length > 0) {
                 results.push({
                     path: filePath,
-                    matches
+                    matches,
                 })
             }
         }
@@ -182,7 +221,11 @@ class FileService {
         return results
     }
 
-    private findMatches(content: string, query: string, isRegex: boolean): Array<{
+    private findMatches(
+        content: string,
+        query: string,
+        isRegex: boolean
+    ): Array<{
         line: number
         content: string
         startIndex: number
@@ -207,7 +250,7 @@ class FileService {
                         line: i + 1,
                         content: line,
                         startIndex: match.index || 0,
-                        endIndex: (match.index || 0) + match[0].length
+                        endIndex: (match.index || 0) + match[0].length,
                     })
                 }
             } else {
@@ -217,7 +260,7 @@ class FileService {
                         line: i + 1,
                         content: line,
                         startIndex: index,
-                        endIndex: index + query.length
+                        endIndex: index + query.length,
                     })
                     index = line.indexOf(query, index + 1)
                 }
@@ -246,26 +289,34 @@ class FileService {
         this.index.clear()
     }
 
-    getIndexStats(): { totalFiles: number; totalSize: number; languages: Record<string, number> } {
+    getIndexStats(): {
+        totalFiles: number
+        totalSize: number
+        languages: Record<string, number>
+    } {
         let totalSize = 0
         const languages: Record<string, number> = {}
 
         for (const fileIndex of this.index.values()) {
             totalSize += fileIndex.size
-            languages[fileIndex.language] = (languages[fileIndex.language] || 0) + 1
+            languages[fileIndex.language] =
+                (languages[fileIndex.language] || 0) + 1
         }
 
         return {
             totalFiles: this.index.size,
             totalSize,
-            languages
+            languages,
         }
     }
 
     private async saveIndexToCache(): Promise<void> {
         try {
             const indexData = Array.from(this.index.entries())
-            await fs.promises.writeFile(this.indexCachePath, JSON.stringify(indexData))
+            await fs.promises.writeFile(
+                this.indexCachePath,
+                JSON.stringify(indexData)
+            )
         } catch (error) {
             log.error('Failed to save index to cache:', error)
         }
@@ -274,7 +325,9 @@ class FileService {
     private async loadIndexFromCache(): Promise<void> {
         try {
             if (fs.existsSync(this.indexCachePath)) {
-                const indexData = JSON.parse(await fs.promises.readFile(this.indexCachePath, 'utf-8'))
+                const indexData = JSON.parse(
+                    await fs.promises.readFile(this.indexCachePath, 'utf-8')
+                )
                 this.index = new Map(indexData)
                 log.info(`Loaded index from cache. Files: ${this.index.size}`)
             }

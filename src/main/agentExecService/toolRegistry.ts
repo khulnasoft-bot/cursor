@@ -66,8 +66,8 @@ export class ToolRegistry {
                     name: 'filePath',
                     type: 'string',
                     required: true,
-                    description: 'Path to the file to read'
-                }
+                    description: 'Path to the file to read',
+                },
             ],
             dangerous: false,
             requiresConfirmation: false,
@@ -78,16 +78,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: content,
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Failed to read file',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Failed to read file',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         this.registerTool({
@@ -99,14 +102,14 @@ export class ToolRegistry {
                     name: 'filePath',
                     type: 'string',
                     required: true,
-                    description: 'Path to the file to write'
+                    description: 'Path to the file to write',
                 },
                 {
                     name: 'content',
                     type: 'string',
                     required: true,
-                    description: 'Content to write to the file'
-                }
+                    description: 'Content to write to the file',
+                },
             ],
             dangerous: true,
             requiresConfirmation: true,
@@ -117,16 +120,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: 'File written successfully',
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Failed to write file',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Failed to write file',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         this.registerTool({
@@ -138,33 +144,38 @@ export class ToolRegistry {
                     name: 'dirPath',
                     type: 'string',
                     required: true,
-                    description: 'Path to the directory to list'
-                }
+                    description: 'Path to the directory to list',
+                },
             ],
             dangerous: false,
             requiresConfirmation: false,
             execute: async (params) => {
                 const startTime = Date.now()
                 try {
-                    const entries = await fs.readdir(params.dirPath, { withFileTypes: true })
-                    const result = entries.map(entry => ({
+                    const entries = await fs.readdir(params.dirPath, {
+                        withFileTypes: true,
+                    })
+                    const result = entries.map((entry) => ({
                         name: entry.name,
                         isDirectory: entry.isDirectory(),
-                        isFile: entry.isFile()
+                        isFile: entry.isFile(),
                     }))
                     return {
                         success: true,
                         data: result,
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Failed to list directory',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Failed to list directory',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         this.registerTool({
@@ -176,8 +187,8 @@ export class ToolRegistry {
                     name: 'dirPath',
                     type: 'string',
                     required: true,
-                    description: 'Path to the directory to create'
-                }
+                    description: 'Path to the directory to create',
+                },
             ],
             dangerous: true,
             requiresConfirmation: true,
@@ -188,16 +199,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: 'Directory created successfully',
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Failed to create directory',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Failed to create directory',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         this.registerTool({
@@ -209,8 +223,8 @@ export class ToolRegistry {
                     name: 'filePath',
                     type: 'string',
                     required: true,
-                    description: 'Path to the file to delete'
-                }
+                    description: 'Path to the file to delete',
+                },
             ],
             dangerous: true,
             requiresConfirmation: true,
@@ -221,16 +235,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: 'File deleted successfully',
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Failed to delete file',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Failed to delete file',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         // Search tools
@@ -243,14 +260,14 @@ export class ToolRegistry {
                     name: 'directory',
                     type: 'string',
                     required: true,
-                    description: 'Directory to search in'
+                    description: 'Directory to search in',
                 },
                 {
                     name: 'pattern',
                     type: 'string',
                     required: true,
-                    description: 'File name pattern to match'
-                }
+                    description: 'File name pattern to match',
+                },
             ],
             dangerous: false,
             requiresConfirmation: false,
@@ -259,7 +276,9 @@ export class ToolRegistry {
                 try {
                     const results: string[] = []
                     const searchDir = async (dir: string) => {
-                        const entries = await fs.readdir(dir, { withFileTypes: true })
+                        const entries = await fs.readdir(dir, {
+                            withFileTypes: true,
+                        })
                         for (const entry of entries) {
                             const fullPath = path.join(dir, entry.name)
                             if (entry.isDirectory()) {
@@ -273,16 +292,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: results,
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Search failed',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Search failed',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         // Git tools
@@ -295,8 +317,8 @@ export class ToolRegistry {
                     name: 'directory',
                     type: 'string',
                     required: true,
-                    description: 'Path to the git repository'
-                }
+                    description: 'Path to the git repository',
+                },
             ],
             dangerous: false,
             requiresConfirmation: false,
@@ -308,16 +330,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: { status: 'placeholder', branch: 'main' },
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Git status failed',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Git status failed',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         // Terminal tools with safety checks
@@ -330,21 +355,21 @@ export class ToolRegistry {
                     name: 'command',
                     type: 'string',
                     required: true,
-                    description: 'Command to execute'
+                    description: 'Command to execute',
                 },
                 {
                     name: 'args',
                     type: 'array',
                     required: false,
                     description: 'Command arguments',
-                    default: []
+                    default: [],
                 },
                 {
                     name: 'cwd',
                     type: 'string',
                     required: false,
-                    description: 'Working directory'
-                }
+                    description: 'Working directory',
+                },
             ],
             dangerous: true,
             requiresConfirmation: true,
@@ -359,7 +384,7 @@ export class ToolRegistry {
                         return {
                             success: false,
                             error: `Command is blocked for safety: ${baseCommand}`,
-                            executionTime: Date.now() - startTime
+                            executionTime: Date.now() - startTime,
                         }
                     }
 
@@ -374,16 +399,19 @@ export class ToolRegistry {
                     return {
                         success: true,
                         data: result,
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'Command execution failed',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Command execution failed',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
 
         this.registerTool({
@@ -395,28 +423,36 @@ export class ToolRegistry {
                     name: 'directory',
                     type: 'string',
                     required: true,
-                    description: 'Directory to list'
-                }
+                    description: 'Directory to list',
+                },
             ],
             dangerous: false,
             requiresConfirmation: false,
             execute: async (params) => {
                 const startTime = Date.now()
                 try {
-                    const result = await this.executeCommandWithTimeout('ls', ['-la', params.directory], undefined, 5000)
+                    const result = await this.executeCommandWithTimeout(
+                        'ls',
+                        ['-la', params.directory],
+                        undefined,
+                        5000
+                    )
                     return {
                         success: true,
                         data: result,
-                        executionTime: Date.now() - startTime
+                        executionTime: Date.now() - startTime,
                     }
                 } catch (error) {
                     return {
                         success: false,
-                        error: error instanceof Error ? error.message : 'ls command failed',
-                        executionTime: Date.now() - startTime
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'ls command failed',
+                        executionTime: Date.now() - startTime,
                     }
                 }
-            }
+            },
         })
     }
 
@@ -429,7 +465,7 @@ export class ToolRegistry {
         return new Promise((resolve, reject) => {
             const child = spawn(command, args, {
                 cwd: cwd || process.cwd(),
-                stdio: ['pipe', 'pipe', 'pipe']
+                stdio: ['pipe', 'pipe', 'pipe'],
             })
 
             let stdout = ''
@@ -479,17 +515,20 @@ export class ToolRegistry {
     }
 
     getToolsByCategory(category: AgentTool['category']): AgentTool[] {
-        return this.getTools().filter(tool => tool.category === category)
+        return this.getTools().filter((tool) => tool.category === category)
     }
 
-    async executeTool(toolName: string, params: Record<string, any>): Promise<ToolResult> {
+    async executeTool(
+        toolName: string,
+        params: Record<string, any>
+    ): Promise<ToolResult> {
         const tool = this.tools.get(toolName)
 
         if (!tool) {
             return {
                 success: false,
                 error: `Tool not found: ${toolName}`,
-                executionTime: 0
+                executionTime: 0,
             }
         }
 
@@ -499,16 +538,19 @@ export class ToolRegistry {
             return {
                 success: false,
                 error: validation.error,
-                executionTime: 0
+                executionTime: 0,
             }
         }
 
         // Check if command is blocked
-        if (tool.category === 'terminal' && this.blockedCommands.has(toolName)) {
+        if (
+            tool.category === 'terminal' &&
+            this.blockedCommands.has(toolName)
+        ) {
             return {
                 success: false,
                 error: `Command is blocked for safety: ${toolName}`,
-                executionTime: 0
+                executionTime: 0,
             }
         }
 
@@ -517,23 +559,35 @@ export class ToolRegistry {
         } catch (error) {
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Tool execution failed',
-                executionTime: 0
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : 'Tool execution failed',
+                executionTime: 0,
             }
         }
     }
 
-    private validateParameters(tool: AgentTool, params: Record<string, any>): { valid: boolean; error?: string } {
+    private validateParameters(
+        tool: AgentTool,
+        params: Record<string, any>
+    ): { valid: boolean; error?: string } {
         for (const param of tool.parameters) {
             if (param.required && !(param.name in params)) {
-                return { valid: false, error: `Missing required parameter: ${param.name}` }
+                return {
+                    valid: false,
+                    error: `Missing required parameter: ${param.name}`,
+                }
             }
 
             if (param.name in params) {
                 const value = params[param.name]
                 const typeMatch = this.checkType(value, param.type)
                 if (!typeMatch) {
-                    return { valid: false, error: `Parameter ${param.name} has wrong type. Expected ${param.type}` }
+                    return {
+                        valid: false,
+                        error: `Parameter ${param.name} has wrong type. Expected ${param.type}`,
+                    }
                 }
             }
         }
@@ -541,7 +595,10 @@ export class ToolRegistry {
         return { valid: true }
     }
 
-    private checkType(value: any, expectedType: ToolParameter['type']): boolean {
+    private checkType(
+        value: any,
+        expectedType: ToolParameter['type']
+    ): boolean {
         switch (expectedType) {
             case 'string':
                 return typeof value === 'string'
@@ -552,7 +609,11 @@ export class ToolRegistry {
             case 'array':
                 return Array.isArray(value)
             case 'object':
-                return typeof value === 'object' && value !== null && !Array.isArray(value)
+                return (
+                    typeof value === 'object' &&
+                    value !== null &&
+                    !Array.isArray(value)
+                )
             default:
                 return true
         }

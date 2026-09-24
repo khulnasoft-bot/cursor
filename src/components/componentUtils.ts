@@ -10,18 +10,24 @@ export function throttleCallback(fn: (...args: any[]) => void, limit = 300) {
             inThrottle = true
         } else {
             clearTimeout(lastFn)
-            lastFn = setTimeout(() => {
-                if (Date.now() - lastTime >= limit) {
-                    fn.apply(context, args)
-                    lastTime = Date.now()
-                    inThrottle = false
-                }
-            }, Math.max(limit - (Date.now() - lastTime), 0))
+            lastFn = setTimeout(
+                () => {
+                    if (Date.now() - lastTime >= limit) {
+                        fn.apply(context, args)
+                        lastTime = Date.now()
+                        inThrottle = false
+                    }
+                },
+                Math.max(limit - (Date.now() - lastTime), 0)
+            )
         }
     }
 }
 
-export function normalThrottleCallback(fn: (...args: any[]) => void, limit = 300) {
+export function normalThrottleCallback(
+    fn: (...args: any[]) => void,
+    limit = 300
+) {
     let inThrottle: boolean,
         lastFn: ReturnType<typeof setTimeout>,
         lastTime: number

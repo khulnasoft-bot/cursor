@@ -1,33 +1,33 @@
 {
-  "name": "@cursor/rules-service",
-  "version": "1.0.0",
-  "description": "Code analysis rules engine for team conventions and code quality",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
-  },
-  "keywords": [
-    "cursor",
-    "rules",
-    "code-quality",
-    "linting",
-    "conventions"
-  ],
-  "author": "Cursor Team",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
-    "jest": "^30.5.2",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {},
-  "files": [
-    "dist",
-    "README.md"
-  ]
+    "name": "@cursor/rules-service",
+    "version": "1.0.0",
+    "description": "Code analysis rules engine for team conventions and code quality",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "prepublishOnly": "npm run build",
+        "test": "jest"
+    },
+    "keywords": [
+        "cursor",
+        "rules",
+        "code-quality",
+        "linting",
+        "conventions"
+    ],
+    "author": "Cursor Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.0.0",
+        "jest": "^30.5.2",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {},
+    "files": [
+        "dist",
+        "README.md"
+    ]
 }

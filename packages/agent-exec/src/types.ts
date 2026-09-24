@@ -6,7 +6,8 @@
 /**
  * Task status
  */
-export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+export type TaskStatus =
+    'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
 
 /**
  * Goal priority
@@ -16,17 +17,20 @@ export type GoalPriority = 'low' | 'medium' | 'high' | 'critical'
 /**
  * Plan status
  */
-export type PlanStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled'
+export type PlanStatus =
+    'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled'
 
 /**
  * Step status
  */
-export type StepStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped'
+export type StepStatus =
+    'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped'
 
 /**
  * Memory entry type
  */
-export type MemoryType = 'observation' | 'action' | 'result' | 'context' | 'goal'
+export type MemoryType =
+    'observation' | 'action' | 'result' | 'context' | 'goal'
 
 /**
  * Agent task definition
@@ -136,7 +140,10 @@ export interface AgentExecution {
 export interface Tool {
     name: string
     description: string
-    parameters: Record<string, { type: string; required: boolean; description: string }>
+    parameters: Record<
+        string,
+        { type: string; required: boolean; description: string }
+    >
     execute: (params: Record<string, any>) => Promise<ToolResult>
 }
 

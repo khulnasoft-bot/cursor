@@ -75,7 +75,7 @@ class LocalModeService {
         if (!this.shouldUseLocalResource(url)) {
             return null
         }
-        
+
         // Placeholder for actual path conversion logic
         return null
     }

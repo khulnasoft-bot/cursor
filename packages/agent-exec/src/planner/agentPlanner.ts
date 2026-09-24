@@ -10,7 +10,7 @@ import {
     GoalPriority,
     PlanStatus,
     StepStatus,
-    Tool
+    Tool,
 } from '../types'
 import { Logger, ConsoleLogger } from '../logger'
 
@@ -38,32 +38,41 @@ export class AgentPlanner {
         this.logger.info('Tool registry set for agent planner')
     }
 
-    async createPlan(goal: string, context?: Record<string, any>): Promise<AgentPlan> {
+    async createPlan(
+        goal: string,
+        context?: Record<string, any>
+    ): Promise<AgentPlan> {
         const planId = `plan-${++this.planCounter}`
-        
+
         this.logger.info(`Creating plan for goal: ${goal}`)
-        
+
         // Analyze the goal and decompose it into steps
         const steps = await this.decomposeGoal(goal, context)
-        
+
         const plan: AgentPlan = {
             id: planId,
             goal,
             steps,
-            estimatedDuration: steps.reduce((sum, step) => sum + step.estimatedDuration, 0),
+            estimatedDuration: steps.reduce(
+                (sum, step) => sum + step.estimatedDuration,
+                0
+            ),
             status: 'pending',
             currentStep: 0,
             totalSteps: steps.length,
-            createdAt: new Date()
+            createdAt: new Date(),
         }
 
         this.plans.set(planId, plan)
         this.logger.info(`Created plan ${planId} with ${steps.length} steps`)
-        
+
         return plan
     }
 
-    async decomposeGoal(goal: string, context?: Record<string, any>): Promise<AgentStep[]> {
+    async decomposeGoal(
+        goal: string,
+        context?: Record<string, any>
+    ): Promise<AgentStep[]> {
         const steps: AgentStep[] = []
         const availableTools = this.toolRegistry?.getTools() || []
 
@@ -82,12 +91,15 @@ export class AgentPlanner {
                     toolParams: { filePath },
                     status: 'pending',
                     estimatedDuration: 1000,
-                    dependencies: []
+                    dependencies: [],
                 })
             }
         }
 
-        if (goalLower.includes('write') || goalLower.includes('create') && goalLower.includes('file')) {
+        if (
+            goalLower.includes('write') ||
+            (goalLower.includes('create') && goalLower.includes('file'))
+        ) {
             const filePath = this.extractFilePath(goal)
             if (filePath) {
                 steps.push({
@@ -97,7 +109,7 @@ export class AgentPlanner {
                     toolParams: { filePath, content: '' },
                     status: 'pending',
                     estimatedDuration: 1000,
-                    dependencies: []
+                    dependencies: [],
                 })
             }
         }
@@ -112,7 +124,7 @@ export class AgentPlanner {
                     toolParams: { filePath },
                     status: 'pending',
                     estimatedDuration: 500,
-                    dependencies: []
+                    dependencies: [],
                 })
             }
         }
@@ -127,7 +139,7 @@ export class AgentPlanner {
                 toolParams: { dirPath },
                 status: 'pending',
                 estimatedDuration: 500,
-                dependencies: []
+                dependencies: [],
             })
         }
 
@@ -141,7 +153,7 @@ export class AgentPlanner {
                     toolParams: { dirPath },
                     status: 'pending',
                     estimatedDuration: 500,
-                    dependencies: []
+                    dependencies: [],
                 })
             }
         }
@@ -158,7 +170,7 @@ export class AgentPlanner {
                     toolParams: { directory, pattern },
                     status: 'pending',
                     estimatedDuration: 5000,
-                    dependencies: []
+                    dependencies: [],
                 })
             }
         }
@@ -172,7 +184,7 @@ export class AgentPlanner {
                 toolParams: { goal },
                 status: 'pending',
                 estimatedDuration: 1000,
-                dependencies: []
+                dependencies: [],
             })
         }
 
@@ -191,14 +203,19 @@ export class AgentPlanner {
         return patternMatch ? patternMatch[1] : null
     }
 
-    async executePlan(planId: string, onProgress?: (step: AgentStep, progress: number) => void): Promise<AgentPlan> {
+    async executePlan(
+        planId: string,
+        onProgress?: (step: AgentStep, progress: number) => void
+    ): Promise<AgentPlan> {
         const plan = this.plans.get(planId)
         if (!plan) {
             throw new Error(`Plan not found: ${planId}`)
         }
 
         if (!this.toolRegistry) {
-            throw new Error('Tool registry not set. Call setToolRegistry() first.')
+            throw new Error(
+                'Tool registry not set. Call setToolRegistry() first.'
+            )
         }
 
         plan.status = 'in_progress'
@@ -213,7 +230,9 @@ export class AgentPlanner {
             // Check dependencies
             if (!this.checkDependencies(step, plan.steps)) {
                 step.status = 'skipped'
-                this.logger.info(`Step ${step.id} skipped due to unmet dependencies`)
+                this.logger.info(
+                    `Step ${step.id} skipped due to unmet dependencies`
+                )
                 continue
             }
 
@@ -223,14 +242,17 @@ export class AgentPlanner {
             }
 
             try {
-                const result = await this.toolRegistry.executeTool(step.toolName, step.toolParams)
+                const result = await this.toolRegistry.executeTool(
+                    step.toolName,
+                    step.toolParams
+                )
                 step.result = result
                 step.status = result.success ? 'completed' : 'failed'
-                
+
                 if (!result.success) {
                     step.error = result.error
                     this.logger.error(`Step ${step.id} failed: ${result.error}`)
-                    
+
                     // Decide whether to continue or abort
                     if (this.shouldAbortOnFailure(step)) {
                         plan.status = 'failed'
@@ -240,9 +262,10 @@ export class AgentPlanner {
                 }
             } catch (error) {
                 step.status = 'failed'
-                step.error = error instanceof Error ? error.message : 'Unknown error'
+                step.error =
+                    error instanceof Error ? error.message : 'Unknown error'
                 this.logger.error(`Step ${step.id} error:`, error)
-                
+
                 if (this.shouldAbortOnFailure(step)) {
                     plan.status = 'failed'
                     plan.completedAt = new Date()
@@ -258,13 +281,13 @@ export class AgentPlanner {
         plan.status = 'completed'
         plan.completedAt = new Date()
         this.logger.info(`Plan ${planId} completed successfully`)
-        
+
         return plan
     }
 
     private checkDependencies(step: AgentStep, allSteps: AgentStep[]): boolean {
         for (const depId of step.dependencies) {
-            const depStep = allSteps.find(s => s.id === depId)
+            const depStep = allSteps.find((s) => s.id === depId)
             if (!depStep || depStep.status !== 'completed') {
                 return false
             }
@@ -277,21 +300,25 @@ export class AgentPlanner {
         return step.dependencies.length > 0
     }
 
-    createGoal(description: string, priority: GoalPriority = 'medium', dependencies: string[] = []): AgentGoal {
+    createGoal(
+        description: string,
+        priority: GoalPriority = 'medium',
+        dependencies: string[] = []
+    ): AgentGoal {
         const goalId = `goal-${++this.goalCounter}`
-        
+
         const goal: AgentGoal = {
             id: goalId,
             description,
             priority,
             status: 'pending',
             dependencies,
-            createdAt: new Date()
+            createdAt: new Date(),
         }
 
         this.goals.set(goalId, goal)
         this.logger.info(`Created goal ${goalId}: ${description}`)
-        
+
         return goal
     }
 
@@ -321,11 +348,11 @@ export class AgentPlanner {
     }
 
     getGoalsByStatus(status: AgentGoal['status']): AgentGoal[] {
-        return this.getGoals().filter(g => g.status === status)
+        return this.getGoals().filter((g) => g.status === status)
     }
 
     getGoalsByPriority(priority: GoalPriority): AgentGoal[] {
-        return this.getGoals().filter(g => g.priority === priority)
+        return this.getGoals().filter((g) => g.priority === priority)
     }
 
     deletePlan(planId: string): void {

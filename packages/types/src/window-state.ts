@@ -180,7 +180,13 @@ export interface DiffSpan {
     startLine: number
     endLine: number
     text: string
-    mode: 'accepted' | 'rejected' | 'showed' | 'showing' | 'generating' | 'creating'
+    mode:
+        | 'accepted'
+        | 'rejected'
+        | 'showed'
+        | 'showing'
+        | 'generating'
+        | 'creating'
 }
 
 /**
@@ -338,12 +344,7 @@ export type Message = UserMessage | BotMessage
  * Response types for AI interactions
  */
 export type ResponseType =
-    | 'idk'
-    | 'freeform'
-    | 'generate'
-    | 'edit'
-    | 'chat_edit'
-    | 'lsp_edit'
+    'idk' | 'freeform' | 'generate' | 'edit' | 'chat_edit' | 'lsp_edit'
 
 /**
  * Chat state management

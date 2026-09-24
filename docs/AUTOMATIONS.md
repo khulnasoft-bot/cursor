@@ -59,20 +59,20 @@ const workflow = automationService.createWorkflow({
             type: 'file-change',
             config: {
                 patterns: ['*.ts', '*.tsx'],
-                events: ['save']
-            }
-        }
+                events: ['save'],
+            },
+        },
     ],
     actions: [
         {
             type: 'command',
             config: {
                 command: 'prettier',
-                args: ['--write', '$FILE_PATH']
-            }
-        }
+                args: ['--write', '$FILE_PATH'],
+            },
+        },
     ],
-    enabled: true
+    enabled: true,
 })
 ```
 
@@ -80,7 +80,7 @@ const workflow = automationService.createWorkflow({
 
 ```typescript
 const execution = await automationService.executeWorkflow(workflow.id, {
-    filePath: '/path/to/file.ts'
+    filePath: '/path/to/file.ts',
 })
 ```
 
@@ -109,7 +109,7 @@ const devTemplates = templates.getTemplatesByCategory('development')
 
 // Create workflow from template
 const workflow = templates.createWorkflowFromTemplate('auto-format', {
-    patterns: ['*.ts']
+    patterns: ['*.ts'],
 })
 ```
 
@@ -217,20 +217,20 @@ const workflow = automationService.createWorkflow({
             type: 'file-change',
             config: {
                 patterns: ['*.ts', '*.tsx', '*.js', '*.jsx'],
-                events: ['save']
-            }
-        }
+                events: ['save'],
+            },
+        },
     ],
     actions: [
         {
             type: 'command',
             config: {
                 command: 'prettier',
-                args: ['--write', '$FILE_PATH']
-            }
-        }
+                args: ['--write', '$FILE_PATH'],
+            },
+        },
     ],
-    enabled: true
+    enabled: true,
 })
 ```
 
@@ -246,11 +246,11 @@ const workflow = automationService.createWorkflow({
             type: 'command',
             config: {
                 command: 'git',
-                args: ['push', 'origin', 'main']
-            }
-        }
+                args: ['push', 'origin', 'main'],
+            },
+        },
     ],
-    enabled: true
+    enabled: true,
 })
 
 scheduler.scheduleWorkflow(workflow.id, '0 2 * * *') // 2 AM daily
@@ -271,7 +271,7 @@ actionRegistry.registerAction({
     execute: async (context) => {
         console.log('Executing custom action with context:', context)
         return { success: true }
-    }
+    },
 })
 ```
 

@@ -37,7 +37,8 @@ export interface ScalingEvent {
 export interface LoadBalancerConfig {
     id: string
     name: string
-    algorithm: 'round_robin' | 'least_connections' | 'resource_based' | 'weighted'
+    algorithm:
+        'round_robin' | 'least_connections' | 'resource_based' | 'weighted'
     healthCheckInterval: number
     unhealthyThreshold: number
     healthyThreshold: number
@@ -96,7 +97,7 @@ export class ScalingManager {
 
         const newPolicy: ScalingPolicy = {
             ...policy,
-            id: policyId
+            id: policyId,
         }
 
         this.scalingPolicies.set(policyId, newPolicy)
@@ -104,7 +105,10 @@ export class ScalingManager {
         return newPolicy
     }
 
-    updateScalingPolicy(policyId: string, updates: Partial<ScalingPolicy>): ScalingPolicy | null {
+    updateScalingPolicy(
+        policyId: string,
+        updates: Partial<ScalingPolicy>
+    ): ScalingPolicy | null {
         const policy = this.scalingPolicies.get(policyId)
         if (!policy) return null
 
@@ -160,14 +164,17 @@ export class ScalingManager {
     }
 
     private async evaluatePolicy(policy: ScalingPolicy): Promise<void> {
-        const instances = this.cloudAgentService.getInstancesByConfig(policy.configId)
-        const runningInstances = instances.filter(i => i.status === 'running')
+        const instances = this.cloudAgentService.getInstancesByConfig(
+            policy.configId
+        )
+        const runningInstances = instances.filter((i) => i.status === 'running')
 
         const currentInstanceCount = runningInstances.length
 
         // Check cooldown period
         if (policy.lastScaleAction) {
-            const cooldownMs = policy.lastScaleAction.getTime() + (policy.scaleUpCooldown * 1000)
+            const cooldownMs =
+                policy.lastScaleAction.getTime() + policy.scaleUpCooldown * 1000
             if (Date.now() < cooldownMs) {
                 return // Still in cooldown period
             }
@@ -176,7 +183,11 @@ export class ScalingManager {
         if (currentInstanceCount === 0) {
             // Scale up to minimum
             if (currentInstanceCount < policy.minInstances) {
-                await this.scaleUp(policy, policy.minInstances - currentInstanceCount, 'Below minimum instances')
+                await this.scaleUp(
+                    policy,
+                    policy.minInstances - currentInstanceCount,
+                    'Below minimum instances'
+                )
             }
             return
         }
@@ -193,14 +204,20 @@ export class ScalingManager {
         const scaleDownThreshold = policy.scaleDownThreshold || 20
 
         // Check scale up conditions
-        if (cpuUtil > policy.targetCpuUtilization + scaleUpThreshold || memUtil > policy.targetMemoryUtilization + scaleUpThreshold) {
+        if (
+            cpuUtil > policy.targetCpuUtilization + scaleUpThreshold ||
+            memUtil > policy.targetMemoryUtilization + scaleUpThreshold
+        ) {
             if (currentInstanceCount < policy.maxInstances) {
                 action = 'scale_up'
                 reason = `High utilization: CPU ${cpuUtil.toFixed(1)}%, Memory ${memUtil.toFixed(1)}%`
             }
         }
         // Check scale down conditions
-        else if (cpuUtil < policy.targetCpuUtilization - scaleDownThreshold && memUtil < policy.targetMemoryUtilization - scaleDownThreshold) {
+        else if (
+            cpuUtil < policy.targetCpuUtilization - scaleDownThreshold &&
+            memUtil < policy.targetMemoryUtilization - scaleDownThreshold
+        ) {
             if (currentInstanceCount > policy.minInstances) {
                 action = 'scale_down'
                 reason = `Low utilization: CPU ${cpuUtil.toFixed(1)}%, Memory ${memUtil.toFixed(1)}%`
@@ -212,9 +229,15 @@ export class ScalingManager {
         }
     }
 
-    private async executeScalingAction(policy: ScalingPolicy, action: 'scale_up' | 'scale_down', reason: string): Promise<void> {
-        const instances = this.cloudAgentService.getInstancesByConfig(policy.configId)
-        const runningInstances = instances.filter(i => i.status === 'running')
+    private async executeScalingAction(
+        policy: ScalingPolicy,
+        action: 'scale_up' | 'scale_down',
+        reason: string
+    ): Promise<void> {
+        const instances = this.cloudAgentService.getInstancesByConfig(
+            policy.configId
+        )
+        const runningInstances = instances.filter((i) => i.status === 'running')
         const currentCount = runningInstances.length
 
         let newCount = currentCount
@@ -235,14 +258,20 @@ export class ScalingManager {
             action,
             reason,
             previousInstanceCount: currentCount,
-            newInstanceCount: newCount
+            newInstanceCount: newCount,
         }
 
         this.scalingEvents.push(event)
-        log.info(`Scaling event: ${action} from ${currentCount} to ${newCount} instances`)
+        log.info(
+            `Scaling event: ${action} from ${currentCount} to ${newCount} instances`
+        )
     }
 
-    private async scaleUp(policy: ScalingPolicy, count: number, _reason: string): Promise<void> {
+    private async scaleUp(
+        policy: ScalingPolicy,
+        count: number,
+        _reason: string
+    ): Promise<void> {
         for (let i = 0; i < count; i++) {
             try {
                 await this.cloudAgentService.provisionInstance(policy.configId)
@@ -253,13 +282,21 @@ export class ScalingManager {
         }
     }
 
-    private async scaleDown(policy: ScalingPolicy, count: number, _reason: string): Promise<void> {
-        const instances = this.cloudAgentService.getInstancesByConfig(policy.configId)
-        const runningInstances = instances.filter(i => i.status === 'running')
+    private async scaleDown(
+        policy: ScalingPolicy,
+        count: number,
+        _reason: string
+    ): Promise<void> {
+        const instances = this.cloudAgentService.getInstancesByConfig(
+            policy.configId
+        )
+        const runningInstances = instances.filter((i) => i.status === 'running')
 
         for (let i = 0; i < count && i < runningInstances.length; i++) {
             try {
-                await this.cloudAgentService.deprovisionInstance(runningInstances[i].id)
+                await this.cloudAgentService.deprovisionInstance(
+                    runningInstances[i].id
+                )
                 policy.lastScaleAction = new Date()
             } catch (error) {
                 log.error(`Failed to scale down: ${error}`)
@@ -268,12 +305,14 @@ export class ScalingManager {
     }
 
     // Load Balancer Management
-    createLoadBalancer(config: Omit<LoadBalancerConfig, 'id'>): LoadBalancerConfig {
+    createLoadBalancer(
+        config: Omit<LoadBalancerConfig, 'id'>
+    ): LoadBalancerConfig {
         const balancerId = `balancer-${++this.balancerCounter}`
 
         const newBalancer: LoadBalancerConfig = {
             ...config,
-            id: balancerId
+            id: balancerId,
         }
 
         this.loadBalancers.set(balancerId, newBalancer)
@@ -281,7 +320,10 @@ export class ScalingManager {
         return newBalancer
     }
 
-    updateLoadBalancer(balancerId: string, updates: Partial<LoadBalancerConfig>): LoadBalancerConfig | null {
+    updateLoadBalancer(
+        balancerId: string,
+        updates: Partial<LoadBalancerConfig>
+    ): LoadBalancerConfig | null {
         const balancer = this.loadBalancers.get(balancerId)
         if (!balancer) return null
 
@@ -308,9 +350,12 @@ export class ScalingManager {
     }
 
     // Load Balancing
-    selectInstance(configId: string, algorithm: LoadBalancerConfig['algorithm']): string | null {
+    selectInstance(
+        configId: string,
+        algorithm: LoadBalancerConfig['algorithm']
+    ): string | null {
         const instances = this.cloudAgentService.getInstancesByConfig(configId)
-        const runningInstances = instances.filter(i => i.status === 'running')
+        const runningInstances = instances.filter((i) => i.status === 'running')
 
         if (runningInstances.length === 0) return null
 
@@ -347,7 +392,9 @@ export class ScalingManager {
         let lowestUtil = Infinity
 
         for (const instance of instances) {
-            const utilization = this.resourceManager.getInstanceResourceUsage(instance.id)
+            const utilization = this.resourceManager.getInstanceResourceUsage(
+                instance.id
+            )
             if (utilization) {
                 const totalUtil = utilization.cpu + utilization.memory
                 if (totalUtil < lowestUtil) {
@@ -362,13 +409,15 @@ export class ScalingManager {
 
     private weightedSelect(instances: CloudAgentInstance[]): string {
         // Simple weighted selection based on resources
-        const totalResources = instances.reduce((sum, i) =>
-            sum + i.resources.cpu + i.resources.memory / 1024, 0
+        const totalResources = instances.reduce(
+            (sum, i) => sum + i.resources.cpu + i.resources.memory / 1024,
+            0
         )
 
         let random = Math.random() * totalResources
         for (const instance of instances) {
-            const weight = instance.resources.cpu + instance.resources.memory / 1024
+            const weight =
+                instance.resources.cpu + instance.resources.memory / 1024
             random -= weight
             if (random <= 0) {
                 return instance.id
@@ -384,12 +433,12 @@ export class ScalingManager {
     }
 
     getScalingEventsByPolicy(policyId: string): ScalingEvent[] {
-        return this.scalingEvents.filter(e => e.policyId === policyId)
+        return this.scalingEvents.filter((e) => e.policyId === policyId)
     }
 
     getRecentScalingEvents(minutes: number = 60): ScalingEvent[] {
         const cutoff = new Date(Date.now() - minutes * 60 * 1000)
-        return this.scalingEvents.filter(e => e.timestamp >= cutoff)
+        return this.scalingEvents.filter((e) => e.timestamp >= cutoff)
     }
 
     clearScalingEvents(): void {
@@ -412,12 +461,16 @@ export class ScalingManager {
 
         return {
             totalPolicies: policies.length,
-            enabledPolicies: policies.filter(p => p.enabled).length,
+            enabledPolicies: policies.filter((p) => p.enabled).length,
             totalLoadBalancers: balancers.length,
-            enabledLoadBalancers: balancers.filter(b => b.enabled).length,
+            enabledLoadBalancers: balancers.filter((b) => b.enabled).length,
             totalScalingEvents: this.scalingEvents.length,
-            scaleUpEvents: this.scalingEvents.filter(e => e.action === 'scale_up').length,
-            scaleDownEvents: this.scalingEvents.filter(e => e.action === 'scale_down').length
+            scaleUpEvents: this.scalingEvents.filter(
+                (e) => e.action === 'scale_up'
+            ).length,
+            scaleDownEvents: this.scalingEvents.filter(
+                (e) => e.action === 'scale_down'
+            ).length,
         }
     }
 

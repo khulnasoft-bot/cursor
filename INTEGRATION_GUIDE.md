@@ -173,7 +173,7 @@ const aiService = createAIService({
     defaultProvider: 'openai',
     enableStreaming: true,
     maxRetries: 3,
-    timeoutMs: 30000
+    timeoutMs: 30000,
 })
 
 // Configure providers
@@ -192,7 +192,7 @@ const composer = createComposerService({
     executionTimeoutMs: 300000,
     defaultMaxFiles: 10,
     enableRollback: true,
-    logLevel: 'info'
+    logLevel: 'info',
 })
 ```
 
@@ -206,7 +206,7 @@ const agentExec = createAgentExecService({
     executionTimeoutMs: 300000,
     maxMemories: 1000,
     importanceThreshold: 0.3,
-    enableRollback: true
+    enableRollback: true,
 })
 ```
 
@@ -220,7 +220,7 @@ const indexer = createSemanticIndexer({
     chunkOverlap: 50,
     maxIndexSize: 100000,
     enableCache: true,
-    enablePersistence: false
+    enablePersistence: false,
 })
 ```
 
@@ -325,7 +325,7 @@ import { createSemanticIndexer } from '@cursor/semantic-indexer'
 const CodeEditor = createReactCodeMirror({
     theme: 'cursor-dark',
     lineNumbers: true,
-    highlightSelectionMatches: true
+    highlightSelectionMatches: true,
 })
 
 // Semantic search for code navigation
@@ -446,6 +446,7 @@ await indexer.indexFile('./src/main.ts', content, 'typescript')
 ## Support
 
 For issues or questions:
+
 - Check package READMEs for detailed documentation
 - Review integration examples in this guide
 - Check error messages for specific guidance

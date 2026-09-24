@@ -1,34 +1,34 @@
 {
-  "name": "@cursor/semantic-indexer",
-  "version": "1.0.0",
-  "description": "Embedding-based semantic codebase understanding and search",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
-  },
-  "keywords": [
-    "cursor",
-    "semantic",
-    "indexer",
-    "embedding",
-    "search",
-    "codebase"
-  ],
-  "author": "Cursor Team",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
-    "jest": "^30.5.2",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {},
-  "files": [
-    "dist",
-    "README.md"
-  ]
+    "name": "@cursor/semantic-indexer",
+    "version": "1.0.0",
+    "description": "Embedding-based semantic codebase understanding and search",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "prepublishOnly": "npm run build",
+        "test": "jest"
+    },
+    "keywords": [
+        "cursor",
+        "semantic",
+        "indexer",
+        "embedding",
+        "search",
+        "codebase"
+    ],
+    "author": "Cursor Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.0.0",
+        "jest": "^30.5.2",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {},
+    "files": [
+        "dist",
+        "README.md"
+    ]
 }

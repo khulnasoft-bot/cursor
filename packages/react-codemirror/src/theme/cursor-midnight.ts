@@ -11,7 +11,7 @@ export function cursorMidnight(): Extension {
     // - Background colors
     // - Selection colors
     // - UI element styling
-    
+
     return [] // Return actual theme extensions in production
 }
 

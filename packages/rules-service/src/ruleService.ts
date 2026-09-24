@@ -9,14 +9,18 @@ import {
     Rule,
     RuleSet,
     RuleStatistics,
-    RuleServiceConfig
+    RuleServiceConfig,
 } from './types'
 import { RuleParser, getRuleParser } from './parser/ruleParser'
 import { Logger, ConsoleLogger } from './logger'
 
 export class RuleService {
     private ruleParser: RuleParser
-    private currentRules: { ruleSets: Map<string, RuleSet>; errors: string[]; lastUpdated: Date } | null = null
+    private currentRules: {
+        ruleSets: Map<string, RuleSet>
+        errors: string[]
+        lastUpdated: Date
+    } | null = null
     private config: RuleServiceConfig
     private logger: Logger
 
@@ -26,7 +30,7 @@ export class RuleService {
             cacheEnabled: true,
             logLevel: 'info',
             autoLoad: true,
-            ...config
+            ...config,
         }
         this.logger = logger || new ConsoleLogger()
         this.ruleParser = getRuleParser(this.logger)
@@ -43,12 +47,21 @@ export class RuleService {
 
     async initialize(projectPath: string): Promise<void> {
         this.logger.info('Initializing rule service for project:', projectPath)
-        this.currentRules = await this.ruleParser.loadRulesFromDirectory(projectPath)
+        this.currentRules =
+            await this.ruleParser.loadRulesFromDirectory(projectPath)
     }
 
-    async applyRulesToCode(code: string, filePath: string): Promise<RuleApplicationResult> {
+    async applyRulesToCode(
+        code: string,
+        filePath: string
+    ): Promise<RuleApplicationResult> {
         if (!this.currentRules) {
-            return { violations: [], appliedRules: 0, skippedRules: 0, errors: ['Rules not initialized'] }
+            return {
+                violations: [],
+                appliedRules: 0,
+                skippedRules: 0,
+                errors: ['Rules not initialized'],
+            }
         }
 
         const startTime = Date.now()
@@ -77,27 +90,40 @@ export class RuleService {
                             severity: rule.severity,
                             message: rule.message,
                             filePath,
-                            lineNumber: this.getLineNumber(code, match.index || 0),
-                            column: this.getColumnNumber(code, match.index || 0),
+                            lineNumber: this.getLineNumber(
+                                code,
+                                match.index || 0
+                            ),
+                            column: this.getColumnNumber(
+                                code,
+                                match.index || 0
+                            ),
                             fix: rule.fix,
                             category: rule.category,
-                            matchedText: match[0]
+                            matchedText: match[0],
                         }
 
                         // Check if this match is in the exceptions list
                         const matchedText = match[0]
                         if (!rule.exceptions.includes(matchedText)) {
                             violations.push(violation)
-                            
+
                             // Check max violations limit
-                            if (this.config.maxViolations && violations.length >= this.config.maxViolations) {
-                                this.logger.warn(`Max violations limit reached: ${this.config.maxViolations}`)
+                            if (
+                                this.config.maxViolations &&
+                                violations.length >= this.config.maxViolations
+                            ) {
+                                this.logger.warn(
+                                    `Max violations limit reached: ${this.config.maxViolations}`
+                                )
                                 break
                             }
                         }
                     }
                 } catch (error) {
-                    this.logger.warn(`Invalid regex pattern in rule ${rule.id}: ${pattern}`)
+                    this.logger.warn(
+                        `Invalid regex pattern in rule ${rule.id}: ${pattern}`
+                    )
                 }
             }
         }
@@ -109,7 +135,7 @@ export class RuleService {
             appliedRules,
             skippedRules,
             errors: this.currentRules.errors,
-            duration
+            duration,
         }
     }
 
@@ -133,7 +159,7 @@ export class RuleService {
         }
 
         const applicableRules = this.ruleParser.getRulesForFile(filePath)
-        const activeRules = applicableRules.filter(r => r.enabled)
+        const activeRules = applicableRules.filter((r) => r.enabled)
 
         if (activeRules.length === 0) {
             return context
@@ -141,7 +167,7 @@ export class RuleService {
 
         // Build rules context for AI
         let rulesContext = '\n\n--- Team Rules ---\n'
-        
+
         // Group rules by category
         const rulesByCategory = new Map<Rule['category'], Rule[]>()
         for (const rule of activeRules) {
@@ -189,7 +215,11 @@ export class RuleService {
         await this.initialize(projectPath)
     }
 
-    async updateRuleSet(name: string, updates: Partial<RuleSet>, projectPath: string): Promise<void> {
+    async updateRuleSet(
+        name: string,
+        updates: Partial<RuleSet>,
+        projectPath: string
+    ): Promise<void> {
         const existing = this.getRuleSet(name)
         if (!existing) {
             throw new Error(`Rule set not found: ${name}`)
@@ -213,11 +243,15 @@ export class RuleService {
         await this.toggleRule(ruleId, false, projectPath)
     }
 
-    private async toggleRule(ruleId: string, enabled: boolean, projectPath: string): Promise<void> {
+    private async toggleRule(
+        ruleId: string,
+        enabled: boolean,
+        projectPath: string
+    ): Promise<void> {
         const ruleSets = this.getAllRuleSets()
-        
+
         for (const ruleSet of ruleSets) {
-            const rule = ruleSet.rules.find(r => r.id === ruleId)
+            const rule = ruleSet.rules.find((r) => r.id === ruleId)
             if (rule) {
                 rule.enabled = enabled
                 await this.ruleParser.saveRuleSet(ruleSet, projectPath)
@@ -231,8 +265,8 @@ export class RuleService {
 
     getStatistics(): RuleStatistics {
         const ruleSets = this.getAllRuleSets()
-        const allRules = ruleSets.flatMap(rs => rs.rules)
-        const activeRules = allRules.filter(r => r.enabled)
+        const allRules = ruleSets.flatMap((rs) => rs.rules)
+        const activeRules = allRules.filter((r) => r.enabled)
 
         const rulesByCategory: Record<Rule['category'], number> = {
             style: 0,
@@ -241,14 +275,14 @@ export class RuleService {
             security: 0,
             performance: 0,
             testing: 0,
-            custom: 0
+            custom: 0,
         }
 
         const rulesBySeverity: Record<Rule['severity'], number> = {
             error: 0,
             warning: 0,
             suggestion: 0,
-            info: 0
+            info: 0,
         }
 
         for (const rule of allRules) {
@@ -261,7 +295,7 @@ export class RuleService {
             totalRules: allRules.length,
             activeRules: activeRules.length,
             rulesByCategory,
-            rulesBySeverity
+            rulesBySeverity,
         }
     }
 
@@ -275,10 +309,17 @@ export class RuleService {
 
     async importRules(json: string, projectPath: string): Promise<void> {
         try {
-            const parsed = JSON.parse(json) as { ruleSets: Map<string, RuleSet>; errors: string[]; lastUpdated: Date }
-            
+            const parsed = JSON.parse(json) as {
+                ruleSets: Map<string, RuleSet>
+                errors: string[]
+                lastUpdated: Date
+            }
+
             for (const ruleSet of Object.values(parsed.ruleSets)) {
-                await this.ruleParser.saveRuleSet(ruleSet as RuleSet, projectPath)
+                await this.ruleParser.saveRuleSet(
+                    ruleSet as RuleSet,
+                    projectPath
+                )
             }
 
             await this.initialize(projectPath)
@@ -299,7 +340,10 @@ export class RuleService {
 // Singleton instance
 let ruleService: RuleService | null = null
 
-export function getRuleService(config?: RuleServiceConfig, logger?: Logger): RuleService {
+export function getRuleService(
+    config?: RuleServiceConfig,
+    logger?: Logger
+): RuleService {
     if (!ruleService) {
         ruleService = new RuleService(config, logger)
     }
@@ -313,6 +357,9 @@ export function destroyRuleService(): void {
     }
 }
 
-export function createRuleService(config?: RuleServiceConfig, logger?: Logger): RuleService {
+export function createRuleService(
+    config?: RuleServiceConfig,
+    logger?: Logger
+): RuleService {
     return new RuleService(config, logger)
 }

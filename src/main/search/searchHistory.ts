@@ -37,12 +37,15 @@ export class SearchHistoryService {
         this.loadFromStorage()
     }
 
-    addToHistory(query: Omit<SearchQuery, 'id' | 'timestamp'>, resultCount: number): SearchQuery {
+    addToHistory(
+        query: Omit<SearchQuery, 'id' | 'timestamp'>,
+        resultCount: number
+    ): SearchQuery {
         const historyEntry: SearchQuery = {
             id: `history-${++this.historyCounter}`,
             ...query,
             timestamp: new Date(),
-            resultCount
+            resultCount,
         }
 
         this.history.unshift(historyEntry)
@@ -66,11 +69,11 @@ export class SearchHistoryService {
     }
 
     getHistoryByPattern(pattern: string): SearchQuery[] {
-        return this.history.filter(h => h.pattern.includes(pattern))
+        return this.history.filter((h) => h.pattern.includes(pattern))
     }
 
     removeFromHistory(id: string): boolean {
-        const index = this.history.findIndex(h => h.id === id)
+        const index = this.history.findIndex((h) => h.id === id)
         if (index !== -1) {
             this.history.splice(index, 1)
             this.saveToStorage()
@@ -86,7 +89,11 @@ export class SearchHistoryService {
         log.info('Cleared search history')
     }
 
-    saveQuery(query: Omit<SearchQuery, 'id' | 'timestamp'>, name: string, description?: string): SavedQuery {
+    saveQuery(
+        query: Omit<SearchQuery, 'id' | 'timestamp'>,
+        name: string,
+        description?: string
+    ): SavedQuery {
         const savedQuery: SavedQuery = {
             id: `saved-${++this.savedCounter}`,
             ...query,
@@ -94,7 +101,7 @@ export class SearchHistoryService {
             description,
             isFavorite: false,
             timestamp: new Date(),
-            resultCount: 0
+            resultCount: 0,
         }
 
         this.savedQueries.push(savedQuery)
@@ -108,15 +115,18 @@ export class SearchHistoryService {
     }
 
     getSavedQuery(id: string): SavedQuery | undefined {
-        return this.savedQueries.find(q => q.id === id)
+        return this.savedQueries.find((q) => q.id === id)
     }
 
     getFavoriteQueries(): SavedQuery[] {
-        return this.savedQueries.filter(q => q.isFavorite)
+        return this.savedQueries.filter((q) => q.isFavorite)
     }
 
-    updateSavedQuery(id: string, updates: Partial<Omit<SavedQuery, 'id'>>): boolean {
-        const query = this.savedQueries.find(q => q.id === id)
+    updateSavedQuery(
+        id: string,
+        updates: Partial<Omit<SavedQuery, 'id'>>
+    ): boolean {
+        const query = this.savedQueries.find((q) => q.id === id)
         if (query) {
             Object.assign(query, updates)
             this.saveToStorage()
@@ -127,7 +137,7 @@ export class SearchHistoryService {
     }
 
     deleteSavedQuery(id: string): boolean {
-        const index = this.savedQueries.findIndex(q => q.id === id)
+        const index = this.savedQueries.findIndex((q) => q.id === id)
         if (index !== -1) {
             this.savedQueries.splice(index, 1)
             this.saveToStorage()
@@ -138,7 +148,7 @@ export class SearchHistoryService {
     }
 
     toggleFavorite(id: string): boolean {
-        const query = this.savedQueries.find(q => q.id === id)
+        const query = this.savedQueries.find((q) => q.id === id)
         if (query) {
             query.isFavorite = !query.isFavorite
             this.saveToStorage()
@@ -150,18 +160,21 @@ export class SearchHistoryService {
 
     searchHistory(query: string): SearchQuery[] {
         const queryLower = query.toLowerCase()
-        return this.history.filter(h => 
-            h.pattern.toLowerCase().includes(queryLower) ||
-            h.directory.toLowerCase().includes(queryLower)
+        return this.history.filter(
+            (h) =>
+                h.pattern.toLowerCase().includes(queryLower) ||
+                h.directory.toLowerCase().includes(queryLower)
         )
     }
 
     searchSavedQueries(query: string): SavedQuery[] {
         const queryLower = query.toLowerCase()
-        return this.savedQueries.filter(q => 
-            q.name.toLowerCase().includes(queryLower) ||
-            q.pattern.toLowerCase().includes(queryLower) ||
-            (q.description && q.description.toLowerCase().includes(queryLower))
+        return this.savedQueries.filter(
+            (q) =>
+                q.name.toLowerCase().includes(queryLower) ||
+                q.pattern.toLowerCase().includes(queryLower) ||
+                (q.description &&
+                    q.description.toLowerCase().includes(queryLower))
         )
     }
 
@@ -176,8 +189,14 @@ export class SearchHistoryService {
         const directoryCounts = new Map<string, number>()
 
         for (const entry of this.history) {
-            patternCounts.set(entry.pattern, (patternCounts.get(entry.pattern) || 0) + 1)
-            directoryCounts.set(entry.directory, (directoryCounts.get(entry.directory) || 0) + 1)
+            patternCounts.set(
+                entry.pattern,
+                (patternCounts.get(entry.pattern) || 0) + 1
+            )
+            directoryCounts.set(
+                entry.directory,
+                (directoryCounts.get(entry.directory) || 0) + 1
+            )
         }
 
         const mostCommonPatterns = Array.from(patternCounts.entries())
@@ -193,9 +212,10 @@ export class SearchHistoryService {
         return {
             totalHistory: this.history.length,
             totalSaved: this.savedQueries.length,
-            totalFavorites: this.savedQueries.filter(q => q.isFavorite).length,
+            totalFavorites: this.savedQueries.filter((q) => q.isFavorite)
+                .length,
             mostCommonPatterns,
-            mostCommonDirectories
+            mostCommonDirectories,
         }
     }
 
@@ -252,8 +272,10 @@ export class SearchHistoryService {
 
     private loadFromStorage(): void {
         try {
-            const history = store.get('searchHistory') as SearchQuery[] | undefined
-            const savedQueries = store.get('savedQueries') as SavedQuery[] | undefined
+            const history = store.get('searchHistory') as
+                SearchQuery[] | undefined
+            const savedQueries = store.get('savedQueries') as
+                SavedQuery[] | undefined
 
             if (history) {
                 this.history = history
@@ -262,7 +284,9 @@ export class SearchHistoryService {
                 this.savedQueries = savedQueries
             }
 
-            log.info(`Loaded ${this.history.length} history entries and ${this.savedQueries.length} saved queries`)
+            log.info(
+                `Loaded ${this.history.length} history entries and ${this.savedQueries.length} saved queries`
+            )
         } catch (error) {
             log.error('Failed to load search history from storage:', error)
         }

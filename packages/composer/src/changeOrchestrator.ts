@@ -30,14 +30,17 @@ export class ChangeOrchestrator {
         this.logger = logger || new ConsoleLogger()
     }
 
-    createPlan(changes: FileChange[], executionOrder: string[]): OrchestrationPlan {
+    createPlan(
+        changes: FileChange[],
+        executionOrder: string[]
+    ): OrchestrationPlan {
         const steps: OrchestrationStep[] = []
         const rollbackSteps: OrchestrationStep[] = []
 
         // Create execution steps in order
         for (let i = 0; i < executionOrder.length; i++) {
             const filePath = executionOrder[i]
-            const change = changes.find(c => c.filePath === filePath)
+            const change = changes.find((c) => c.filePath === filePath)
             if (!change) continue
 
             steps.push({
@@ -45,7 +48,7 @@ export class ChangeOrchestrator {
                 filePath,
                 change,
                 dependencies: change.dependencies,
-                status: 'pending'
+                status: 'pending',
             })
         }
 
@@ -57,7 +60,7 @@ export class ChangeOrchestrator {
                 filePath: step.filePath,
                 change: step.change,
                 dependencies: [],
-                status: 'pending'
+                status: 'pending',
             })
         }
 
@@ -65,7 +68,7 @@ export class ChangeOrchestrator {
             steps,
             rollbackSteps,
             estimatedDuration: this.estimateDuration(steps),
-            canRollback: true
+            canRollback: true,
         }
     }
 
@@ -74,7 +77,9 @@ export class ChangeOrchestrator {
         execution: ComposerExecution,
         applyChange: (change: FileChange) => Promise<void>
     ): Promise<void> {
-        this.logger.info(`Executing orchestration plan with ${plan.steps.length} steps`)
+        this.logger.info(
+            `Executing orchestration plan with ${plan.steps.length} steps`
+        )
 
         for (const step of plan.steps) {
             step.status = 'in_progress'
@@ -83,7 +88,7 @@ export class ChangeOrchestrator {
             try {
                 // Check dependencies
                 for (const depId of step.dependencies) {
-                    const depStep = plan.steps.find(s => s.filePath === depId)
+                    const depStep = plan.steps.find((s) => s.filePath === depId)
                     if (depStep && depStep.status === 'failed') {
                         throw new Error(`Dependency failed: ${depId}`)
                     }
@@ -95,10 +100,13 @@ export class ChangeOrchestrator {
                 step.result = 'Successfully applied change'
                 execution.executedChanges.push(step.filePath)
 
-                this.logger.info(`Completed step: ${step.stepId} for ${step.filePath}`)
+                this.logger.info(
+                    `Completed step: ${step.stepId} for ${step.filePath}`
+                )
             } catch (error) {
                 step.status = 'failed'
-                step.error = error instanceof Error ? error.message : 'Unknown error'
+                step.error =
+                    error instanceof Error ? error.message : 'Unknown error'
                 execution.failedChanges.push(step.filePath)
                 throw error
             }
@@ -110,24 +118,34 @@ export class ChangeOrchestrator {
         execution: ComposerExecution,
         restoreFile: (filePath: string, content: string) => Promise<void>
     ): Promise<void> {
-        this.logger.info(`Rolling back orchestration plan with ${plan.rollbackSteps.length} steps`)
+        this.logger.info(
+            `Rolling back orchestration plan with ${plan.rollbackSteps.length} steps`
+        )
 
         for (const step of plan.rollbackSteps) {
             step.status = 'in_progress'
 
             try {
                 // Restore original content
-                const originalContent = execution.rollbackData?.get(step.filePath)
+                const originalContent = execution.rollbackData?.get(
+                    step.filePath
+                )
                 if (originalContent !== undefined) {
                     await restoreFile(step.filePath, originalContent)
                     step.status = 'completed'
                     step.result = 'Successfully restored file'
-                    this.logger.info(`Rolled back step: ${step.stepId} for ${step.filePath}`)
+                    this.logger.info(
+                        `Rolled back step: ${step.stepId} for ${step.filePath}`
+                    )
                 }
             } catch (error) {
                 step.status = 'failed'
-                step.error = error instanceof Error ? error.message : 'Unknown error'
-                this.logger.error(`Rollback failed for step ${step.stepId}:`, error)
+                step.error =
+                    error instanceof Error ? error.message : 'Unknown error'
+                this.logger.error(
+                    `Rollback failed for step ${step.stepId}:`,
+                    error
+                )
                 throw error
             }
         }
@@ -142,14 +160,20 @@ export class ChangeOrchestrator {
         return duration
     }
 
-    validatePlan(plan: OrchestrationPlan): { valid: boolean; errors: string[] } {
+    validatePlan(plan: OrchestrationPlan): {
+        valid: boolean
+        errors: string[]
+    } {
         const errors: string[] = []
 
         // Check for circular dependencies
         const visited = new Set<string>()
         const visiting = new Set<string>()
 
-        const checkCircular = (stepId: string, steps: OrchestrationStep[]): boolean => {
+        const checkCircular = (
+            stepId: string,
+            steps: OrchestrationStep[]
+        ): boolean => {
             if (visiting.has(stepId)) {
                 errors.push(`Circular dependency detected involving ${stepId}`)
                 return true
@@ -159,10 +183,10 @@ export class ChangeOrchestrator {
             }
 
             visiting.add(stepId)
-            const step = steps.find(s => s.stepId === stepId)
+            const step = steps.find((s) => s.stepId === stepId)
             if (step) {
                 for (const dep of step.dependencies) {
-                    const depStep = steps.find(s => s.filePath === dep)
+                    const depStep = steps.find((s) => s.filePath === dep)
                     if (depStep && checkCircular(depStep.stepId, steps)) {
                         return true
                     }
@@ -180,7 +204,7 @@ export class ChangeOrchestrator {
         // Check that all dependencies exist
         for (const step of plan.steps) {
             for (const dep of step.dependencies) {
-                const depExists = plan.steps.some(s => s.filePath === dep)
+                const depExists = plan.steps.some((s) => s.filePath === dep)
                 if (!depExists) {
                     errors.push(`Dependency not found: ${dep}`)
                 }
@@ -189,7 +213,7 @@ export class ChangeOrchestrator {
 
         return {
             valid: errors.length === 0,
-            errors
+            errors,
         }
     }
 
@@ -198,12 +222,14 @@ export class ChangeOrchestrator {
         total: number
         percentage: number
     } {
-        const completed = plan.steps.filter(s => s.status === 'completed').length
+        const completed = plan.steps.filter(
+            (s) => s.status === 'completed'
+        ).length
         const total = plan.steps.length
         return {
             completed,
             total,
-            percentage: total > 0 ? (completed / total) * 100 : 0
+            percentage: total > 0 ? (completed / total) * 100 : 0,
         }
     }
 }

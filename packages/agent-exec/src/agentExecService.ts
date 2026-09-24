@@ -4,20 +4,17 @@
  * Extracted and adapted from Cursor's agent execution service
  */
 
-import {
-    AgentTask,
-    TaskStatus,
-    Tool,
-    ToolResult,
-    AgentConfig
-} from './types'
+import { AgentTask, TaskStatus, Tool, ToolResult, AgentConfig } from './types'
 import { Logger, ConsoleLogger } from './logger'
 
 // Tool registry interface for integration
 export interface ToolRegistry {
     getTools(): Tool[]
     getTool(toolName: string): Tool | undefined
-    executeTool(toolName: string, params: Record<string, any>): Promise<ToolResult>
+    executeTool(
+        toolName: string,
+        params: Record<string, any>
+    ): Promise<ToolResult>
 }
 
 export class AgentExecService {
@@ -35,7 +32,7 @@ export class AgentExecService {
             importanceThreshold: 0.3,
             enableRollback: true,
             logLevel: 'info',
-            ...config
+            ...config,
         }
         this.logger = logger || new ConsoleLogger()
     }
@@ -69,7 +66,7 @@ export class AgentExecService {
             cwd,
             env,
             status: 'pending',
-            output: ''
+            output: '',
         }
 
         this.tasks.set(taskId, task)
@@ -88,7 +85,8 @@ export class AgentExecService {
             return taskId
         } catch (error) {
             task.status = 'failed'
-            task.error = error instanceof Error ? error.message : 'Unknown error'
+            task.error =
+                error instanceof Error ? error.message : 'Unknown error'
             task.endTime = new Date()
             this.logger.error('Failed to execute agent:', error)
             throw error
@@ -105,10 +103,10 @@ export class AgentExecService {
         // Placeholder for actual command execution
         // In a real implementation, this would use child_process.spawn
         this.logger.info(`Executing command: ${command} ${args.join(' ')}`)
-        
+
         // Simulate command execution
         task.output = `Executed: ${command} ${args.join(' ')}`
-        
+
         // In production, this would:
         // 1. Spawn the process with proper environment
         // 2. Capture stdout and stderr
@@ -116,20 +114,32 @@ export class AgentExecService {
         // 4. Handle timeout
     }
 
-    async executeAgentScript(scriptPath: string, args: string[] = [], cwd?: string): Promise<string> {
+    async executeAgentScript(
+        scriptPath: string,
+        args: string[] = [],
+        cwd?: string
+    ): Promise<string> {
         return this.executeAgent(scriptPath, args, cwd)
     }
 
-    async executeAgentCommand(commandString: string, cwd?: string): Promise<string> {
+    async executeAgentCommand(
+        commandString: string,
+        cwd?: string
+    ): Promise<string> {
         const parts = commandString.split(' ')
         const command = parts[0]
         const args = parts.slice(1)
         return this.executeAgent(command, args, cwd)
     }
 
-    async executeTool(toolName: string, params: Record<string, any>): Promise<string> {
+    async executeTool(
+        toolName: string,
+        params: Record<string, any>
+    ): Promise<string> {
         if (!this.toolRegistry) {
-            throw new Error('Tool registry not set. Call setToolRegistry() first.')
+            throw new Error(
+                'Tool registry not set. Call setToolRegistry() first.'
+            )
         }
 
         const taskId = `tool-task-${++this.taskIdCounter}`
@@ -141,7 +151,7 @@ export class AgentExecService {
             status: 'pending',
             output: '',
             toolName,
-            toolParams: params
+            toolParams: params,
         }
 
         this.tasks.set(taskId, task)
@@ -161,7 +171,8 @@ export class AgentExecService {
             return taskId
         } catch (error) {
             task.status = 'failed'
-            task.error = error instanceof Error ? error.message : 'Unknown error'
+            task.error =
+                error instanceof Error ? error.message : 'Unknown error'
             task.endTime = new Date()
             this.logger.error(`Tool task ${taskId} error:`, error)
             throw error
@@ -177,15 +188,15 @@ export class AgentExecService {
     }
 
     getRunningTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'running')
+        return this.getTasks().filter((t) => t.status === 'running')
     }
 
     getCompletedTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'completed')
+        return this.getTasks().filter((t) => t.status === 'completed')
     }
 
     getFailedTasks(): AgentTask[] {
-        return this.getTasks().filter(t => t.status === 'failed')
+        return this.getTasks().filter((t) => t.status === 'failed')
     }
 
     async stopTask(taskId: string): Promise<void> {
@@ -260,10 +271,12 @@ export class AgentExecService {
         const tasks = this.getTasks()
         return {
             totalTasks: tasks.length,
-            runningTasks: tasks.filter(t => t.status === 'running').length,
-            completedTasks: tasks.filter(t => t.status === 'completed').length,
-            failedTasks: tasks.filter(t => t.status === 'failed').length,
-            cancelledTasks: tasks.filter(t => t.status === 'cancelled').length
+            runningTasks: tasks.filter((t) => t.status === 'running').length,
+            completedTasks: tasks.filter((t) => t.status === 'completed')
+                .length,
+            failedTasks: tasks.filter((t) => t.status === 'failed').length,
+            cancelledTasks: tasks.filter((t) => t.status === 'cancelled')
+                .length,
         }
     }
 
@@ -277,7 +290,10 @@ export class AgentExecService {
 // Singleton instance
 let agentExecService: AgentExecService | null = null
 
-export function getAgentExecService(config?: AgentConfig, logger?: Logger): AgentExecService {
+export function getAgentExecService(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentExecService {
     if (!agentExecService) {
         agentExecService = new AgentExecService(config, logger)
     }
@@ -292,6 +308,9 @@ export function destroyAgentExecService(): void {
     }
 }
 
-export function createAgentExecService(config?: AgentConfig, logger?: Logger): AgentExecService {
+export function createAgentExecService(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentExecService {
     return new AgentExecService(config, logger)
 }

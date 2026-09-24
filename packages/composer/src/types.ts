@@ -11,7 +11,8 @@ export type ChangeType = 'insert' | 'delete' | 'replace' | 'move'
 /**
  * Execution status
  */
-export type ExecutionStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled'
+export type ExecutionStatus =
+    'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled'
 
 /**
  * File change definition

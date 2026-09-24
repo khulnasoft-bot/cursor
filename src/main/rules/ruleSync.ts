@@ -31,13 +31,13 @@ export class RuleSyncService {
         syncMethod: 'git',
         autoSync: false,
         syncInterval: 30,
-        conflictResolution: 'local'
+        conflictResolution: 'local',
     }
     private status: SyncStatus = {
         lastSync: null,
         lastSyncSuccess: true,
         pendingChanges: 0,
-        conflicts: 0
+        conflicts: 0,
     }
     private syncIntervalId: NodeJS.Timeout | null = null
     private ruleParser = getRuleParser()
@@ -102,11 +102,14 @@ export class RuleSyncService {
                 case 'custom':
                     return await this.syncViaCustom(projectPath)
                 default:
-                    throw new Error(`Unknown sync method: ${this.config.syncMethod}`)
+                    throw new Error(
+                        `Unknown sync method: ${this.config.syncMethod}`
+                    )
             }
         } catch (error) {
             this.status.lastSyncSuccess = false
-            this.status.lastSyncError = error instanceof Error ? error.message : 'Unknown error'
+            this.status.lastSyncError =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error('Rule sync failed:', error)
             return this.status
         }
@@ -117,26 +120,27 @@ export class RuleSyncService {
 
         try {
             const rulesDir = path.join(projectPath, '.cursor', 'rules')
-            
+
             // Check if rules directory is a git repository
             // For now, this is a placeholder - actual git integration would be here
             // const gitStatus = await this.getGitStatus(rulesDir)
-            
+
             // Pull latest changes
             // await this.gitPull(rulesDir)
-            
+
             // Push local changes
             // await this.gitPush(rulesDir)
 
             this.status.lastSync = new Date()
             this.status.lastSyncSuccess = true
             this.status.lastSyncError = undefined
-            
+
             log.info('Git sync completed successfully')
             return this.status
         } catch (error) {
             this.status.lastSyncSuccess = false
-            this.status.lastSyncError = error instanceof Error ? error.message : 'Unknown error'
+            this.status.lastSyncError =
+                error instanceof Error ? error.message : 'Unknown error'
             throw error
         }
     }
@@ -156,10 +160,15 @@ export class RuleSyncService {
             await fs.mkdir(remoteRulesDir, { recursive: true })
 
             // Copy local rules to remote
-            const localFiles = await fs.readdir(localRulesDir, { withFileTypes: true })
-            
+            const localFiles = await fs.readdir(localRulesDir, {
+                withFileTypes: true,
+            })
+
             for (const file of localFiles) {
-                if (file.isFile() && (file.name.endsWith('.yaml') || file.name.endsWith('.yml'))) {
+                if (
+                    file.isFile() &&
+                    (file.name.endsWith('.yaml') || file.name.endsWith('.yml'))
+                ) {
                     const localPath = path.join(localRulesDir, file.name)
                     const remotePath = path.join(remoteRulesDir, file.name)
                     await fs.copyFile(localPath, remotePath)
@@ -167,10 +176,15 @@ export class RuleSyncService {
             }
 
             // Copy remote rules to local
-            const remoteFiles = await fs.readdir(remoteRulesDir, { withFileTypes: true })
-            
+            const remoteFiles = await fs.readdir(remoteRulesDir, {
+                withFileTypes: true,
+            })
+
             for (const file of remoteFiles) {
-                if (file.isFile() && (file.name.endsWith('.yaml') || file.name.endsWith('.yml'))) {
+                if (
+                    file.isFile() &&
+                    (file.name.endsWith('.yaml') || file.name.endsWith('.yml'))
+                ) {
                     const remotePath = path.join(remoteRulesDir, file.name)
                     const localPath = path.join(localRulesDir, file.name)
                     await fs.copyFile(remotePath, localPath)
@@ -183,12 +197,13 @@ export class RuleSyncService {
             this.status.lastSync = new Date()
             this.status.lastSyncSuccess = true
             this.status.lastSyncError = undefined
-            
+
             log.info('File sync completed successfully')
             return this.status
         } catch (error) {
             this.status.lastSyncSuccess = false
-            this.status.lastSyncError = error instanceof Error ? error.message : 'Unknown error'
+            this.status.lastSyncError =
+                error instanceof Error ? error.message : 'Unknown error'
             throw error
         }
     }
@@ -198,11 +213,11 @@ export class RuleSyncService {
 
         // Placeholder for custom sync implementation
         // This could integrate with cloud storage, API, etc.
-        
+
         this.status.lastSync = new Date()
         this.status.lastSyncSuccess = true
         this.status.lastSyncError = undefined
-        
+
         log.info('Custom sync completed (placeholder)')
         return this.status
     }
@@ -217,14 +232,16 @@ export class RuleSyncService {
         }
 
         const intervalMs = this.config.syncInterval * 60 * 1000
-        
+
         this.syncIntervalId = setInterval(async () => {
             if (projectPath) {
                 await this.syncRules(projectPath)
             }
         }, intervalMs)
 
-        log.info(`Started auto-sync (interval: ${this.config.syncInterval} minutes)`)
+        log.info(
+            `Started auto-sync (interval: ${this.config.syncInterval} minutes)`
+        )
     }
 
     stopAutoSync(): void {
@@ -237,23 +254,35 @@ export class RuleSyncService {
 
     async exportRulesForSharing(projectPath: string): Promise<string> {
         const rulesDir = path.join(projectPath, '.cursor', 'rules')
-        const exportPath = path.join(projectPath, '.cursor', 'rules-export.json')
+        const exportPath = path.join(
+            projectPath,
+            '.cursor',
+            'rules-export.json'
+        )
 
-        const parsedRules = await this.ruleParser.loadRulesFromDirectory(projectPath)
-        
+        const parsedRules =
+            await this.ruleParser.loadRulesFromDirectory(projectPath)
+
         const exportData = {
             version: '1.0.0',
             exportedAt: new Date().toISOString(),
-            ruleSets: Array.from(parsedRules.ruleSets.values())
+            ruleSets: Array.from(parsedRules.ruleSets.values()),
         }
 
-        await fs.writeFile(exportPath, JSON.stringify(exportData, null, 2), 'utf-8')
-        
+        await fs.writeFile(
+            exportPath,
+            JSON.stringify(exportData, null, 2),
+            'utf-8'
+        )
+
         log.info(`Exported rules to ${exportPath}`)
         return exportPath
     }
 
-    async importRulesFromSharing(exportPath: string, projectPath: string): Promise<void> {
+    async importRulesFromSharing(
+        exportPath: string,
+        projectPath: string
+    ): Promise<void> {
         const content = await fs.readFile(exportPath, 'utf-8')
         const exportData = JSON.parse(content)
 
@@ -278,7 +307,7 @@ export class RuleSyncService {
         yaml += `version: ${ruleSet.version}\n`
         yaml += `description: ${ruleSet.description}\n`
         yaml += `rules:\n`
-        
+
         for (const rule of ruleSet.rules) {
             yaml += `  - id: ${rule.id}\n`
             yaml += `    name: ${rule.name}\n`
@@ -304,12 +333,15 @@ export class RuleSyncService {
         return yaml
     }
 
-    async detectConflicts(projectPath: string): Promise<Array<{ ruleSet: string; conflict: string }>> {
+    async detectConflicts(
+        projectPath: string
+    ): Promise<Array<{ ruleSet: string; conflict: string }>> {
         const conflicts: Array<{ ruleSet: string; conflict: string }> = []
 
         try {
-            const parsedRules = await this.ruleParser.loadRulesFromDirectory(projectPath)
-            
+            const parsedRules =
+                await this.ruleParser.loadRulesFromDirectory(projectPath)
+
             // Check for duplicate rule IDs
             const ruleIds = new Map<string, string>()
             for (const ruleSet of parsedRules.ruleSets.values()) {
@@ -317,7 +349,7 @@ export class RuleSyncService {
                     if (ruleIds.has(rule.id)) {
                         conflicts.push({
                             ruleSet: ruleSet.name,
-                            conflict: `Duplicate rule ID: ${rule.id} (also in ${ruleIds.get(rule.id)})`
+                            conflict: `Duplicate rule ID: ${rule.id} (also in ${ruleIds.get(rule.id)})`,
                         })
                     } else {
                         ruleIds.set(rule.id, ruleSet.name)
@@ -333,18 +365,23 @@ export class RuleSyncService {
         return conflicts
     }
 
-    async resolveConflicts(projectPath: string, resolution: 'local' | 'remote'): Promise<void> {
+    async resolveConflicts(
+        projectPath: string,
+        resolution: 'local' | 'remote'
+    ): Promise<void> {
         const conflicts = await this.detectConflicts(projectPath)
-        
+
         if (conflicts.length === 0) {
             return
         }
 
-        log.info(`Resolving ${conflicts.length} conflicts with strategy: ${resolution}`)
+        log.info(
+            `Resolving ${conflicts.length} conflicts with strategy: ${resolution}`
+        )
 
         // Conflict resolution logic would go here
         // For now, this is a placeholder
-        
+
         this.status.conflicts = 0
         log.info('Conflicts resolved')
     }

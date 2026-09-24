@@ -96,13 +96,13 @@ export class VisualEditorService {
         changes: [],
         undoStack: [],
         redoStack: [],
-        previewMode: false
+        previewMode: false,
     }
     private elementCounter = 0
     private changeCounter = 0
     private changeStats = {
         byAuthor: new Map<string, number>(),
-        byType: new Map<string, number>()
+        byType: new Map<string, number>(),
     }
 
     /**
@@ -187,7 +187,13 @@ export class VisualEditorService {
      * @param tags Optional tags for categorizing the change
      * @returns The VisualChange record
      */
-    updateElementProperty(elementId: string, property: string, value: any, author?: string, tags?: string[]): VisualChange {
+    updateElementProperty(
+        elementId: string,
+        property: string,
+        value: any,
+        author?: string,
+        tags?: string[]
+    ): VisualChange {
         const change: VisualChange = {
             id: `change-${++this.changeCounter}`,
             elementId,
@@ -198,7 +204,7 @@ export class VisualEditorService {
             timestamp: new Date(),
             description: `Updated ${property} to ${value}`,
             author,
-            tags
+            tags,
         }
 
         this.state.changes.push(change)
@@ -219,7 +225,13 @@ export class VisualEditorService {
      * @param tags Optional tags for categorizing the change
      * @returns The VisualChange record
      */
-    updateElementStyle(elementId: string, styleProperty: string, value: string, author?: string, tags?: string[]): VisualChange {
+    updateElementStyle(
+        elementId: string,
+        styleProperty: string,
+        value: string,
+        author?: string,
+        tags?: string[]
+    ): VisualChange {
         const change: VisualChange = {
             id: `change-${++this.changeCounter}`,
             elementId,
@@ -230,7 +242,7 @@ export class VisualEditorService {
             timestamp: new Date(),
             description: `Updated style ${styleProperty} to ${value}`,
             author,
-            tags
+            tags,
         }
 
         this.state.changes.push(change)
@@ -366,7 +378,7 @@ export class VisualEditorService {
      * @returns Changes made by the specified author
      */
     getChangesByAuthor(author: string): VisualChange[] {
-        return this.state.changes.filter(c => c.author === author)
+        return this.state.changes.filter((c) => c.author === author)
     }
 
     /**
@@ -375,7 +387,7 @@ export class VisualEditorService {
      * @returns Changes with the specified tag
      */
     getChangesByTag(tag: string): VisualChange[] {
-        return this.state.changes.filter(c => c.tags?.includes(tag))
+        return this.state.changes.filter((c) => c.tags?.includes(tag))
     }
 
     /**
@@ -385,8 +397,8 @@ export class VisualEditorService {
      * @returns Changes within the specified time range
      */
     getChangesByTimeRange(start: Date, end: Date): VisualChange[] {
-        return this.state.changes.filter(c =>
-            c.timestamp >= start && c.timestamp <= end
+        return this.state.changes.filter(
+            (c) => c.timestamp >= start && c.timestamp <= end
         )
     }
 
@@ -428,7 +440,7 @@ export class VisualEditorService {
             undoable: this.state.undoStack.length,
             redoable: this.state.redoStack.length,
             byAuthor,
-            byType
+            byType,
         }
     }
 
@@ -506,8 +518,8 @@ export class VisualEditorService {
                 line: 0,
                 column: 0,
                 oldText: '',
-                newText: ''
-            }
+                newText: '',
+            },
         }
     }
 
@@ -530,7 +542,7 @@ export class VisualEditorService {
             changes: [],
             undoStack: [],
             redoStack: [],
-            previewMode: false
+            previewMode: false,
         }
         log.info('Visual editor state reset')
     }

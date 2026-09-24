@@ -39,10 +39,16 @@ const result = await composer.planChanges({
     context: {
         projectPath: './my-project',
         files: new Map([
-            ['src/api/user.ts', 'export function getUser() { return fetch(...) }'],
-            ['src/api/auth.ts', 'export function login() { return fetch(...) }']
-        ])
-    }
+            [
+                'src/api/user.ts',
+                'export function getUser() { return fetch(...) }',
+            ],
+            [
+                'src/api/auth.ts',
+                'export function login() { return fetch(...) }',
+            ],
+        ]),
+    },
 })
 
 console.log(`Planned ${result.changes.length} changes`)
@@ -58,7 +64,7 @@ const toolRegistry = createToolRegistry()
 agentExec.setToolRegistry(toolRegistry)
 
 const taskId = await agentExec.executeTool('read_file', {
-    filePath: './src/main.ts'
+    filePath: './src/main.ts',
 })
 
 console.log(`Task ${taskId} completed`)
@@ -75,10 +81,10 @@ await indexer.indexFile('./src/main.ts', fileContent, 'typescript')
 
 const results = await indexer.search({
     query: 'authentication logic',
-    limit: 5
+    limit: 5,
 })
 
-results.forEach(result => {
+results.forEach((result) => {
     console.log(`${result.filePath}:${result.lineRange.start}`)
     console.log(`Similarity: ${result.similarity.toFixed(2)}`)
 })

@@ -9,7 +9,13 @@ export interface RuleTemplate {
     id: string
     name: string
     description: string
-    category: 'style' | 'security' | 'performance' | 'testing' | 'architecture' | 'custom'
+    category:
+        | 'style'
+        | 'security'
+        | 'performance'
+        | 'testing'
+        | 'architecture'
+        | 'custom'
     language: 'javascript' | 'typescript' | 'python' | 'go' | 'rust' | 'general'
     ruleSet: RuleSet
 }
@@ -26,7 +32,8 @@ export class RuleTemplates {
         this.addTemplate({
             id: 'js-best-practices',
             name: 'JavaScript/TypeScript Best Practices',
-            description: 'Standard coding standards for JavaScript and TypeScript projects',
+            description:
+                'Standard coding standards for JavaScript and TypeScript projects',
             category: 'style',
             language: 'typescript',
             ruleSet: {
@@ -37,7 +44,8 @@ export class RuleTemplates {
                     {
                         id: 'js-001',
                         name: 'Use const and let, avoid var',
-                        description: 'Use const for constants and let for variables, avoid var',
+                        description:
+                            'Use const for constants and let for variables, avoid var',
                         category: 'style',
                         severity: 'error',
                         enabled: true,
@@ -46,12 +54,13 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.jsx', '*.tsx'],
                         message: 'Use const or let instead of var',
-                        fix: 'Replace var with const or let'
+                        fix: 'Replace var with const or let',
                     },
                     {
                         id: 'js-002',
                         name: 'Avoid console.log in production',
-                        description: 'Remove console.log statements before committing',
+                        description:
+                            'Remove console.log statements before committing',
                         category: 'style',
                         severity: 'error',
                         enabled: true,
@@ -60,12 +69,13 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.jsx', '*.tsx'],
                         message: 'Remove console.log statement',
-                        fix: 'Replace with proper logging or remove'
+                        fix: 'Replace with proper logging or remove',
                     },
                     {
                         id: 'js-003',
                         name: 'Use template literals instead of concatenation',
-                        description: 'Prefer template literals over string concatenation',
+                        description:
+                            'Prefer template literals over string concatenation',
                         category: 'style',
                         severity: 'suggestion',
                         enabled: true,
@@ -73,8 +83,9 @@ export class RuleTemplates {
                         patterns: ['["\'][^"\']*[+][^"\']*["\']'],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.jsx', '*.tsx'],
-                        message: 'Use template literals instead of string concatenation',
-                        fix: 'Convert to template literal syntax'
+                        message:
+                            'Use template literals instead of string concatenation',
+                        fix: 'Convert to template literal syntax',
                     },
                     {
                         id: 'js-004',
@@ -84,13 +95,16 @@ export class RuleTemplates {
                         severity: 'suggestion',
                         enabled: true,
                         priority: 4,
-                        patterns: ['function\\s+\\w+', 'const\\s+\\w+\\s*=\\s*\\('],
+                        patterns: [
+                            'function\\s+\\w+',
+                            'const\\s+\\w+\\s*=\\s*\\(',
+                        ],
                         exceptions: [],
                         appliesTo: ['*.ts', '*.tsx', '*.js'],
-                        message: 'Add JSDoc comment for this function'
-                    }
-                ]
-            }
+                        message: 'Add JSDoc comment for this function',
+                    },
+                ],
+            },
         })
 
         // Python Style Guide
@@ -108,7 +122,8 @@ export class RuleTemplates {
                     {
                         id: 'py-001',
                         name: 'Use snake_case for variables and functions',
-                        description: 'Python naming convention: snake_case for variables and functions',
+                        description:
+                            'Python naming convention: snake_case for variables and functions',
                         category: 'naming',
                         severity: 'warning',
                         enabled: true,
@@ -116,13 +131,15 @@ export class RuleTemplates {
                         patterns: ['\\b[A-Z][a-z]+[A-Z]'],
                         exceptions: ['True', 'False', 'None'],
                         appliesTo: ['*.py'],
-                        message: 'Use snake_case for variable and function names',
-                        fix: 'Convert to snake_case naming convention'
+                        message:
+                            'Use snake_case for variable and function names',
+                        fix: 'Convert to snake_case naming convention',
                     },
                     {
                         id: 'py-002',
                         name: 'Use PascalCase for classes',
-                        description: 'Python naming convention: PascalCase for class names',
+                        description:
+                            'Python naming convention: PascalCase for class names',
                         category: 'naming',
                         severity: 'warning',
                         enabled: true,
@@ -131,12 +148,13 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.py'],
                         message: 'Use PascalCase for class names',
-                        fix: 'Convert class name to PascalCase'
+                        fix: 'Convert class name to PascalCase',
                     },
                     {
                         id: 'py-003',
                         name: 'Avoid print statements in production',
-                        description: 'Use proper logging instead of print statements',
+                        description:
+                            'Use proper logging instead of print statements',
                         category: 'style',
                         severity: 'error',
                         enabled: true,
@@ -145,10 +163,10 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.py'],
                         message: 'Use logging module instead of print',
-                        fix: 'Replace print with logging.info/debug/error'
-                    }
-                ]
-            }
+                        fix: 'Replace print with logging.info/debug/error',
+                    },
+                ],
+            },
         })
 
         // Security Standards
@@ -166,21 +184,28 @@ export class RuleTemplates {
                     {
                         id: 'sec-001',
                         name: 'Avoid hardcoded secrets',
-                        description: 'Do not hardcode API keys, passwords, or secrets',
+                        description:
+                            'Do not hardcode API keys, passwords, or secrets',
                         category: 'security',
                         severity: 'error',
                         enabled: true,
                         priority: 1,
-                        patterns: ['api[_-]?key\\s*=\\s*["\']', 'password\\s*=\\s*["\']', 'secret\\s*=\\s*["\']'],
+                        patterns: [
+                            'api[_-]?key\\s*=\\s*["\']',
+                            'password\\s*=\\s*["\']',
+                            'secret\\s*=\\s*["\']',
+                        ],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py', '*.go', '*.rs'],
-                        message: 'Hardcoded secrets detected - use environment variables',
-                        fix: 'Move to environment variables or secure config'
+                        message:
+                            'Hardcoded secrets detected - use environment variables',
+                        fix: 'Move to environment variables or secure config',
                     },
                     {
                         id: 'sec-002',
                         name: 'Avoid eval()',
-                        description: 'Do not use eval() as it can execute arbitrary code',
+                        description:
+                            'Do not use eval() as it can execute arbitrary code',
                         category: 'security',
                         severity: 'error',
                         enabled: true,
@@ -189,12 +214,13 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.jsx', '*.tsx'],
                         message: 'Avoid eval() - it can execute arbitrary code',
-                        fix: 'Use safer alternatives or avoid dynamic code execution'
+                        fix: 'Use safer alternatives or avoid dynamic code execution',
                     },
                     {
                         id: 'sec-003',
                         name: 'Use parameterized queries',
-                        description: 'Use parameterized queries to prevent SQL injection',
+                        description:
+                            'Use parameterized queries to prevent SQL injection',
                         category: 'security',
                         severity: 'error',
                         enabled: true,
@@ -202,11 +228,12 @@ export class RuleTemplates {
                         patterns: ['SELECT.*WHERE.*["\'].*\\+.*["\']'],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py'],
-                        message: 'Use parameterized queries to prevent SQL injection',
-                        fix: 'Use prepared statements or parameterized queries'
-                    }
-                ]
-            }
+                        message:
+                            'Use parameterized queries to prevent SQL injection',
+                        fix: 'Use prepared statements or parameterized queries',
+                    },
+                ],
+            },
         })
 
         // Performance Guidelines
@@ -233,7 +260,7 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py'],
                         message: 'Consider optimizing nested loops',
-                        fix: 'Use more efficient algorithms or data structures'
+                        fix: 'Use more efficient algorithms or data structures',
                     },
                     {
                         id: 'perf-002',
@@ -247,24 +274,27 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts'],
                         message: 'Consider caching expensive operations',
-                        fix: 'Cache the result if called repeatedly'
+                        fix: 'Cache the result if called repeatedly',
                     },
                     {
                         id: 'perf-003',
                         name: 'Use efficient data structures',
-                        description: 'Use appropriate data structures for the use case',
+                        description:
+                            'Use appropriate data structures for the use case',
                         category: 'performance',
                         severity: 'suggestion',
                         enabled: true,
                         priority: 3,
-                        patterns: ['Array\\.prototype\\.find\\s*\\(.*\\)\\s*\\.includes'],
+                        patterns: [
+                            'Array\\.prototype\\.find\\s*\\(.*\\)\\s*\\.includes',
+                        ],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts'],
                         message: 'Consider using Set for membership tests',
-                        fix: 'Use Set or Map for better performance'
-                    }
-                ]
-            }
+                        fix: 'Use Set or Map for better performance',
+                    },
+                ],
+            },
         })
 
         // Testing Standards
@@ -287,15 +317,19 @@ export class RuleTemplates {
                         severity: 'suggestion',
                         enabled: true,
                         priority: 1,
-                        patterns: ['function\\s+\\w+', 'const\\s+\\w+\\s*=\\s*\\('],
+                        patterns: [
+                            'function\\s+\\w+',
+                            'const\\s+\\w+\\s*=\\s*\\(',
+                        ],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py'],
-                        message: 'Add test coverage for this function'
+                        message: 'Add test coverage for this function',
                     },
                     {
                         id: 'test-002',
                         name: 'Use descriptive test names',
-                        description: 'Test names should describe what they test',
+                        description:
+                            'Test names should describe what they test',
                         category: 'testing',
                         severity: 'suggestion',
                         enabled: true,
@@ -304,24 +338,29 @@ export class RuleTemplates {
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py'],
                         message: 'Use descriptive test names',
-                        fix: 'Rename test to describe what it tests'
+                        fix: 'Rename test to describe what it tests',
                     },
                     {
                         id: 'test-003',
                         name: 'Avoid testing implementation details',
-                        description: 'Test behavior, not implementation details',
+                        description:
+                            'Test behavior, not implementation details',
                         category: 'testing',
                         severity: 'warning',
                         enabled: true,
                         priority: 3,
-                        patterns: ['expect\\(.*\\.length\\)', 'assertEqual\\(.*\\.length'],
+                        patterns: [
+                            'expect\\(.*\\.length\\)',
+                            'assertEqual\\(.*\\.length',
+                        ],
                         exceptions: [],
                         appliesTo: ['*.js', '*.ts', '*.py'],
-                        message: 'Test behavior instead of implementation details',
-                        fix: 'Test the actual behavior/output'
-                    }
-                ]
-            }
+                        message:
+                            'Test behavior instead of implementation details',
+                        fix: 'Test the actual behavior/output',
+                    },
+                ],
+            },
         })
     }
 
@@ -338,18 +377,19 @@ export class RuleTemplates {
     }
 
     getTemplatesByCategory(category: RuleTemplate['category']): RuleTemplate[] {
-        return this.getTemplates().filter(t => t.category === category)
+        return this.getTemplates().filter((t) => t.category === category)
     }
 
     getTemplatesByLanguage(language: RuleTemplate['language']): RuleTemplate[] {
-        return this.getTemplates().filter(t => t.language === language)
+        return this.getTemplates().filter((t) => t.language === language)
     }
 
     searchTemplates(query: string): RuleTemplate[] {
         const queryLower = query.toLowerCase()
-        return this.getTemplates().filter(t =>
-            t.name.toLowerCase().includes(queryLower) ||
-            t.description.toLowerCase().includes(queryLower)
+        return this.getTemplates().filter(
+            (t) =>
+                t.name.toLowerCase().includes(queryLower) ||
+                t.description.toLowerCase().includes(queryLower)
         )
     }
 
@@ -369,13 +409,17 @@ export class RuleTemplates {
             description: ruleSet.description,
             category: 'custom',
             language: 'general',
-            ruleSet
+            ruleSet,
         }
         this.addTemplate(template)
         return template
     }
 
-    createCustomTemplate(name: string, description: string, category: RuleTemplate['category']): RuleTemplate {
+    createCustomTemplate(
+        name: string,
+        description: string,
+        category: RuleTemplate['category']
+    ): RuleTemplate {
         const template: RuleTemplate = {
             id: `custom-${Date.now()}`,
             name,
@@ -386,8 +430,8 @@ export class RuleTemplates {
                 name: name.toLowerCase().replace(/\s+/g, '-'),
                 version: '1.0.0',
                 description,
-                rules: []
-            }
+                rules: [],
+            },
         }
         this.addTemplate(template)
         return template

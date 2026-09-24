@@ -6,17 +6,34 @@
 /**
  * Trigger types for automations
  */
-export type TriggerType = 'file_save' | 'file_change' | 'git_commit' | 'time' | 'manual' | 'event' | 'api' | 'webhook'
+export type TriggerType =
+    | 'file_save'
+    | 'file_change'
+    | 'git_commit'
+    | 'time'
+    | 'manual'
+    | 'event'
+    | 'api'
+    | 'webhook'
 
 /**
  * Action types for automations
  */
-export type ActionType = 'command' | 'script' | 'ai_task' | 'notification' | 'file_operation' | 'git_operation' | 'http_request' | 'custom'
+export type ActionType =
+    | 'command'
+    | 'script'
+    | 'ai_task'
+    | 'notification'
+    | 'file_operation'
+    | 'git_operation'
+    | 'http_request'
+    | 'custom'
 
 /**
  * Execution status
  */
-export type ExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+export type ExecutionStatus =
+    'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
 
 /**
  * Automation trigger configuration

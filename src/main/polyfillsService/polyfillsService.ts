@@ -49,7 +49,7 @@ class PolyfillsService {
     }
 
     getEnabledPolyfills(): Polyfill[] {
-        return this.getPolyfills().filter(p => p.enabled)
+        return this.getPolyfills().filter((p) => p.enabled)
     }
 
     enablePolyfill(name: string): void {
@@ -78,7 +78,7 @@ class PolyfillsService {
 
     getAllPolyfillCode(): string {
         const enabledPolyfills = this.getEnabledPolyfills()
-        return enabledPolyfills.map(p => p.code).join('\n')
+        return enabledPolyfills.map((p) => p.code).join('\n')
     }
 }
 

@@ -72,9 +72,9 @@ export const upgradeCursor = createAsyncThunk(
             state.cursorLogin.stripeId
         ) {
             return
-        } else if (
-            !(state.cursorLogin.accessToken && state.cursorLogin.profile)
-        ) {
+        } else if (!(
+            state.cursorLogin.accessToken && state.cursorLogin.profile
+        )) {
             log.info('Upgrade cursor passes to login')
             await connector.loginCursor()
         } else {

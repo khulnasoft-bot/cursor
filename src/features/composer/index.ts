@@ -1,5 +1,10 @@
 export { getComposerService, destroyComposerService } from './composerService'
 export { getDiffGenerator } from './diffGenerator'
 export { setupComposerIpcs } from './ipcHandlers'
-export type { FileChange, ComposerRequest, ComposerResult, ComposerExecution } from './composerService'
+export type {
+    FileChange,
+    ComposerRequest,
+    ComposerResult,
+    ComposerExecution,
+} from './composerService'
 export type { DiffHunk, FileDiff, MultiFileDiff } from './diffGenerator'

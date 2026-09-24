@@ -31,29 +31,34 @@ console.log(`Found ${result.violations.length} violations`)
 ## Features
 
 ### Rule Management
+
 - Load rules from project configuration
 - Create, update, delete rule sets
 - Enable/disable individual rules
 - Import/export rules as JSON
 
 ### Code Analysis
+
 - Pattern-based rule matching
 - File-specific rule application
 - Line and column reporting
 - Exception handling for false positives
 
 ### AI Context Integration
+
 - Automatically adds team rules to AI context
 - Categorized rule presentation
 - Fix suggestions included
 
 ### Rule Validation
+
 - Comprehensive rule validation
 - Pattern syntax checking
 - Conflict detection
 - Improvement suggestions
 
 ### Default Rules
+
 - Style rules (no console, no debugger)
 - Naming conventions
 - Security rules (no hardcoded secrets)
@@ -64,6 +69,7 @@ console.log(`Found ${result.violations.length} violations`)
 ### RuleService
 
 #### Configuration
+
 ```typescript
 interface RuleServiceConfig {
     maxViolations?: number
@@ -74,14 +80,17 @@ interface RuleServiceConfig {
 ```
 
 #### Initialization
+
 - `initialize(projectPath)` - Load rules from project directory
 - `reset()` - Reset service state
 
 #### Rule Application
+
 - `applyRulesToCode(code, filePath)` - Apply rules to code
 - `applyRulesToAIContext(context, filePath)` - Add rules to AI context
 
 #### Rule Management
+
 - `getActiveRules()` - Get all active rules
 - `getRulesByCategory(category)` - Get rules by category
 - `getRulesBySeverity(severity)` - Get rules by severity
@@ -94,6 +103,7 @@ interface RuleServiceConfig {
 - `disableRule(ruleId, projectPath)` - Disable rule
 
 #### Validation & Statistics
+
 - `validateRule(rule)` - Validate rule definition
 - `getStatistics()` - Get rule statistics
 - `exportRules()` - Export rules as JSON
@@ -102,6 +112,7 @@ interface RuleServiceConfig {
 ### RuleValidator
 
 #### Validation
+
 - `validateRule(rule)` - Validate single rule
 - `validateRuleSet(ruleSet)` - Validate rule set
 - `validateRuleJSON(json)` - Validate JSON rule definition
@@ -111,6 +122,7 @@ interface RuleServiceConfig {
 ## Examples
 
 ### Basic Usage
+
 ```typescript
 import { RuleService } from '@cursor/rules-service'
 
@@ -123,11 +135,14 @@ const result = await service.applyRulesToCode(
 )
 
 for (const violation of result.violations) {
-    console.log(`${violation.severity}: ${violation.message} at line ${violation.lineNumber}`)
+    console.log(
+        `${violation.severity}: ${violation.message} at line ${violation.lineNumber}`
+    )
 }
 ```
 
 ### Custom Rules
+
 ```typescript
 const customRuleSet = {
     name: 'custom',
@@ -146,15 +161,16 @@ const customRuleSet = {
             exceptions: [],
             enabled: true,
             language: ['javascript', 'typescript'],
-            filePatterns: ['src/**/*']
-        }
-    ]
+            filePatterns: ['src/**/*'],
+        },
+    ],
 }
 
 await service.createRuleSet(customRuleSet, './my-project')
 ```
 
 ### AI Context Integration
+
 ```typescript
 const code = 'function example() { console.log("test"); }'
 const context = 'Please review this code'
@@ -166,6 +182,7 @@ console.log(enhancedContext)
 ```
 
 ### Rule Validation
+
 ```typescript
 import { RuleValidator } from '@cursor/rules-service'
 
@@ -180,7 +197,7 @@ const validation = validator.validateRule({
     patterns: ['test'],
     message: 'Test found',
     exceptions: [],
-    enabled: true
+    enabled: true,
 })
 
 if (!validation.valid) {
@@ -190,6 +207,7 @@ console.log('Warnings:', validation.warnings)
 ```
 
 ### Statistics
+
 ```typescript
 const stats = service.getStatistics()
 console.log(`Total rules: ${stats.totalRules}`)
@@ -199,6 +217,7 @@ console.log(`Rules by severity:`, stats.rulesBySeverity)
 ```
 
 ### Import/Export
+
 ```typescript
 // Export rules
 const json = service.exportRules()
@@ -211,24 +230,26 @@ await service.importRules(json, './my-project')
 ## Rule Structure
 
 ### Rule Definition
+
 ```typescript
 interface Rule {
-    id: string                    // Unique identifier
-    name: string                  // Human-readable name
-    description: string          // Rule description
-    category: RuleCategory        // Rule category
-    severity: RuleSeverity        // Rule severity
-    patterns: string[]            // Regex patterns to match
-    message: string              // Violation message
-    fix?: string                 // Suggested fix
-    exceptions: string[]         // Exception patterns
-    enabled: boolean             // Whether rule is active
-    language?: string[]          // Target languages
-    filePatterns?: string[]      // File patterns to match
+    id: string // Unique identifier
+    name: string // Human-readable name
+    description: string // Rule description
+    category: RuleCategory // Rule category
+    severity: RuleSeverity // Rule severity
+    patterns: string[] // Regex patterns to match
+    message: string // Violation message
+    fix?: string // Suggested fix
+    exceptions: string[] // Exception patterns
+    enabled: boolean // Whether rule is active
+    language?: string[] // Target languages
+    filePatterns?: string[] // File patterns to match
 }
 ```
 
 ### Rule Categories
+
 - `style` - Code style and formatting
 - `naming` - Naming conventions
 - `architecture` - Architectural guidelines
@@ -238,6 +259,7 @@ interface Rule {
 - `custom` - Custom rules
 
 ### Severity Levels
+
 - `error` - Critical issues that must be fixed
 - `warning` - Issues that should be addressed
 - `suggestion` - Optional improvements
@@ -246,6 +268,7 @@ interface Rule {
 ## Best Practices
 
 ### Rule Design
+
 - Keep rules focused and specific
 - Provide clear, actionable messages
 - Include fix suggestions when possible
@@ -253,12 +276,14 @@ interface Rule {
 - Add exceptions for common false positives
 
 ### Performance
+
 - Use specific patterns to avoid false positives
 - Limit rule scope with file patterns
 - Set appropriate max violations limit
 - Enable caching for repeated analysis
 
 ### Team Collaboration
+
 - Use descriptive rule names and descriptions
 - Categorize rules logically
 - Document rule rationale
@@ -267,6 +292,7 @@ interface Rule {
 ## Advanced Features
 
 ### Custom Rule Categories
+
 ```typescript
 const customRule = {
     id: 'custom-category',
@@ -276,6 +302,7 @@ const customRule = {
 ```
 
 ### Language-Specific Rules
+
 ```typescript
 const tsRule = {
     id: 'typescript-rule',
@@ -286,6 +313,7 @@ const tsRule = {
 ```
 
 ### Pattern Exceptions
+
 ```typescript
 const rule = {
     id: 'no-console',
@@ -296,11 +324,14 @@ const rule = {
 ```
 
 ### Conflict Detection
+
 ```typescript
 const validator = new RuleValidator()
 const conflicts = validator.checkRuleConflicts(rules)
 for (const conflict of conflicts) {
-    console.log(`Conflict between ${conflict.rule1.id} and ${conflict.rule2.id}`)
+    console.log(
+        `Conflict between ${conflict.rule1.id} and ${conflict.rule2.id}`
+    )
 }
 ```
 
@@ -309,13 +340,16 @@ for (const conflict of conflicts) {
 The service includes default rules for common scenarios:
 
 ### Style Rules
+
 - No console statements in production code
 - No debugger statements
 
 ### Naming Rules
+
 - CamelCase for variables (suggestion)
 
 ### Security Rules
+
 - No hardcoded API keys or secrets
 
 ## Error Handling

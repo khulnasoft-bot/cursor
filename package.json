@@ -1,37 +1,37 @@
 {
-  "name": "cursor-packages",
-  "version": "1.0.0",
-  "description": "Cursor packages - Reusable components for AI-powered development tools",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "validate": "./validate-all-packages.sh",
-    "build": "./build-all-packages.sh",
-    "test": "./test-basic-integration.sh",
-    "format": "prettier --write .",
-    "format-check": "prettier --check .",
-    "publish:all": "./publish-all.sh",
-    "clean": "rm -rf packages/*/dist"
-  },
-  "keywords": [
-    "cursor",
-    "ai",
-    "automation",
-    "semantic-search",
-    "multi-file-editing",
-    "agent-execution"
-  ],
-  "author": "Cursor Team",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^26.6.2",
-    "prettier": "^3.6.2",
-    "typescript": "^7.0.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cursor/cursor-packages.git"
-  }
+    "name": "cursor-packages",
+    "version": "1.0.0",
+    "description": "Cursor packages - Reusable components for AI-powered development tools",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "validate": "./validate-all-packages.sh",
+        "build": "./build-all-packages.sh",
+        "test": "./test-basic-integration.sh",
+        "format": "prettier --write .",
+        "format-check": "prettier --check .",
+        "publish:all": "./publish-all.sh",
+        "clean": "rm -rf packages/*/dist"
+    },
+    "keywords": [
+        "cursor",
+        "ai",
+        "automation",
+        "semantic-search",
+        "multi-file-editing",
+        "agent-execution"
+    ],
+    "author": "Cursor Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^26.6.2",
+        "prettier": "^3.6.2",
+        "typescript": "^7.0.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cursor/cursor-packages.git"
+    }
 }

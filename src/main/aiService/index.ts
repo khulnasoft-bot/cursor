@@ -11,6 +11,6 @@ export type {
     AIProvider,
     ModelCapabilities,
     ModelConfig,
-    ProviderConfig
+    ProviderConfig,
 } from './aiService'
 export type { ModelSettings } from './modelConfig'

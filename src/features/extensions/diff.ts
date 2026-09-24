@@ -493,8 +493,8 @@ export const diffField = StateField.define<DiffState>({
                     const className = part.added
                         ? 'cm-diff-added'
                         : part.removed
-                        ? 'cm-diff-removed'
-                        : null
+                          ? 'cm-diff-removed'
+                          : null
                     if (className) {
                         const from = tr.state.doc.line(
                             origLine + lineOffset
@@ -560,8 +560,8 @@ export const diffField = StateField.define<DiffState>({
                     const className = part.added
                         ? 'cm-diff-added'
                         : part.removed
-                        ? 'cm-diff-removed'
-                        : null
+                          ? 'cm-diff-removed'
+                          : null
                     if (className) {
                         const from = tr.state.doc.line(
                             origLine + newLineOffset

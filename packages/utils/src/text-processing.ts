@@ -36,7 +36,11 @@ export function removeWhitespace(str: string): string {
  * @param suffix - Suffix to add if truncated (default: '...')
  * @returns Truncated string
  */
-export function truncate(str: string, maxLength: number, suffix: string = '...'): string {
+export function truncate(
+    str: string,
+    maxLength: number,
+    suffix: string = '...'
+): string {
     if (str.length <= maxLength) {
         return str
     }
@@ -115,7 +119,10 @@ export function toPascalCase(str: string): string {
  * @returns Word count
  */
 export function countWords(str: string): number {
-    return str.trim().split(/\s+/).filter((word) => word.length > 0).length
+    return str
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length
 }
 
 /**

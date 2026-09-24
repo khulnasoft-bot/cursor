@@ -21,11 +21,21 @@ export interface MappingResult {
 }
 
 export class VisualCodeMapper {
-    private elementToCodeMap: Map<string, { filePath: string; line: number; column: number }> = new Map()
+    private elementToCodeMap: Map<
+        string,
+        { filePath: string; line: number; column: number }
+    > = new Map()
 
-    registerElementMapping(elementId: string, filePath: string, line: number, column: number): void {
+    registerElementMapping(
+        elementId: string,
+        filePath: string,
+        line: number,
+        column: number
+    ): void {
         this.elementToCodeMap.set(elementId, { filePath, line, column })
-        log.info(`Registered mapping for element ${elementId} to ${filePath}:${line}:${column}`)
+        log.info(
+            `Registered mapping for element ${elementId} to ${filePath}:${line}:${column}`
+        )
     }
 
     unregisterElementMapping(elementId: string): void {
@@ -44,7 +54,9 @@ export class VisualCodeMapper {
 
         const location = this.elementToCodeMap.get(change.elementId)
         if (!location) {
-            errors.push(`No code location found for element ${change.elementId}`)
+            errors.push(
+                `No code location found for element ${change.elementId}`
+            )
             return { codeChanges, errors }
         }
 
@@ -61,12 +73,18 @@ export class VisualCodeMapper {
                     break
                 }
                 case 'structure': {
-                    const structChange = this.mapStructureChange(change, location)
+                    const structChange = this.mapStructureChange(
+                        change,
+                        location
+                    )
                     if (structChange) codeChanges.push(structChange)
                     break
                 }
                 case 'content': {
-                    const contentChange = this.mapContentChange(change, location)
+                    const contentChange = this.mapContentChange(
+                        change,
+                        location
+                    )
                     if (contentChange) codeChanges.push(contentChange)
                     break
                 }
@@ -74,13 +92,18 @@ export class VisualCodeMapper {
                     errors.push(`Unknown change type: ${change.type}`)
             }
         } catch (error) {
-            errors.push(`Failed to map change ${change.id}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+            errors.push(
+                `Failed to map change ${change.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
+            )
         }
 
         return { codeChanges, errors }
     }
 
-    private mapPropertyChange(change: VisualChange, location: { filePath: string; line: number; column: number }): CodeChange | null {
+    private mapPropertyChange(
+        change: VisualChange,
+        location: { filePath: string; line: number; column: number }
+    ): CodeChange | null {
         if (!change.property) return null
 
         // Map property changes to code
@@ -94,11 +117,14 @@ export class VisualCodeMapper {
             column: location.column,
             oldText,
             newText,
-            description: change.description
+            description: change.description,
         }
     }
 
-    private mapStyleChange(change: VisualChange, location: { filePath: string; line: number; column: number }): CodeChange | null {
+    private mapStyleChange(
+        change: VisualChange,
+        location: { filePath: string; line: number; column: number }
+    ): CodeChange | null {
         if (!change.property) return null
 
         // Map style changes to code
@@ -112,11 +138,14 @@ export class VisualCodeMapper {
             column: location.column,
             oldText: oldStyle,
             newText: newStyle,
-            description: change.description
+            description: change.description,
         }
     }
 
-    private mapStructureChange(change: VisualChange, location: { filePath: string; line: number; column: number }): CodeChange | null {
+    private mapStructureChange(
+        change: VisualChange,
+        location: { filePath: string; line: number; column: number }
+    ): CodeChange | null {
         // Map structural changes (adding/removing elements)
         // This is a placeholder - would need more sophisticated parsing
         return {
@@ -125,11 +154,14 @@ export class VisualCodeMapper {
             column: location.column,
             oldText: change.oldValue || '',
             newText: change.newValue || '',
-            description: change.description
+            description: change.description,
         }
     }
 
-    private mapContentChange(change: VisualChange, location: { filePath: string; line: number; column: number }): CodeChange | null {
+    private mapContentChange(
+        change: VisualChange,
+        location: { filePath: string; line: number; column: number }
+    ): CodeChange | null {
         // Map content changes (text content)
         return {
             filePath: location.filePath,
@@ -137,7 +169,7 @@ export class VisualCodeMapper {
             column: location.column,
             oldText: change.oldValue || '',
             newText: change.newValue || '',
-            description: change.description
+            description: change.description,
         }
     }
 
@@ -178,11 +210,16 @@ export class VisualCodeMapper {
                     codeLocation: {
                         line: i + 1,
                         column: line.indexOf(componentMatch[0]),
-                        filePath
-                    }
+                        filePath,
+                    },
                 }
                 elements.push(element)
-                this.registerElementMapping(element.id, filePath, i + 1, line.indexOf(componentMatch[0]))
+                this.registerElementMapping(
+                    element.id,
+                    filePath,
+                    i + 1,
+                    line.indexOf(componentMatch[0])
+                )
             }
 
             // Match style definitions
@@ -197,11 +234,16 @@ export class VisualCodeMapper {
                     codeLocation: {
                         line: i + 1,
                         column: line.indexOf(styleMatch[0]),
-                        filePath
-                    }
+                        filePath,
+                    },
                 }
                 elements.push(element)
-                this.registerElementMapping(element.id, filePath, i + 1, line.indexOf(styleMatch[0]))
+                this.registerElementMapping(
+                    element.id,
+                    filePath,
+                    i + 1,
+                    line.indexOf(styleMatch[0])
+                )
             }
         }
 
@@ -242,11 +284,16 @@ export class VisualCodeMapper {
         return this.elementToCodeMap.has(elementId)
     }
 
-    getMapping(elementId: string): { filePath: string; line: number; column: number } | undefined {
+    getMapping(
+        elementId: string
+    ): { filePath: string; line: number; column: number } | undefined {
         return this.elementToCodeMap.get(elementId)
     }
 
-    getAllMappings(): Map<string, { filePath: string; line: number; column: number }> {
+    getAllMappings(): Map<
+        string,
+        { filePath: string; line: number; column: number }
+    > {
         return new Map(this.elementToCodeMap)
     }
 
@@ -257,12 +304,13 @@ export class VisualCodeMapper {
         const mappingsByFile: Record<string, number> = {}
 
         for (const location of this.elementToCodeMap.values()) {
-            mappingsByFile[location.filePath] = (mappingsByFile[location.filePath] || 0) + 1
+            mappingsByFile[location.filePath] =
+                (mappingsByFile[location.filePath] || 0) + 1
         }
 
         return {
             totalMappings: this.elementToCodeMap.size,
-            mappingsByFile
+            mappingsByFile,
         }
     }
 }

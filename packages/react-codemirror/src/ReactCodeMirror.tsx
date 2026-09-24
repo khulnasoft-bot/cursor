@@ -1,4 +1,9 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react'
+import React, {
+    forwardRef,
+    useImperativeHandle,
+    useRef,
+    useEffect,
+} from 'react'
 import {
     EditorState,
     EditorStateConfig,
@@ -11,7 +16,8 @@ import { EditorView } from '@codemirror/view'
 type CMTransaction = Transaction
 
 export interface ReactCodeMirrorProps
-    extends Omit<EditorStateConfig, 'doc' | 'extensions'>,
+    extends
+        Omit<EditorStateConfig, 'doc' | 'extensions'>,
         Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'placeholder'> {
     /** value of the auto created model in the editor. */
     value?: string
@@ -122,7 +128,11 @@ export const ReactCodeMirror = forwardRef<
 
     useImperativeHandle(
         ref,
-        () => ({ editor: editor.current, state: stateRef.current, view: viewRef.current }),
+        () => ({
+            editor: editor.current,
+            state: stateRef.current,
+            view: viewRef.current,
+        }),
         [editor]
     )
 
@@ -167,7 +177,7 @@ export const ReactCodeMirror = forwardRef<
                 if (customDispatch && viewRef.current) {
                     customDispatch(viewRef.current, tr)
                 }
-            }
+            },
         })
 
         viewRef.current = view
@@ -192,9 +202,17 @@ export const ReactCodeMirror = forwardRef<
 
     // Update value when prop changes
     useEffect(() => {
-        if (viewRef.current && value !== undefined && value !== viewRef.current.state.doc.toString()) {
+        if (
+            viewRef.current &&
+            value !== undefined &&
+            value !== viewRef.current.state.doc.toString()
+        ) {
             const transaction = viewRef.current.state.update({
-                changes: { from: 0, to: viewRef.current.state.doc.length, insert: value }
+                changes: {
+                    from: 0,
+                    to: viewRef.current.state.doc.length,
+                    insert: value,
+                },
             })
             viewRef.current.dispatch(transaction)
         }
@@ -216,7 +234,15 @@ export const ReactCodeMirror = forwardRef<
         typeof theme === 'string' ? `cm-theme-${theme}` : 'cm-theme'
 
     function isImageFile(fileName: string): boolean {
-        const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp']
+        const imageExtensions = [
+            'png',
+            'jpg',
+            'jpeg',
+            'gif',
+            'svg',
+            'webp',
+            'bmp',
+        ]
         const extension = fileName.split('.').pop()?.toLowerCase()
         return extension !== undefined && imageExtensions.includes(extension)
     }

@@ -747,7 +747,9 @@ class LSPManager {
         )
 
         log.info('created connection', language)
-        if (Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
+        if (
+            Object.prototype.hasOwnProperty.call(this.runningClients, language)
+        ) {
             log.warn('SHUTTING DOWN OLD CLIENT')
             this.killServer(event, language)
         }
@@ -820,7 +822,9 @@ class LSPManager {
         return language
     }
     killServer(event: IpcMainInvokeEvent, language: Language) {
-        if (Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
+        if (
+            Object.prototype.hasOwnProperty.call(this.runningClients, language)
+        ) {
             const { connection, childProcess } = this.runningClients[language]
             connection.dispose()
             childProcess.kill()
@@ -845,7 +849,9 @@ class LSPManager {
             params: LSPRequestMap[K][0]
         }
     ): Promise<LSPRequestMap[K][1]> {
-        if (!Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
+        if (
+            !Object.prototype.hasOwnProperty.call(this.runningClients, language)
+        ) {
             return
         }
         const { connection } = this.runningClients[language]
@@ -1015,7 +1021,9 @@ class LSPManager {
             params: LSPNotifyMap[K]
         }
     ): Promise<void> {
-        if (!Object.prototype.hasOwnProperty.call(this.runningClients, language)) {
+        if (
+            !Object.prototype.hasOwnProperty.call(this.runningClients, language)
+        ) {
             return
         }
         const { connection } = this.runningClients[language]

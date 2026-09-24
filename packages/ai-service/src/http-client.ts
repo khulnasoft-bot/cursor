@@ -17,8 +17,17 @@ export interface HttpResponse<T = any> {
  * HTTP client interface
  */
 export interface HttpClient {
-    post(url: string, body: any, headers?: Record<string, string>): Promise<HttpResponse>
-    stream(url: string, body: any, onChunk: (chunk: string) => void, headers?: Record<string, string>): Promise<void>
+    post(
+        url: string,
+        body: any,
+        headers?: Record<string, string>
+    ): Promise<HttpResponse>
+    stream(
+        url: string,
+        body: any,
+        onChunk: (chunk: string) => void,
+        headers?: Record<string, string>
+    ): Promise<void>
 }
 
 /**
@@ -33,7 +42,12 @@ export interface HttpError extends Error {
 /**
  * Create an HTTP error
  */
-export function createHttpError(message: string, status?: number, statusText?: string, data?: any): HttpError {
+export function createHttpError(
+    message: string,
+    status?: number,
+    statusText?: string,
+    data?: any
+): HttpError {
     const error = new Error(message) as HttpError
     error.status = status
     error.statusText = statusText
@@ -58,20 +72,26 @@ export class FetchHttpClient implements HttpClient {
                 const nodeFetch = require('node-fetch')
                 this.fetch = nodeFetch.default || nodeFetch
             } catch (error) {
-                throw new Error('fetch is not available. Please install node-fetch or run in a browser environment.')
+                throw new Error(
+                    'fetch is not available. Please install node-fetch or run in a browser environment.'
+                )
             }
         }
     }
 
-    async post(url: string, body: any, headers?: Record<string, string>): Promise<HttpResponse> {
+    async post(
+        url: string,
+        body: any,
+        headers?: Record<string, string>
+    ): Promise<HttpResponse> {
         try {
             const response = await this.fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...headers
+                    ...headers,
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             })
 
             const responseHeaders: Record<string, string> = {}
@@ -94,7 +114,7 @@ export class FetchHttpClient implements HttpClient {
                 data,
                 status: response.status,
                 statusText: response.statusText,
-                headers: responseHeaders
+                headers: responseHeaders,
             }
         } catch (error) {
             if (error instanceof Error) {
@@ -115,9 +135,9 @@ export class FetchHttpClient implements HttpClient {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...headers
+                    ...headers,
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             })
 
             if (!response.ok) {
@@ -168,7 +188,11 @@ export class MockHttpClient implements HttpClient {
         this.streamResponses.set(url, chunks)
     }
 
-    async post(url: string, body: any, headers?: Record<string, string>): Promise<HttpResponse> {
+    async post(
+        url: string,
+        body: any,
+        headers?: Record<string, string>
+    ): Promise<HttpResponse> {
         const response = this.responses.get(url)
         if (response === undefined) {
             throw createHttpError(`No mock response for ${url}`)
@@ -177,7 +201,7 @@ export class MockHttpClient implements HttpClient {
             data: response,
             status: 200,
             statusText: 'OK',
-            headers: {}
+            headers: {},
         }
     }
 

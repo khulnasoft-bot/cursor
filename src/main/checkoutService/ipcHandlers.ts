@@ -14,13 +14,28 @@ export function setupCheckoutServiceIpcs() {
     // Checkout branch
     ipcMain.handle(
         'checkout-service-branch',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string, options?: CheckoutOptions) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branchName: string,
+            options?: CheckoutOptions
+        ) => {
             try {
-                await checkoutService.checkoutBranch(repoPath, branchName, options)
+                await checkoutService.checkoutBranch(
+                    repoPath,
+                    branchName,
+                    options
+                )
                 return { success: true }
             } catch (error) {
                 log.error('Failed to checkout branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -28,13 +43,23 @@ export function setupCheckoutServiceIpcs() {
     // Checkout file
     ipcMain.handle(
         'checkout-service-file',
-        async (_event: IpcMainInvokeEvent, repoPath: string, filePath: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            filePath: string
+        ) => {
             try {
                 await checkoutService.checkoutFile(repoPath, filePath)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to checkout file:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -42,13 +67,23 @@ export function setupCheckoutServiceIpcs() {
     // Checkout commit
     ipcMain.handle(
         'checkout-service-commit',
-        async (_event: IpcMainInvokeEvent, repoPath: string, commitHash: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            commitHash: string
+        ) => {
             try {
                 await checkoutService.checkoutCommit(repoPath, commitHash)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to checkout commit:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -62,7 +97,13 @@ export function setupCheckoutServiceIpcs() {
                 return { success: true, branch }
             } catch (error) {
                 log.error('Failed to get current branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,7 +117,13 @@ export function setupCheckoutServiceIpcs() {
                 return { success: true, commit }
             } catch (error) {
                 log.error('Failed to get current commit:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -90,7 +137,13 @@ export function setupCheckoutServiceIpcs() {
                 return { success: true, branches }
             } catch (error) {
                 log.error('Failed to get branches:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -98,13 +151,28 @@ export function setupCheckoutServiceIpcs() {
     // Create branch
     ipcMain.handle(
         'checkout-service-create-branch',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string, startPoint?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branchName: string,
+            startPoint?: string
+        ) => {
             try {
-                await checkoutService.createBranch(repoPath, branchName, startPoint)
+                await checkoutService.createBranch(
+                    repoPath,
+                    branchName,
+                    startPoint
+                )
                 return { success: true }
             } catch (error) {
                 log.error('Failed to create branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -112,13 +180,24 @@ export function setupCheckoutServiceIpcs() {
     // Delete branch
     ipcMain.handle(
         'checkout-service-delete-branch',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string, force?: boolean) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branchName: string,
+            force?: boolean
+        ) => {
             try {
                 await checkoutService.deleteBranch(repoPath, branchName, force)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to delete branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -126,13 +205,23 @@ export function setupCheckoutServiceIpcs() {
     // Discard changes
     ipcMain.handle(
         'checkout-service-discard',
-        async (_event: IpcMainInvokeEvent, repoPath: string, filePath?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            filePath?: string
+        ) => {
             try {
                 await checkoutService.discardChanges(repoPath, filePath)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to discard changes:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -140,13 +229,26 @@ export function setupCheckoutServiceIpcs() {
     // Stash changes
     ipcMain.handle(
         'checkout-service-stash',
-        async (_event: IpcMainInvokeEvent, repoPath: string, message?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            message?: string
+        ) => {
             try {
-                const result = await checkoutService.stashChanges(repoPath, message)
+                const result = await checkoutService.stashChanges(
+                    repoPath,
+                    message
+                )
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to stash changes:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -154,13 +256,23 @@ export function setupCheckoutServiceIpcs() {
     // Stash pop
     ipcMain.handle(
         'checkout-service-stash-pop',
-        async (_event: IpcMainInvokeEvent, repoPath: string, stashRef?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            stashRef?: string
+        ) => {
             try {
                 await checkoutService.stashPop(repoPath, stashRef)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to pop stash:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

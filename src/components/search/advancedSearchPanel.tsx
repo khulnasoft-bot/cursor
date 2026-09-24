@@ -20,13 +20,15 @@ export function AdvancedSearchPanel() {
     const [query, setQuery] = useState('')
     const [results, setResults] = useState<SearchResult[]>([])
     const [isSearching, setIsSearching] = useState(false)
-    const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
+    const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
+        null
+    )
     const [filters, setFilters] = useState<SearchFilters>({
         caseSensitive: false,
         regex: true,
         wholeWord: false,
         fileExtensions: [],
-        excludePatterns: []
+        excludePatterns: [],
     })
     const [extensionInput, setExtensionInput] = useState('')
     const [excludeInput, setExcludeInput] = useState('')
@@ -56,10 +58,16 @@ export function AdvancedSearchPanel() {
     }
 
     const addExtension = () => {
-        if (extensionInput.trim() && !filters.fileExtensions.includes(extensionInput.trim())) {
+        if (
+            extensionInput.trim() &&
+            !filters.fileExtensions.includes(extensionInput.trim())
+        ) {
             setFilters({
                 ...filters,
-                fileExtensions: [...filters.fileExtensions, extensionInput.trim()]
+                fileExtensions: [
+                    ...filters.fileExtensions,
+                    extensionInput.trim(),
+                ],
             })
             setExtensionInput('')
         }
@@ -68,15 +76,21 @@ export function AdvancedSearchPanel() {
     const removeExtension = (ext: string) => {
         setFilters({
             ...filters,
-            fileExtensions: filters.fileExtensions.filter(e => e !== ext)
+            fileExtensions: filters.fileExtensions.filter((e) => e !== ext),
         })
     }
 
     const addExcludePattern = () => {
-        if (excludeInput.trim() && !filters.excludePatterns.includes(excludeInput.trim())) {
+        if (
+            excludeInput.trim() &&
+            !filters.excludePatterns.includes(excludeInput.trim())
+        ) {
             setFilters({
                 ...filters,
-                excludePatterns: [...filters.excludePatterns, excludeInput.trim()]
+                excludePatterns: [
+                    ...filters.excludePatterns,
+                    excludeInput.trim(),
+                ],
             })
             setExcludeInput('')
         }
@@ -85,7 +99,9 @@ export function AdvancedSearchPanel() {
     const removeExcludePattern = (pattern: string) => {
         setFilters({
             ...filters,
-            excludePatterns: filters.excludePatterns.filter(p => p !== pattern)
+            excludePatterns: filters.excludePatterns.filter(
+                (p) => p !== pattern
+            ),
         })
     }
 
@@ -125,7 +141,12 @@ export function AdvancedSearchPanel() {
                         <input
                             type="checkbox"
                             checked={filters.caseSensitive}
-                            onChange={(e) => setFilters({ ...filters, caseSensitive: e.target.checked })}
+                            onChange={(e) =>
+                                setFilters({
+                                    ...filters,
+                                    caseSensitive: e.target.checked,
+                                })
+                            }
                         />
                         Case Sensitive
                     </label>
@@ -133,7 +154,12 @@ export function AdvancedSearchPanel() {
                         <input
                             type="checkbox"
                             checked={filters.regex}
-                            onChange={(e) => setFilters({ ...filters, regex: e.target.checked })}
+                            onChange={(e) =>
+                                setFilters({
+                                    ...filters,
+                                    regex: e.target.checked,
+                                })
+                            }
                         />
                         Regex
                     </label>
@@ -141,7 +167,12 @@ export function AdvancedSearchPanel() {
                         <input
                             type="checkbox"
                             checked={filters.wholeWord}
-                            onChange={(e) => setFilters({ ...filters, wholeWord: e.target.checked })}
+                            onChange={(e) =>
+                                setFilters({
+                                    ...filters,
+                                    wholeWord: e.target.checked,
+                                })
+                            }
                         />
                         Whole Word
                     </label>
@@ -156,15 +187,21 @@ export function AdvancedSearchPanel() {
                             placeholder=".ts,.tsx,.js"
                             value={extensionInput}
                             onChange={(e) => setExtensionInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && addExtension()}
+                            onKeyPress={(e) =>
+                                e.key === 'Enter' && addExtension()
+                            }
                         />
-                        <button className="add-button" onClick={addExtension}>+</button>
+                        <button className="add-button" onClick={addExtension}>
+                            +
+                        </button>
                     </div>
                     <div className="filter-tags">
-                        {filters.fileExtensions.map(ext => (
+                        {filters.fileExtensions.map((ext) => (
                             <span key={ext} className="filter-tag">
                                 {ext}
-                                <button onClick={() => removeExtension(ext)}>×</button>
+                                <button onClick={() => removeExtension(ext)}>
+                                    ×
+                                </button>
                             </span>
                         ))}
                     </div>
@@ -179,15 +216,28 @@ export function AdvancedSearchPanel() {
                             placeholder="node_modules,dist"
                             value={excludeInput}
                             onChange={(e) => setExcludeInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && addExcludePattern()}
+                            onKeyPress={(e) =>
+                                e.key === 'Enter' && addExcludePattern()
+                            }
                         />
-                        <button className="add-button" onClick={addExcludePattern}>+</button>
+                        <button
+                            className="add-button"
+                            onClick={addExcludePattern}
+                        >
+                            +
+                        </button>
                     </div>
                     <div className="filter-tags">
-                        {filters.excludePatterns.map(pattern => (
+                        {filters.excludePatterns.map((pattern) => (
                             <span key={pattern} className="filter-tag">
                                 {pattern}
-                                <button onClick={() => removeExcludePattern(pattern)}>×</button>
+                                <button
+                                    onClick={() =>
+                                        removeExcludePattern(pattern)
+                                    }
+                                >
+                                    ×
+                                </button>
                             </span>
                         ))}
                     </div>
@@ -206,8 +256,12 @@ export function AdvancedSearchPanel() {
                             onClick={() => setSelectedResult(result)}
                         >
                             <div className="result-file">{result.filePath}</div>
-                            <div className="result-location">Line {result.lineNumber}</div>
-                            <div className="result-match">{result.matchText}</div>
+                            <div className="result-location">
+                                Line {result.lineNumber}
+                            </div>
+                            <div className="result-match">
+                                {result.matchText}
+                            </div>
                         </div>
                     ))}
                     {results.length === 0 && !isSearching && (
@@ -220,27 +274,49 @@ export function AdvancedSearchPanel() {
                 <div className="result-preview">
                     <div className="preview-header">
                         <h4>Preview: {selectedResult.filePath}</h4>
-                        <button onClick={() => setSelectedResult(null)}>×</button>
+                        <button onClick={() => setSelectedResult(null)}>
+                            ×
+                        </button>
                     </div>
                     <div className="preview-content">
-                        {selectedResult.contextBefore && selectedResult.contextBefore.length > 0 && (
-                            <div className="preview-context-before">
-                                {selectedResult.contextBefore.map((line, i) => (
-                                    <div key={i} className="preview-line">{line}</div>
-                                ))}
-                            </div>
-                        )}
+                        {selectedResult.contextBefore &&
+                            selectedResult.contextBefore.length > 0 && (
+                                <div className="preview-context-before">
+                                    {selectedResult.contextBefore.map(
+                                        (line, i) => (
+                                            <div
+                                                key={i}
+                                                className="preview-line"
+                                            >
+                                                {line}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            )}
                         <div className="preview-match">
-                            <span className="line-number">{selectedResult.lineNumber}:</span>
-                            <span className="line-content">{selectedResult.lineContent}</span>
+                            <span className="line-number">
+                                {selectedResult.lineNumber}:
+                            </span>
+                            <span className="line-content">
+                                {selectedResult.lineContent}
+                            </span>
                         </div>
-                        {selectedResult.contextAfter && selectedResult.contextAfter.length > 0 && (
-                            <div className="preview-context-after">
-                                {selectedResult.contextAfter.map((line, i) => (
-                                    <div key={i} className="preview-line">{line}</div>
-                                ))}
-                            </div>
-                        )}
+                        {selectedResult.contextAfter &&
+                            selectedResult.contextAfter.length > 0 && (
+                                <div className="preview-context-after">
+                                    {selectedResult.contextAfter.map(
+                                        (line, i) => (
+                                            <div
+                                                key={i}
+                                                className="preview-line"
+                                            >
+                                                {line}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            )}
                     </div>
                 </div>
             )}

@@ -7,7 +7,10 @@ import { ipcRenderer } from 'electron'
 import type { DeeplinkAction } from '../main/setup/protocol'
 
 export class DeeplinkClient {
-    private actionHandlers: Map<DeeplinkAction['type'], (params: Record<string, string>) => void> = new Map()
+    private actionHandlers: Map<
+        DeeplinkAction['type'],
+        (params: Record<string, string>) => void
+    > = new Map()
     private pollingInterval: NodeJS.Timeout | null = null
 
     constructor() {
@@ -18,7 +21,9 @@ export class DeeplinkClient {
         // Poll for pending deeplink actions every 500ms
         this.pollingInterval = setInterval(async () => {
             try {
-                const action = await ipcRenderer.invoke('get-pending-deeplink-action')
+                const action = await ipcRenderer.invoke(
+                    'get-pending-deeplink-action'
+                )
                 if (action) {
                     this.handleAction(action)
                 }
@@ -37,11 +42,17 @@ export class DeeplinkClient {
                 console.error('Error handling deeplink action:', error)
             }
         } else {
-            console.warn('No handler registered for deeplink action:', action.type)
+            console.warn(
+                'No handler registered for deeplink action:',
+                action.type
+            )
         }
     }
 
-    on(actionType: DeeplinkAction['type'], handler: (params: Record<string, string>) => void) {
+    on(
+        actionType: DeeplinkAction['type'],
+        handler: (params: Record<string, string>) => void
+    ) {
         this.actionHandlers.set(actionType, handler)
     }
 

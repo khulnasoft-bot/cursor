@@ -31,14 +31,20 @@ export class TriggerSystem {
         const triggerHandler: TriggerHandler = {
             trigger,
             handler,
-            enabled: trigger.enabled
+            enabled: trigger.enabled,
         }
 
         this.handlers.set(handlerId, triggerHandler)
-        this.logger.info(`Registered trigger handler: ${handlerId} for trigger type: ${trigger.type}`)
+        this.logger.info(
+            `Registered trigger handler: ${handlerId} for trigger type: ${trigger.type}`
+        )
 
         // Register event listener if needed
-        if (trigger.type === 'event' || trigger.type === 'api' || trigger.type === 'webhook') {
+        if (
+            trigger.type === 'event' ||
+            trigger.type === 'api' ||
+            trigger.type === 'webhook'
+        ) {
             this.registerEventListener(trigger, handlerId, handler)
         }
 
@@ -50,7 +56,11 @@ export class TriggerSystem {
         if (!handler) return false
 
         // Remove event listener if registered
-        if (handler.trigger.type === 'event' || handler.trigger.type === 'api' || handler.trigger.type === 'webhook') {
+        if (
+            handler.trigger.type === 'event' ||
+            handler.trigger.type === 'api' ||
+            handler.trigger.type === 'webhook'
+        ) {
             this.unregisterEventListener(handler.trigger, handlerId)
         }
 
@@ -104,11 +114,19 @@ export class TriggerSystem {
         this.triggerByType('file_save', { filePath, ...context })
     }
 
-    triggerFileChange(filePath: string, changeType: string, context?: Record<string, any>): void {
+    triggerFileChange(
+        filePath: string,
+        changeType: string,
+        context?: Record<string, any>
+    ): void {
         this.triggerByType('file_change', { filePath, changeType, ...context })
     }
 
-    triggerGitCommit(commitHash: string, message: string, context?: Record<string, any>): void {
+    triggerGitCommit(
+        commitHash: string,
+        message: string,
+        context?: Record<string, any>
+    ): void {
         this.triggerByType('git_commit', { commitHash, message, ...context })
     }
 
@@ -120,28 +138,44 @@ export class TriggerSystem {
         this.triggerByType('event', { eventName, ...eventContext })
     }
 
-    triggerApi(endpoint: string, method: string, context?: Record<string, any>): void {
+    triggerApi(
+        endpoint: string,
+        method: string,
+        context?: Record<string, any>
+    ): void {
         this.triggerByType('api', { endpoint, method, ...context })
     }
 
-    triggerWebhook(webhookId: string, payload: any, context?: Record<string, any>): void {
+    triggerWebhook(
+        webhookId: string,
+        payload: any,
+        context?: Record<string, any>
+    ): void {
         this.triggerByType('webhook', { webhookId, payload, ...context })
     }
 
-    private triggerByType(triggerType: TriggerType, context?: Record<string, any>): void {
+    private triggerByType(
+        triggerType: TriggerType,
+        context?: Record<string, any>
+    ): void {
         for (const [handlerId, handler] of this.handlers) {
             if (!handler.enabled) continue
             if (handler.trigger.type !== triggerType) continue
 
             // Check if trigger conditions match
             if (this.matchesTriggerConfig(handler.trigger, context)) {
-                this.logger.info(`Triggering handler: ${handlerId} for type: ${triggerType}`)
+                this.logger.info(
+                    `Triggering handler: ${handlerId} for type: ${triggerType}`
+                )
                 handler.handler(context)
             }
         }
     }
 
-    private matchesTriggerConfig(trigger: AutomationTrigger, context?: Record<string, any>): boolean {
+    private matchesTriggerConfig(
+        trigger: AutomationTrigger,
+        context?: Record<string, any>
+    ): boolean {
         if (!context) return true
 
         // Check if all required config keys match
@@ -165,11 +199,16 @@ export class TriggerSystem {
         this.eventListeners.set(eventKey, listeners)
     }
 
-    private unregisterEventListener(trigger: AutomationTrigger, handlerId: string): void {
+    private unregisterEventListener(
+        trigger: AutomationTrigger,
+        handlerId: string
+    ): void {
         const eventKey = trigger.config.eventName || trigger.type
         const listeners = this.eventListeners.get(eventKey)
         if (listeners) {
-            const index = listeners.findIndex(l => l.toString().includes(handlerId))
+            const index = listeners.findIndex((l) =>
+                l.toString().includes(handlerId)
+            )
             if (index > -1) {
                 listeners.splice(index, 1)
             }
@@ -181,11 +220,13 @@ export class TriggerSystem {
     }
 
     getTriggerHandlersByType(triggerType: TriggerType): TriggerHandler[] {
-        return this.getTriggerHandlers().filter(h => h.trigger.type === triggerType)
+        return this.getTriggerHandlers().filter(
+            (h) => h.trigger.type === triggerType
+        )
     }
 
     getEnabledTriggerHandlers(): TriggerHandler[] {
-        return this.getTriggerHandlers().filter(h => h.enabled)
+        return this.getTriggerHandlers().filter((h) => h.enabled)
     }
 
     reset(): void {

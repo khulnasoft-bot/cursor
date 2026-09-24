@@ -13,13 +13,32 @@ export function setupDebuggerServiceIpcs() {
     // Start debug session
     ipcMain.handle(
         'debugger-service-start-session',
-        async (_event: IpcMainInvokeEvent, name: string, type: string, request: string, program: string, args: string[] = []) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            name: string,
+            type: string,
+            request: string,
+            program: string,
+            args: string[] = []
+        ) => {
             try {
-                const sessionId = await debuggerService.startSession(name, type, request, program, args)
+                const sessionId = await debuggerService.startSession(
+                    name,
+                    type,
+                    request,
+                    program,
+                    args
+                )
                 return { success: true, sessionId }
             } catch (error) {
                 log.error('Failed to start debug session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -33,35 +52,58 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to stop debug session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Stop all debug sessions
-    ipcMain.handle(
-        'debugger-service-stop-all',
-        async () => {
-            try {
-                debuggerService.stopAllSessions()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to stop all debug sessions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('debugger-service-stop-all', async () => {
+        try {
+            debuggerService.stopAllSessions()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to stop all debug sessions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Set breakpoint
     ipcMain.handle(
         'debugger-service-set-breakpoint',
-        async (_event: IpcMainInvokeEvent, sessionId: string, path: string, line: number, column: number = 0) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            sessionId: string,
+            path: string,
+            line: number,
+            column: number = 0
+        ) => {
             try {
-                const breakpointId = await debuggerService.setBreakpoint(sessionId, path, line, column)
+                const breakpointId = await debuggerService.setBreakpoint(
+                    sessionId,
+                    path,
+                    line,
+                    column
+                )
                 return { success: true, breakpointId }
             } catch (error) {
                 log.error('Failed to set breakpoint:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -69,13 +111,23 @@ export function setupDebuggerServiceIpcs() {
     // Remove breakpoint
     ipcMain.handle(
         'debugger-service-remove-breakpoint',
-        async (_event: IpcMainInvokeEvent, sessionId: string, breakpointId: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            sessionId: string,
+            breakpointId: string
+        ) => {
             try {
                 await debuggerService.removeBreakpoint(sessionId, breakpointId)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to remove breakpoint:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -85,11 +137,18 @@ export function setupDebuggerServiceIpcs() {
         'debugger-service-get-breakpoints',
         async (_event: IpcMainInvokeEvent, sessionId: string) => {
             try {
-                const breakpoints = await debuggerService.getBreakpoints(sessionId)
+                const breakpoints =
+                    await debuggerService.getBreakpoints(sessionId)
                 return { success: true, breakpoints }
             } catch (error) {
                 log.error('Failed to get breakpoints:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -103,7 +162,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to continue debug session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -117,7 +182,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to pause debug session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -131,7 +202,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to step over:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -145,7 +222,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to step into:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -159,7 +242,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to step out:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -169,11 +258,18 @@ export function setupDebuggerServiceIpcs() {
         'debugger-service-get-stack-frames',
         async (_event: IpcMainInvokeEvent, sessionId: string) => {
             try {
-                const stackFrames = await debuggerService.getStackFrames(sessionId)
+                const stackFrames =
+                    await debuggerService.getStackFrames(sessionId)
                 return { success: true, stackFrames }
             } catch (error) {
                 log.error('Failed to get stack frames:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -181,13 +277,26 @@ export function setupDebuggerServiceIpcs() {
     // Get variables
     ipcMain.handle(
         'debugger-service-get-variables',
-        async (_event: IpcMainInvokeEvent, sessionId: string, variablesReference: number) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            sessionId: string,
+            variablesReference: number
+        ) => {
             try {
-                const variables = await debuggerService.getVariables(sessionId, variablesReference)
+                const variables = await debuggerService.getVariables(
+                    sessionId,
+                    variablesReference
+                )
                 return { success: true, variables }
             } catch (error) {
                 log.error('Failed to get variables:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -201,24 +310,30 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true, threads }
             } catch (error) {
                 log.error('Failed to get threads:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get all debug sessions
-    ipcMain.handle(
-        'debugger-service-get-sessions',
-        async () => {
-            try {
-                const sessions = debuggerService.getSessions()
-                return { success: true, sessions }
-            } catch (error) {
-                log.error('Failed to get debug sessions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('debugger-service-get-sessions', async () => {
+        try {
+            const sessions = debuggerService.getSessions()
+            return { success: true, sessions }
+        } catch (error) {
+            log.error('Failed to get debug sessions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if session is connected
     ipcMain.handle(
@@ -229,7 +344,13 @@ export function setupDebuggerServiceIpcs() {
                 return { success: true, connected }
             } catch (error) {
                 log.error('Failed to check debug connection:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

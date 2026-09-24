@@ -45,7 +45,7 @@ class CommitsService {
                 this.getCurrentBranch(repoPath),
                 this.getRecentCommits(repoPath, 20),
                 this.getBranches(repoPath),
-                this.getRepositoryStatus(repoPath)
+                this.getRepositoryStatus(repoPath),
             ])
 
             const repoInfo: RepositoryInfo = {
@@ -53,7 +53,7 @@ class CommitsService {
                 branch,
                 commits,
                 branches,
-                status
+                status,
             }
 
             this.repositories.set(repoPath, repoInfo)
@@ -66,16 +66,22 @@ class CommitsService {
 
     private async getCurrentBranch(repoPath: string): Promise<string> {
         try {
-            const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD', {
-                cwd: repoPath
-            })
+            const { stdout } = await execAsync(
+                'git rev-parse --abbrev-ref HEAD',
+                {
+                    cwd: repoPath,
+                }
+            )
             return stdout.trim()
         } catch (error) {
             return 'unknown'
         }
     }
 
-    private async getRecentCommits(repoPath: string, limit: number): Promise<CommitInfo[]> {
+    private async getRecentCommits(
+        repoPath: string,
+        limit: number
+    ): Promise<CommitInfo[]> {
         try {
             const { stdout } = await execAsync(
                 `git log -${limit} --pretty=format:"%H|%an|%s|%ai" --name-only`,
@@ -97,7 +103,7 @@ class CommitsService {
                         author,
                         message,
                         date: new Date(date),
-                        files: []
+                        files: [],
                     }
                 } else if (currentCommit && line.trim()) {
                     currentCommit.files!.push(line.trim())
@@ -117,14 +123,19 @@ class CommitsService {
 
     private async getBranches(repoPath: string): Promise<BranchInfo[]> {
         try {
-            const { stdout } = await execAsync('git branch -a', { cwd: repoPath })
-            const currentBranch = await this.getCurrentBranch(repoPath)
-            
-            return stdout.trim().split('\n').map(line => {
-                const name = line.replace(/^\*?\s*/, '').trim()
-                const isCurrent = line.startsWith('*')
-                return { name, isCurrent }
+            const { stdout } = await execAsync('git branch -a', {
+                cwd: repoPath,
             })
+            const currentBranch = await this.getCurrentBranch(repoPath)
+
+            return stdout
+                .trim()
+                .split('\n')
+                .map((line) => {
+                    const name = line.replace(/^\*?\s*/, '').trim()
+                    const isCurrent = line.startsWith('*')
+                    return { name, isCurrent }
+                })
         } catch (error) {
             log.error('Failed to get branches:', error)
             return []
@@ -133,14 +144,20 @@ class CommitsService {
 
     private async getRepositoryStatus(repoPath: string): Promise<string> {
         try {
-            const { stdout } = await execAsync('git status --porcelain', { cwd: repoPath })
+            const { stdout } = await execAsync('git status --porcelain', {
+                cwd: repoPath,
+            })
             return stdout.trim()
         } catch (error) {
             return ''
         }
     }
 
-    async createCommit(repoPath: string, message: string, files?: string[]): Promise<string> {
+    async createCommit(
+        repoPath: string,
+        message: string,
+        files?: string[]
+    ): Promise<string> {
         try {
             if (files && files.length > 0) {
                 await execAsync(`git add ${files.join(' ')}`, { cwd: repoPath })
@@ -148,7 +165,9 @@ class CommitsService {
                 await execAsync('git add .', { cwd: repoPath })
             }
 
-            const { stdout } = await execAsync(`git commit -m "${message}"`, { cwd: repoPath })
+            const { stdout } = await execAsync(`git commit -m "${message}"`, {
+                cwd: repoPath,
+            })
             const hashMatch = stdout.match(/\[([a-f0-9]+)\]/)
             const hash = hashMatch ? hashMatch[1] : 'unknown'
 
@@ -194,7 +213,7 @@ class CommitsService {
 
     async push(repoPath: string, branch?: string): Promise<void> {
         try {
-            const branchName = branch || await this.getCurrentBranch(repoPath)
+            const branchName = branch || (await this.getCurrentBranch(repoPath))
             await execAsync(`git push origin ${branchName}`, { cwd: repoPath })
         } catch (error) {
             log.error('Failed to push:', error)
@@ -205,7 +224,7 @@ class CommitsService {
     trackMetric(metricName: string, value: any): void {
         this.metricsCache.set(metricName, {
             value,
-            timestamp: Date.now()
+            timestamp: Date.now(),
         })
         log.info(`Tracked metric: ${metricName}`)
     }

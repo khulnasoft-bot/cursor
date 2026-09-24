@@ -24,7 +24,7 @@ export function UndoRedoToolbar({
     onUndo,
     onRedo,
     onClearHistory,
-    history
+    history,
 }: UndoRedoToolbarProps) {
     return (
         <div className="undo-redo-toolbar">

@@ -35,12 +35,12 @@ class SocketService {
                 socket = tls.connect({
                     host: options.host,
                     port: options.port,
-                    rejectUnauthorized: true // Enforce certificate validation
+                    rejectUnauthorized: true, // Enforce certificate validation
                 })
             } else {
                 socket = net.connect({
                     host: options.host,
-                    port: options.port
+                    port: options.port,
                 })
             }
 
@@ -48,13 +48,15 @@ class SocketService {
                 id: connectionId,
                 socket,
                 connected: false,
-                createdAt: new Date()
+                createdAt: new Date(),
             }
 
             socket.on('connect', () => {
                 connection.connected = true
                 this.connections.set(connectionId, connection)
-                log.info(`Socket connected: ${connectionId} to ${options.host}:${options.port}`)
+                log.info(
+                    `Socket connected: ${connectionId} to ${options.host}:${options.port}`
+                )
                 resolve(connectionId)
             })
 
@@ -81,7 +83,9 @@ class SocketService {
     async send(connectionId: string, data: string | Buffer): Promise<void> {
         const connection = this.connections.get(connectionId)
         if (!connection || !connection.connected) {
-            throw new Error(`Connection not found or not connected: ${connectionId}`)
+            throw new Error(
+                `Connection not found or not connected: ${connectionId}`
+            )
         }
 
         return new Promise((resolve, reject) => {
@@ -100,7 +104,9 @@ class SocketService {
     async receive(connectionId: string, timeout = 30000): Promise<Buffer> {
         const connection = this.connections.get(connectionId)
         if (!connection || !connection.connected) {
-            throw new Error(`Connection not found or not connected: ${connectionId}`)
+            throw new Error(
+                `Connection not found or not connected: ${connectionId}`
+            )
         }
 
         return new Promise((resolve, reject) => {

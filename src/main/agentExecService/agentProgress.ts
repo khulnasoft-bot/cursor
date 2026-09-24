@@ -47,7 +47,7 @@ export class AgentProgressReporter extends EventEmitter {
 
     createExecution(goal: string, totalSteps: number): AgentExecution {
         const executionId = `exec-${++this.executionCounter}`
-        
+
         const execution: AgentExecution = {
             id: executionId,
             goal,
@@ -59,13 +59,13 @@ export class AgentProgressReporter extends EventEmitter {
             steps: Array.from({ length: totalSteps }, (_, i) => ({
                 id: `step-${i}`,
                 name: `Step ${i + 1}`,
-                status: 'pending'
-            }))
+                status: 'pending',
+            })),
         }
 
         this.executions.set(executionId, execution)
         this.emit('execution-created', execution)
-        
+
         log.info(`Created execution ${executionId}: ${goal}`)
         return execution
     }
@@ -79,7 +79,13 @@ export class AgentProgressReporter extends EventEmitter {
         log.info(`Started execution ${executionId}`)
     }
 
-    updateProgress(executionId: string, stepIndex: number, stepName: string, progress: number, message?: string): void {
+    updateProgress(
+        executionId: string,
+        stepIndex: number,
+        stepName: string,
+        progress: number,
+        message?: string
+    ): void {
         const execution = this.executions.get(executionId)
         if (!execution) return
 
@@ -100,14 +106,20 @@ export class AgentProgressReporter extends EventEmitter {
             status: 'in_progress',
             progress,
             message,
-            timestamp: new Date()
+            timestamp: new Date(),
         }
 
         this.emit('progress-update', update)
-        log.info(`Progress update ${executionId}: ${progress}% - ${message || stepName}`)
+        log.info(
+            `Progress update ${executionId}: ${progress}% - ${message || stepName}`
+        )
     }
 
-    completeStep(executionId: string, stepIndex: number, output?: string): void {
+    completeStep(
+        executionId: string,
+        stepIndex: number,
+        output?: string
+    ): void {
         const execution = this.executions.get(executionId)
         if (!execution) return
 
@@ -115,12 +127,16 @@ export class AgentProgressReporter extends EventEmitter {
         if (step) {
             step.status = 'completed'
             step.endTime = new Date()
-            step.duration = step.endTime.getTime() - (step.startTime?.getTime() || step.endTime.getTime())
+            step.duration =
+                step.endTime.getTime() -
+                (step.startTime?.getTime() || step.endTime.getTime())
             step.output = output
         }
 
         // Update overall progress
-        const completedSteps = execution.steps.filter(s => s.status === 'completed').length
+        const completedSteps = execution.steps.filter(
+            (s) => s.status === 'completed'
+        ).length
         execution.progress = (completedSteps / execution.totalSteps) * 100
 
         this.emit('step-completed', { executionId, stepIndex, step })
@@ -135,7 +151,9 @@ export class AgentProgressReporter extends EventEmitter {
         if (step) {
             step.status = 'failed'
             step.endTime = new Date()
-            step.duration = step.endTime.getTime() - (step.startTime?.getTime() || step.endTime.getTime())
+            step.duration =
+                step.endTime.getTime() -
+                (step.startTime?.getTime() || step.endTime.getTime())
             step.error = error
         }
 
@@ -144,7 +162,9 @@ export class AgentProgressReporter extends EventEmitter {
         execution.endTime = new Date()
 
         this.emit('step-failed', { executionId, stepIndex, step, error })
-        log.error(`Failed step ${stepIndex} of execution ${executionId}: ${error}`)
+        log.error(
+            `Failed step ${stepIndex} of execution ${executionId}: ${error}`
+        )
     }
 
     completeExecution(executionId: string): void {
@@ -179,15 +199,15 @@ export class AgentProgressReporter extends EventEmitter {
     }
 
     getActiveExecutions(): AgentExecution[] {
-        return this.getExecutions().filter(e => e.status === 'in_progress')
+        return this.getExecutions().filter((e) => e.status === 'in_progress')
     }
 
     getCompletedExecutions(): AgentExecution[] {
-        return this.getExecutions().filter(e => e.status === 'completed')
+        return this.getExecutions().filter((e) => e.status === 'completed')
     }
 
     getFailedExecutions(): AgentExecution[] {
-        return this.getExecutions().filter(e => e.status === 'failed')
+        return this.getExecutions().filter((e) => e.status === 'failed')
     }
 
     getExecutionProgress(executionId: string): number {
@@ -195,7 +215,9 @@ export class AgentProgressReporter extends EventEmitter {
         return execution ? execution.progress : 0
     }
 
-    getExecutionStatus(executionId: string): AgentExecution['status'] | undefined {
+    getExecutionStatus(
+        executionId: string
+    ): AgentExecution['status'] | undefined {
         const execution = this.executions.get(executionId)
         return execution?.status
     }
@@ -236,13 +258,25 @@ export class AgentProgressReporter extends EventEmitter {
         const execution = this.executions.get(executionId)
         if (!execution) return null
 
-        const duration = (execution.endTime?.getTime() || Date.now()) - execution.startTime.getTime()
-        const stepsCompleted = execution.steps.filter(s => s.status === 'completed').length
-        const stepsFailed = execution.steps.filter(s => s.status === 'failed').length
-        const completedStepsWithDuration = execution.steps.filter(s => s.status === 'completed' && s.duration)
-        const averageStepDuration = completedStepsWithDuration.length > 0
-            ? completedStepsWithDuration.reduce((sum, s) => sum + (s.duration || 0), 0) / completedStepsWithDuration.length
-            : 0
+        const duration =
+            (execution.endTime?.getTime() || Date.now()) -
+            execution.startTime.getTime()
+        const stepsCompleted = execution.steps.filter(
+            (s) => s.status === 'completed'
+        ).length
+        const stepsFailed = execution.steps.filter(
+            (s) => s.status === 'failed'
+        ).length
+        const completedStepsWithDuration = execution.steps.filter(
+            (s) => s.status === 'completed' && s.duration
+        )
+        const averageStepDuration =
+            completedStepsWithDuration.length > 0
+                ? completedStepsWithDuration.reduce(
+                      (sum, s) => sum + (s.duration || 0),
+                      0
+                  ) / completedStepsWithDuration.length
+                : 0
 
         return {
             id: execution.id,
@@ -251,7 +285,7 @@ export class AgentProgressReporter extends EventEmitter {
             duration,
             stepsCompleted,
             stepsFailed,
-            averageStepDuration
+            averageStepDuration,
         }
     }
 
@@ -262,14 +296,16 @@ export class AgentProgressReporter extends EventEmitter {
         duration: number
         progress: number
     }> {
-        return this.getExecutions().map(exec => {
-            const duration = (exec.endTime?.getTime() || Date.now()) - exec.startTime.getTime()
+        return this.getExecutions().map((exec) => {
+            const duration =
+                (exec.endTime?.getTime() || Date.now()) -
+                exec.startTime.getTime()
             return {
                 id: exec.id,
                 goal: exec.goal,
                 status: exec.status,
                 duration,
-                progress: exec.progress
+                progress: exec.progress,
             }
         })
     }

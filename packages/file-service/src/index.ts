@@ -7,7 +7,7 @@
 export {
     getFileService,
     destroyFileService,
-    createFileService
+    createFileService,
 } from './fileService'
 
 // Types
@@ -16,19 +16,11 @@ export type {
     IndexingOptions,
     SearchOptions,
     SearchResult,
-    FileServiceConfig
+    FileServiceConfig,
 } from './fileService'
 
 // Configuration
-export {
-    DEFAULT_INDEXING_OPTIONS,
-    DEFAULT_FILE_SERVICE_CONFIG
-} from './config'
+export { DEFAULT_INDEXING_OPTIONS, DEFAULT_FILE_SERVICE_CONFIG } from './config'
 
 // Logger
-export {
-    Logger,
-    ConsoleLogger,
-    NoOpLogger,
-    MemoryLogger
-} from './logger'
+export { Logger, ConsoleLogger, NoOpLogger, MemoryLogger } from './logger'

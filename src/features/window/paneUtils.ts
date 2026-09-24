@@ -521,14 +521,17 @@ export function doSelectFile(state: State, fileid: number) {
             file.indentUnit = DEFAULT_INDENT
         } else {
             // set minIndent to the most common indent
-            const indentCounts = firstIndents.reduce((counts, indent) => {
-                if (indent in counts) {
-                    counts[indent] += 1
-                } else {
-                    counts[indent] = 1
-                }
-                return counts
-            }, {} as { [indent: string]: number })
+            const indentCounts = firstIndents.reduce(
+                (counts, indent) => {
+                    if (indent in counts) {
+                        counts[indent] += 1
+                    } else {
+                        counts[indent] = 1
+                    }
+                    return counts
+                },
+                {} as { [indent: string]: number }
+            )
             const indentPairs = Object.entries(indentCounts)
             const minPair = indentPairs.reduce((min, args) =>
                 args[1] > min[1] ? args : min

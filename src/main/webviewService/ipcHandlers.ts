@@ -20,7 +20,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true, webViewId }
             } catch (error) {
                 log.error('Failed to create webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -34,7 +40,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to load URL in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -48,7 +60,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to reload webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -62,7 +80,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to go back in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,7 +100,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to go forward in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -90,7 +120,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to stop loading in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -100,11 +136,20 @@ export function setupWebviewServiceIpcs() {
         'webview-service-execute-js',
         async (_event: IpcMainInvokeEvent, webViewId: string, code: string) => {
             try {
-                const result = await webviewService.executeJavaScript(webViewId, code)
+                const result = await webviewService.executeJavaScript(
+                    webViewId,
+                    code
+                )
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to execute JavaScript in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -112,13 +157,24 @@ export function setupWebviewServiceIpcs() {
     // Send message
     ipcMain.handle(
         'webview-service-send-message',
-        async (_event: IpcMainInvokeEvent, webViewId: string, channel: string, data: any) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            webViewId: string,
+            channel: string,
+            data: any
+        ) => {
             try {
                 await webviewService.sendMessage(webViewId, channel, data)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to send message to webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -132,7 +188,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to insert CSS in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -140,13 +202,23 @@ export function setupWebviewServiceIpcs() {
     // Set zoom level
     ipcMain.handle(
         'webview-service-set-zoom',
-        async (_event: IpcMainInvokeEvent, webViewId: string, level: number) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            webViewId: string,
+            level: number
+        ) => {
             try {
                 await webviewService.setZoomLevel(webViewId, level)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to set zoom level in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -154,13 +226,28 @@ export function setupWebviewServiceIpcs() {
     // Find in page
     ipcMain.handle(
         'webview-service-find',
-        async (_event: IpcMainInvokeEvent, webViewId: string, text: string, options?: any) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            webViewId: string,
+            text: string,
+            options?: any
+        ) => {
             try {
-                const result = await webviewService.findInPage(webViewId, text, options)
+                const result = await webviewService.findInPage(
+                    webViewId,
+                    text,
+                    options
+                )
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to find in page in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -168,13 +255,23 @@ export function setupWebviewServiceIpcs() {
     // Stop find in page
     ipcMain.handle(
         'webview-service-stop-find',
-        async (_event: IpcMainInvokeEvent, webViewId: string, action?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            webViewId: string,
+            action?: string
+        ) => {
             try {
                 await webviewService.stopFindInPage(webViewId, action)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to stop find in page in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -188,7 +285,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to capture page in webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -202,7 +305,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to print webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -216,7 +325,13 @@ export function setupWebviewServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to close webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -230,35 +345,51 @@ export function setupWebviewServiceIpcs() {
                 return { success: true, webView }
             } catch (error) {
                 log.error('Failed to get webview:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get all webviews
-    ipcMain.handle(
-        'webview-service-get-all',
-        async () => {
-            try {
-                const webViews = webviewService.getWebViews()
-                return { success: true, webViews }
-            } catch (error) {
-                log.error('Failed to get webviews:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('webview-service-get-all', async () => {
+        try {
+            const webViews = webviewService.getWebViews()
+            return { success: true, webViews }
+        } catch (error) {
+            log.error('Failed to get webviews:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Update config
     ipcMain.handle(
         'webview-service-update-config',
-        async (_event: IpcMainInvokeEvent, webViewId: string, config: Partial<WebViewConfig>) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            webViewId: string,
+            config: Partial<WebViewConfig>
+        ) => {
             try {
                 webviewService.updateConfig(webViewId, config)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to update webview config:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

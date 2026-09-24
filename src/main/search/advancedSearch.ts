@@ -43,7 +43,7 @@ export class AdvancedSearchService {
     private index: SearchIndex = {
         files: new Map(),
         lastIndexed: new Date(),
-        totalFiles: 0
+        totalFiles: 0,
     }
     private watchers: Map<string, any> = new Map()
     private indexingInProgress = false
@@ -59,7 +59,7 @@ export class AdvancedSearchService {
             contextLines = 2,
             fileExtensions,
             excludePatterns,
-            symbolType
+            symbolType,
         } = options
 
         // If symbolType is specified, use symbol-aware search
@@ -69,7 +69,7 @@ export class AdvancedSearchService {
                 maxResults,
                 contextLines,
                 fileExtensions,
-                excludePatterns
+                excludePatterns,
             })
         }
 
@@ -80,7 +80,7 @@ export class AdvancedSearchService {
             maxResults,
             contextLines,
             fileExtensions,
-            excludePatterns
+            excludePatterns,
         })
 
         try {
@@ -119,7 +119,7 @@ export class AdvancedSearchService {
                 maxResults: options.maxResults || 100,
                 contextLines: options.contextLines || 2,
                 fileExtensions: options.fileExtensions,
-                excludePatterns: options.excludePatterns
+                excludePatterns: options.excludePatterns,
             })
 
             try {
@@ -127,7 +127,10 @@ export class AdvancedSearchService {
                 const results = this.parseRipgrepOutput(output)
                 allResults.push(...results)
             } catch (error) {
-                log.warn(`Symbol search failed for pattern ${combinedPattern}:`, error)
+                log.warn(
+                    `Symbol search failed for pattern ${combinedPattern}:`,
+                    error
+                )
             }
         }
 
@@ -136,7 +139,9 @@ export class AdvancedSearchService {
         return uniqueResults.slice(0, options.maxResults || 100)
     }
 
-    private getSymbolPatterns(symbolType: 'function' | 'class' | 'variable' | 'constant'): string[] {
+    private getSymbolPatterns(
+        symbolType: 'function' | 'class' | 'variable' | 'constant'
+    ): string[] {
         switch (symbolType) {
             case 'function':
                 return [
@@ -191,15 +196,22 @@ export class AdvancedSearchService {
         return unique
     }
 
-    async searchInFile(filePath: string, pattern: string, options: Partial<SearchOptions> = {}): Promise<SearchResult[]> {
+    async searchInFile(
+        filePath: string,
+        pattern: string,
+        options: Partial<SearchOptions> = {}
+    ): Promise<SearchResult[]> {
         return this.search({
             pattern,
             directory: path.dirname(filePath),
-            ...options
+            ...options,
         })
     }
 
-    async buildIndex(directory: string, fileExtensions?: string[]): Promise<void> {
+    async buildIndex(
+        directory: string,
+        fileExtensions?: string[]
+    ): Promise<void> {
         if (this.indexingInProgress) {
             log.warn('Indexing already in progress')
             return
@@ -212,12 +224,12 @@ export class AdvancedSearchService {
             // Use ripgrep to find all files
             const args = ['--files', '--hidden']
             if (fileExtensions && fileExtensions.length > 0) {
-                args.push('-g', fileExtensions.map(ext => `*${ext}`).join(''))
+                args.push('-g', fileExtensions.map((ext) => `*${ext}`).join(''))
             }
             args.push(directory)
 
             const fileResults = await this.executeRipgrep(args)
-            const files = fileResults.split('\n').filter(f => f.trim() !== '')
+            const files = fileResults.split('\n').filter((f) => f.trim() !== '')
 
             // Get file stats for each file
             for (const file of files) {
@@ -225,7 +237,7 @@ export class AdvancedSearchService {
                     const stats = await this.getFileStats(file)
                     this.index.files.set(file, {
                         size: stats.size,
-                        modifiedTime: stats.mtime
+                        modifiedTime: stats.mtime,
                     })
                 } catch (error) {
                     log.warn(`Failed to get stats for ${file}:`, error)
@@ -235,7 +247,9 @@ export class AdvancedSearchService {
             this.index.lastIndexed = new Date()
             this.index.totalFiles = this.index.files.size
 
-            log.info(`Search index built: ${this.index.totalFiles} files indexed`)
+            log.info(
+                `Search index built: ${this.index.totalFiles} files indexed`
+            )
         } catch (error) {
             log.error('Failed to build search index:', error)
         } finally {
@@ -243,7 +257,10 @@ export class AdvancedSearchService {
         }
     }
 
-    startWatching(directory: string, callback: (filePath: string, event: string) => void): void {
+    startWatching(
+        directory: string,
+        callback: (filePath: string, event: string) => void
+    ): void {
         if (this.watchers.has(directory)) {
             log.warn(`Already watching directory: ${directory}`)
             return
@@ -251,19 +268,23 @@ export class AdvancedSearchService {
 
         log.info(`Starting to watch directory: ${directory}`)
 
-        const watcher = watch(directory, { recursive: true }, (event, filename) => {
-            if (filename) {
-                const filePath = path.join(directory, filename)
-                callback(filePath, event)
+        const watcher = watch(
+            directory,
+            { recursive: true },
+            (event, filename) => {
+                if (filename) {
+                    const filePath = path.join(directory, filename)
+                    callback(filePath, event)
 
-                // Update index on file changes
-                if (event === 'change' || event === 'rename') {
-                    this.updateIndexEntry(filePath)
-                } else if (event === 'unlink') {
-                    this.index.files.delete(filePath)
+                    // Update index on file changes
+                    if (event === 'change' || event === 'rename') {
+                        this.updateIndexEntry(filePath)
+                    } else if (event === 'unlink') {
+                        this.index.files.delete(filePath)
+                    }
                 }
             }
-        })
+        )
 
         this.watchers.set(directory, watcher)
     }
@@ -366,7 +387,9 @@ export class AdvancedSearchService {
                     // 0 = matches found, 1 = no matches (both are success)
                     resolve(stdout)
                 } else {
-                    reject(new Error(`ripgrep exited with code ${code}: ${stderr}`))
+                    reject(
+                        new Error(`ripgrep exited with code ${code}: ${stderr}`)
+                    )
                 }
             })
 
@@ -378,7 +401,7 @@ export class AdvancedSearchService {
 
     private parseRipgrepOutput(output: string): SearchResult[] {
         const results: SearchResult[] = []
-        const lines = output.split('\n').filter(line => line.trim() !== '')
+        const lines = output.split('\n').filter((line) => line.trim() !== '')
 
         for (const line of lines) {
             try {
@@ -392,7 +415,7 @@ export class AdvancedSearchService {
                         lineContent: data.data.lines.text,
                         matchText: data.data.submatches[0]?.match?.text || '',
                         contextBefore: data.data.lines.before || [],
-                        contextAfter: data.data.lines.after || []
+                        contextAfter: data.data.lines.after || [],
                     }
                     results.push(result)
                 }
@@ -406,9 +429,9 @@ export class AdvancedSearchService {
 
     rankResults(results: SearchResult[], query: string): SearchResult[] {
         // Calculate scores for each result
-        const scoredResults = results.map(result => ({
+        const scoredResults = results.map((result) => ({
             ...result,
-            score: this.calculateScore(result, query)
+            score: this.calculateScore(result, query),
         }))
 
         // Sort by score (descending)
@@ -477,13 +500,15 @@ export class AdvancedSearchService {
         return overlap / shorter.length
     }
 
-    private async getFileStats(filePath: string): Promise<{ size: number; mtime: Date }> {
+    private async getFileStats(
+        filePath: string
+    ): Promise<{ size: number; mtime: Date }> {
         // This would use the file system to get stats
         // For now, return placeholder
         // TODO: Implement actual file stats retrieval
         return {
             size: 0,
-            mtime: new Date()
+            mtime: new Date(),
         }
     }
 
@@ -492,7 +517,7 @@ export class AdvancedSearchService {
             const stats = await this.getFileStats(filePath)
             this.index.files.set(filePath, {
                 size: stats.size,
-                modifiedTime: stats.mtime
+                modifiedTime: stats.mtime,
             })
         } catch (error) {
             log.warn(`Failed to update index entry for ${filePath}:`, error)
@@ -503,7 +528,7 @@ export class AdvancedSearchService {
         return {
             files: this.index.files,
             lastIndexed: this.index.lastIndexed,
-            totalFiles: this.index.totalFiles
+            totalFiles: this.index.totalFiles,
         }
     }
 
@@ -511,7 +536,7 @@ export class AdvancedSearchService {
         this.index = {
             files: new Map(),
             lastIndexed: new Date(),
-            totalFiles: 0
+            totalFiles: 0,
         }
         log.info('Search index cleared')
     }

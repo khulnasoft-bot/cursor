@@ -69,7 +69,7 @@ export class ExecutionEnvironment {
             config,
             status: 'creating',
             createdAt: new Date(),
-            healthStatus: 'unknown'
+            healthStatus: 'unknown',
         }
 
         this.environments.set(envId, environment)
@@ -81,9 +81,11 @@ export class ExecutionEnvironment {
         return environment
     }
 
-    private async provisionEnvironment(environment: EnvironmentInstance): Promise<void> {
+    private async provisionEnvironment(
+        environment: EnvironmentInstance
+    ): Promise<void> {
         // Placeholder for actual environment provisioning
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise((resolve) => setTimeout(resolve, 2000))
 
         environment.status = 'running'
         environment.startedAt = new Date()
@@ -135,7 +137,7 @@ export class ExecutionEnvironment {
     }
 
     getRunningEnvironments(): EnvironmentInstance[] {
-        return this.getEnvironments().filter(e => e.status === 'running')
+        return this.getEnvironments().filter((e) => e.status === 'running')
     }
 
     async executeTask(envId: string, task: CloudAgentTask): Promise<void> {
@@ -147,7 +149,7 @@ export class ExecutionEnvironment {
         log.info(`Executing task ${task.id} in environment ${envId}`)
 
         // Placeholder for actual task execution in environment
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
         log.info(`Task ${task.id} completed in environment ${envId}`)
     }
@@ -195,11 +197,16 @@ export class ExecutionEnvironment {
             memoryUsage: Math.random() * 100,
             storageUsage: Math.random() * 100,
             networkIO: Math.random() * 1000,
-            uptime: environment.startedAt ? Date.now() - environment.startedAt.getTime() : 0
+            uptime: environment.startedAt
+                ? Date.now() - environment.startedAt.getTime()
+                : 0,
         }
     }
 
-    getAllMetrics(): Record<string, ReturnType<typeof this.getEnvironmentMetrics>> {
+    getAllMetrics(): Record<
+        string,
+        ReturnType<typeof this.getEnvironmentMetrics>
+    > {
         const metrics: Record<string, any> = {}
 
         for (const env of this.getRunningEnvironments()) {
@@ -221,7 +228,10 @@ export class ExecutionEnvironment {
         return true
     }
 
-    updateEnvironmentConfig(envId: string, updates: Partial<EnvironmentConfig>): boolean {
+    updateEnvironmentConfig(
+        envId: string,
+        updates: Partial<EnvironmentConfig>
+    ): boolean {
         const environment = this.environments.get(envId)
         if (!environment) return false
 
@@ -234,7 +244,9 @@ export class ExecutionEnvironment {
         // Placeholder for actual log collection
         const logs: string[] = []
         for (let i = 0; i < lines; i++) {
-            logs.push(`[${new Date().toISOString()}] Log line ${i + 1} from ${envId}`)
+            logs.push(
+                `[${new Date().toISOString()}] Log line ${i + 1} from ${envId}`
+            )
         }
         return logs
     }
@@ -279,15 +291,23 @@ export class ExecutionEnvironment {
 
         return {
             totalEnvironments: environments.length,
-            runningEnvironments: environments.filter(e => e.status === 'running').length,
-            stoppedEnvironments: environments.filter(e => e.status === 'stopped').length,
-            healthyEnvironments: environments.filter(e => e.healthStatus === 'healthy').length,
-            unhealthyEnvironments: environments.filter(e => e.healthStatus === 'unhealthy').length,
+            runningEnvironments: environments.filter(
+                (e) => e.status === 'running'
+            ).length,
+            stoppedEnvironments: environments.filter(
+                (e) => e.status === 'stopped'
+            ).length,
+            healthyEnvironments: environments.filter(
+                (e) => e.healthStatus === 'healthy'
+            ).length,
+            unhealthyEnvironments: environments.filter(
+                (e) => e.healthStatus === 'unhealthy'
+            ).length,
             totalResources: {
                 cpu: totalCpu,
                 memory: totalMemory,
-                storage: totalStorage
-            }
+                storage: totalStorage,
+            },
         }
     }
 

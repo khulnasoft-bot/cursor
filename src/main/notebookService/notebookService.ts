@@ -70,7 +70,7 @@ class NotebookService {
                 name: path.basename(notebookPath),
                 kernel: 'python3',
                 cells,
-                metadata
+                metadata,
             }
 
             this.notebooks.set(notebookId, notebook)
@@ -88,35 +88,35 @@ class NotebookService {
             cellType: cell.cell_type,
             content: cell.source.join(''),
             outputs: this.convertJupyterOutputs(cell.outputs || []),
-            executionCount: cell.execution_count || null
+            executionCount: cell.execution_count || null,
         }))
     }
 
     private convertJupyterOutputs(outputs: any[]): CellOutput[] {
-        return outputs.map(output => {
+        return outputs.map((output) => {
             if (output.output_type === 'stream') {
                 return {
                     outputType: 'stream',
                     text: output.text.join(''),
-                    name: output.name
+                    name: output.name,
                 }
             } else if (output.output_type === 'display_data') {
                 return {
                     outputType: 'display_data',
-                    data: output.data
+                    data: output.data,
                 }
             } else if (output.output_type === 'execute_result') {
                 return {
                     outputType: 'execute_result',
                     data: output.data,
-                    executionCount: output.execution_count
+                    executionCount: output.execution_count,
                 }
             } else if (output.output_type === 'error') {
                 return {
                     outputType: 'error',
                     ename: output.ename,
                     evalue: output.evalue,
-                    traceback: output.traceback
+                    traceback: output.traceback,
                 }
             }
             return { outputType: 'stream', text: '' }
@@ -128,15 +128,19 @@ class NotebookService {
 
         try {
             // Start Jupyter kernel
-            const process = spawn('jupyter', ['kernel', '--kernel', kernelName], {
-                stdio: ['pipe', 'pipe', 'pipe']
-            })
+            const process = spawn(
+                'jupyter',
+                ['kernel', '--kernel', kernelName],
+                {
+                    stdio: ['pipe', 'pipe', 'pipe'],
+                }
+            )
 
             const kernel: NotebookKernel = {
                 name: kernelName,
                 language: this.getKernelLanguage(kernelName),
                 process,
-                connected: false
+                connected: false,
             }
 
             this.setupKernelHandlers(kernel)
@@ -152,11 +156,11 @@ class NotebookService {
 
     private getKernelLanguage(kernelName: string): string {
         const kernelLanguages: Record<string, string> = {
-            'python3': 'python',
-            'python2': 'python',
-            'ipython': 'python',
-            'ir': 'r',
-            'ijavascript': 'javascript'
+            python3: 'python',
+            python2: 'python',
+            ipython: 'python',
+            ir: 'r',
+            ijavascript: 'javascript',
         }
         return kernelLanguages[kernelName] || kernelName
     }
@@ -175,7 +179,10 @@ class NotebookService {
                     }
                 }
             } catch (error) {
-                log.warn(`Failed to parse kernel message from ${kernel.name}:`, error)
+                log.warn(
+                    `Failed to parse kernel message from ${kernel.name}:`,
+                    error
+                )
             }
         })
 
@@ -205,13 +212,17 @@ class NotebookService {
         }
     }
 
-    async executeCell(notebookId: string, cellId: string, kernelId: string): Promise<CellOutput[]> {
+    async executeCell(
+        notebookId: string,
+        cellId: string,
+        kernelId: string
+    ): Promise<CellOutput[]> {
         const notebook = this.notebooks.get(notebookId)
         if (!notebook) {
             throw new Error(`Notebook not found: ${notebookId}`)
         }
 
-        const cell = notebook.cells.find(c => c.id === cellId)
+        const cell = notebook.cells.find((c) => c.id === cellId)
         if (!cell) {
             throw new Error(`Cell not found: ${cellId}`)
         }
@@ -227,7 +238,9 @@ class NotebookService {
 
             // Update cell with outputs
             cell.outputs = outputs
-            cell.executionCount = cell.executionCount ? cell.executionCount + 1 : 1
+            cell.executionCount = cell.executionCount
+                ? cell.executionCount + 1
+                : 1
 
             return outputs
         } catch (error) {
@@ -236,7 +249,10 @@ class NotebookService {
         }
     }
 
-    private async sendExecuteRequest(kernel: NotebookKernel, code: string): Promise<CellOutput[]> {
+    private async sendExecuteRequest(
+        kernel: NotebookKernel,
+        code: string
+    ): Promise<CellOutput[]> {
         if (!kernel.process) {
             throw new Error('Kernel process not available')
         }
@@ -245,15 +261,15 @@ class NotebookService {
             const message = {
                 header: {
                     msg_id: `execute_${Date.now()}`,
-                    msg_type: 'execute_request'
+                    msg_type: 'execute_request',
                 },
                 content: {
                     code,
                     silent: false,
                     store_history: true,
                     user_expressions: {},
-                    allow_stdin: false
-                }
+                    allow_stdin: false,
+                },
             }
 
             const messageStr = JSON.stringify(message)
@@ -286,7 +302,11 @@ class NotebookService {
         })
     }
 
-    async addCell(notebookId: string, cellType: 'code' | 'markdown', content: string = ''): Promise<string> {
+    async addCell(
+        notebookId: string,
+        cellType: 'code' | 'markdown',
+        content: string = ''
+    ): Promise<string> {
         const notebook = this.notebooks.get(notebookId)
         if (!notebook) {
             throw new Error(`Notebook not found: ${notebookId}`)
@@ -298,7 +318,7 @@ class NotebookService {
             cellType,
             content,
             outputs: [],
-            executionCount: null
+            executionCount: null,
         }
 
         notebook.cells.push(cell)
@@ -306,13 +326,17 @@ class NotebookService {
         return cellId
     }
 
-    async updateCell(notebookId: string, cellId: string, content: string): Promise<void> {
+    async updateCell(
+        notebookId: string,
+        cellId: string,
+        content: string
+    ): Promise<void> {
         const notebook = this.notebooks.get(notebookId)
         if (!notebook) {
             throw new Error(`Notebook not found: ${notebookId}`)
         }
 
-        const cell = notebook.cells.find(c => c.id === cellId)
+        const cell = notebook.cells.find((c) => c.id === cellId)
         if (!cell) {
             throw new Error(`Cell not found: ${cellId}`)
         }
@@ -326,7 +350,7 @@ class NotebookService {
             throw new Error(`Notebook not found: ${notebookId}`)
         }
 
-        const index = notebook.cells.findIndex(c => c.id === cellId)
+        const index = notebook.cells.findIndex((c) => c.id === cellId)
         if (index === -1) {
             throw new Error(`Cell not found: ${cellId}`)
         }
@@ -342,16 +366,16 @@ class NotebookService {
 
         try {
             const jupyterNotebook = {
-                cells: notebook.cells.map(cell => ({
+                cells: notebook.cells.map((cell) => ({
                     cell_type: cell.cellType,
                     source: cell.content.split('\n'),
                     outputs: this.convertToJupyterOutputs(cell.outputs),
                     execution_count: cell.executionCount,
-                    metadata: {}
+                    metadata: {},
                 })),
                 metadata: notebook.metadata,
                 nbformat: 4,
-                nbformat_minor: 4
+                nbformat_minor: 4,
             }
 
             const data = JSON.stringify(jupyterNotebook, null, 2)
@@ -365,30 +389,30 @@ class NotebookService {
     }
 
     private convertToJupyterOutputs(outputs: CellOutput[]): any[] {
-        return outputs.map(output => {
+        return outputs.map((output) => {
             if (output.outputType === 'stream') {
                 return {
                     output_type: 'stream',
                     name: output.name || 'stdout',
-                    text: output.text ? output.text.split('\n') : []
+                    text: output.text ? output.text.split('\n') : [],
                 }
             } else if (output.outputType === 'display_data') {
                 return {
                     output_type: 'display_data',
-                    data: output.data
+                    data: output.data,
                 }
             } else if (output.outputType === 'execute_result') {
                 return {
                     output_type: 'execute_result',
                     data: output.data,
-                    execution_count: output.executionCount
+                    execution_count: output.executionCount,
                 }
             } else if (output.outputType === 'error') {
                 return {
                     output_type: 'error',
                     ename: output.ename,
                     evalue: output.evalue,
-                    traceback: output.traceback
+                    traceback: output.traceback,
                 }
             }
             return { output_type: 'stream', text: [] }

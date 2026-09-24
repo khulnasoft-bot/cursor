@@ -3,7 +3,11 @@
  * Pre-built automation templates for common workflows
  */
 
-import { AutomationWorkflow, AutomationTrigger, AutomationAction } from '../types'
+import {
+    AutomationWorkflow,
+    AutomationTrigger,
+    AutomationAction,
+} from '../types'
 
 export interface AutomationTemplate {
     id: string
@@ -42,16 +46,16 @@ export class AutomationTemplates {
                             id: 'trigger-file-change',
                             type: 'file_change',
                             config: { filePath },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions,
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Git automation template
@@ -62,41 +66,46 @@ export class AutomationTemplates {
             category: 'git',
             tags: ['git', 'commit', 'automation'],
             createWorkflow: (params) => {
-                const commitMessage = params.commitMessage || 'Auto commit on save'
+                const commitMessage =
+                    params.commitMessage || 'Auto commit on save'
                 const files = params.files || ['*']
 
                 return {
                     id: 'workflow-git-auto-commit',
                     name: 'Auto Commit on Save',
-                    description: 'Automatically commit changes when files are saved',
+                    description:
+                        'Automatically commit changes when files are saved',
                     triggers: [
                         {
                             id: 'trigger-file-save',
                             type: 'file_save',
                             config: { files },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-git-add',
                             type: 'git_operation',
                             config: { operation: 'add', files },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-git-commit',
                             type: 'git_operation',
-                            config: { operation: 'commit', message: commitMessage },
-                            enabled: true
-                        }
+                            config: {
+                                operation: 'commit',
+                                message: commitMessage,
+                            },
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Build automation template
@@ -113,35 +122,36 @@ export class AutomationTemplates {
                 return {
                     id: 'workflow-auto-build',
                     name: 'Auto Build on Change',
-                    description: 'Automatically build project when source files change',
+                    description:
+                        'Automatically build project when source files change',
                     triggers: [
                         {
                             id: 'trigger-file-change',
                             type: 'file_change',
                             config: { files: sourceFiles },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-build',
                             type: 'command',
                             config: { command: buildCommand },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-notify',
                             type: 'notification',
                             config: { message: 'Build completed successfully' },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Test automation template
@@ -153,40 +163,44 @@ export class AutomationTemplates {
             tags: ['testing', 'development', 'automation'],
             createWorkflow: (params) => {
                 const testCommand = params.testCommand || 'npm test'
-                const sourceFiles = params.sourceFiles || ['src/**/*', 'test/**/*']
+                const sourceFiles = params.sourceFiles || [
+                    'src/**/*',
+                    'test/**/*',
+                ]
 
                 return {
                     id: 'workflow-auto-test',
                     name: 'Auto Test on Change',
-                    description: 'Automatically run tests when source files change',
+                    description:
+                        'Automatically run tests when source files change',
                     triggers: [
                         {
                             id: 'trigger-file-change',
                             type: 'file_change',
                             config: { files: sourceFiles },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-test',
                             type: 'command',
                             config: { command: testCommand },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-notify',
                             type: 'notification',
                             config: { message: 'Tests completed' },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Code quality template
@@ -209,29 +223,29 @@ export class AutomationTemplates {
                             id: 'trigger-file-save',
                             type: 'file_save',
                             config: { files: ['src/**/*'] },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-lint',
                             type: 'command',
                             config: { command: lintCommand },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-format',
                             type: 'command',
                             config: { command: formatCommand },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Deployment template
@@ -254,29 +268,29 @@ export class AutomationTemplates {
                             id: 'trigger-git-commit',
                             type: 'git_commit',
                             config: { branch },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-deploy',
                             type: 'command',
                             config: { command: deployCommand },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-notify',
                             type: 'notification',
                             config: { message: 'Deployment completed' },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // Scheduled backup template
@@ -299,29 +313,29 @@ export class AutomationTemplates {
                             id: 'trigger-time',
                             type: 'time',
                             config: { schedule },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-backup',
                             type: 'command',
                             config: { command: backupCommand },
-                            enabled: true
+                            enabled: true,
                         },
                         {
                             id: 'action-notify',
                             type: 'notification',
                             config: { message: 'Backup completed' },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
 
         // AI code review template
@@ -332,7 +346,9 @@ export class AutomationTemplates {
             category: 'ai',
             tags: ['ai', 'review', 'automation'],
             createWorkflow: (params) => {
-                const reviewPrompt = params.reviewPrompt || 'Review this code for quality and best practices'
+                const reviewPrompt =
+                    params.reviewPrompt ||
+                    'Review this code for quality and best practices'
 
                 return {
                     id: 'workflow-ai-code-review',
@@ -343,23 +359,23 @@ export class AutomationTemplates {
                             id: 'trigger-file-save',
                             type: 'file_save',
                             config: { files: ['src/**/*'] },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     actions: [
                         {
                             id: 'action-ai-review',
                             type: 'ai_task',
                             config: { prompt: reviewPrompt },
-                            enabled: true
-                        }
+                            enabled: true,
+                        },
                     ],
                     enabled: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                    runCount: 0
+                    runCount: 0,
                 }
-            }
+            },
         })
     }
 
@@ -380,23 +396,29 @@ export class AutomationTemplates {
     }
 
     getTemplatesByCategory(category: string): AutomationTemplate[] {
-        return this.getTemplates().filter(t => t.category === category)
+        return this.getTemplates().filter((t) => t.category === category)
     }
 
     getTemplatesByTag(tag: string): AutomationTemplate[] {
-        return this.getTemplates().filter(t => t.tags.includes(tag))
+        return this.getTemplates().filter((t) => t.tags.includes(tag))
     }
 
     searchTemplates(query: string): AutomationTemplate[] {
         const queryLower = query.toLowerCase()
-        return this.getTemplates().filter(template =>
-            template.name.toLowerCase().includes(queryLower) ||
-            template.description.toLowerCase().includes(queryLower) ||
-            template.tags.some(tag => tag.toLowerCase().includes(queryLower))
+        return this.getTemplates().filter(
+            (template) =>
+                template.name.toLowerCase().includes(queryLower) ||
+                template.description.toLowerCase().includes(queryLower) ||
+                template.tags.some((tag) =>
+                    tag.toLowerCase().includes(queryLower)
+                )
         )
     }
 
-    createWorkflowFromTemplate(templateId: string, params: Record<string, any>): AutomationWorkflow | null {
+    createWorkflowFromTemplate(
+        templateId: string,
+        params: Record<string, any>
+    ): AutomationWorkflow | null {
         const template = this.templates.get(templateId)
         if (!template) return null
 
@@ -414,7 +436,7 @@ export class AutomationTemplates {
     getAllTags(): string[] {
         const tags = new Set<string>()
         for (const template of this.templates.values()) {
-            template.tags.forEach(tag => tags.add(tag))
+            template.tags.forEach((tag) => tags.add(tag))
         }
         return Array.from(tags)
     }

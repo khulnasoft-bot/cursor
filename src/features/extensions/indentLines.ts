@@ -237,17 +237,15 @@ function addIndentationMarkers(view: EditorView) {
 
                 indentSizeMap.set(line.number, indices.length)
                 decorations.push(
-                    ...indices.map(
-                        (char, i): IndentationMarkerDesc => ({
-                            from: line.from + char,
-                            to: line.from + char + 1,
-                            lineNumber: line.number,
-                            create: (activeIndentIndex) =>
-                                activeIndentIndex === i
-                                    ? activeIndentationMark
-                                    : indentationMark,
-                        })
-                    )
+                    ...indices.map((char, i): IndentationMarkerDesc => ({
+                        from: line.from + char,
+                        to: line.from + char + 1,
+                        lineNumber: line.number,
+                        create: (activeIndentIndex) =>
+                            activeIndentIndex === i
+                                ? activeIndentationMark
+                                : indentationMark,
+                    }))
                 )
             }
 

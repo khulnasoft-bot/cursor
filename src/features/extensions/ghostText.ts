@@ -124,11 +124,8 @@ export const completionDecoration = StateField.define<CompletionState>({
                         endReplacement,
                         uuid,
                     } = state.ghostText
-                    let {
-                        displayText,
-                        displayPos,
-                        decorations,
-                    } = state.ghostText
+                    let { displayText, displayPos, decorations } =
+                        state.ghostText
 
                     displayPos += numChars
 
@@ -428,9 +425,7 @@ const completionRequester = (client: LanguageServerClient) => {
                             position,
                             uuid,
                         } = completionResult.completions[0]
-                        let {
-                            displayText,
-                        } = completionResult.completions[0]
+                        let { displayText } = completionResult.completions[0]
 
                         const startPos = posToOffset(state.doc, {
                             line: start.line,

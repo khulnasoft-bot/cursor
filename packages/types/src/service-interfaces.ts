@@ -48,7 +48,10 @@ export interface SearchResult {
 }
 
 export interface IFileService {
-    indexDirectory(directoryPath: string, options?: IndexingOptions): Promise<void>
+    indexDirectory(
+        directoryPath: string,
+        options?: IndexingOptions
+    ): Promise<void>
     search(options: SearchOptions): Promise<SearchResult[]>
     getFileContent(filePath: string): string | null
     updateFile(filePath: string): Promise<void>
@@ -135,7 +138,11 @@ export interface ModelConfig {
 }
 
 export interface IAIService {
-    sendMessage(message: string, context?: AIContext, conversationId?: string): Promise<string>
+    sendMessage(
+        message: string,
+        context?: AIContext,
+        conversationId?: string
+    ): Promise<string>
     sendMessageStream(
         message: string,
         context?: AIContext,
@@ -171,7 +178,14 @@ export interface Rule {
     enabled: boolean
 }
 
-export type RuleCategory = 'style' | 'naming' | 'architecture' | 'security' | 'performance' | 'testing' | 'custom'
+export type RuleCategory =
+    | 'style'
+    | 'naming'
+    | 'architecture'
+    | 'security'
+    | 'performance'
+    | 'testing'
+    | 'custom'
 
 export type RuleSeverity = 'error' | 'warning' | 'suggestion' | 'info'
 
@@ -204,7 +218,10 @@ export interface RuleApplicationResult {
 
 export interface IRuleService {
     initialize(projectPath: string): Promise<void>
-    applyRulesToCode(code: string, filePath: string): Promise<RuleApplicationResult>
+    applyRulesToCode(
+        code: string,
+        filePath: string
+    ): Promise<RuleApplicationResult>
     applyRulesToAIContext(context: string, filePath: string): string
     getActiveRules(): Rule[]
     getRulesByCategory(category: RuleCategory): Rule[]
@@ -212,7 +229,11 @@ export interface IRuleService {
     getRuleSet(name: string): RuleSet | undefined
     getAllRuleSets(): RuleSet[]
     createRuleSet(ruleSet: RuleSet, projectPath: string): Promise<void>
-    updateRuleSet(name: string, updates: Partial<RuleSet>, projectPath: string): Promise<void>
+    updateRuleSet(
+        name: string,
+        updates: Partial<RuleSet>,
+        projectPath: string
+    ): Promise<void>
     deleteRuleSet(name: string, projectPath: string): Promise<void>
     enableRule(ruleId: string, projectPath: string): Promise<void>
     disableRule(ruleId: string, projectPath: string): Promise<void>
@@ -238,7 +259,8 @@ export interface AutomationTrigger {
     enabled: boolean
 }
 
-export type AutomationTriggerType = 'file_save' | 'file_change' | 'git_commit' | 'time' | 'manual' | 'event'
+export type AutomationTriggerType =
+    'file_save' | 'file_change' | 'git_commit' | 'time' | 'manual' | 'event'
 
 export interface AutomationAction {
     id: string
@@ -247,7 +269,13 @@ export interface AutomationAction {
     enabled: boolean
 }
 
-export type AutomationActionType = 'command' | 'script' | 'ai_task' | 'notification' | 'file_operation' | 'git_operation'
+export type AutomationActionType =
+    | 'command'
+    | 'script'
+    | 'ai_task'
+    | 'notification'
+    | 'file_operation'
+    | 'git_operation'
 
 export interface AutomationWorkflow {
     id: string
@@ -280,7 +308,8 @@ export interface AutomationExecution {
     context?: Record<string, any>
 }
 
-export type ExecutionStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+export type ExecutionStatus =
+    'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
 
 export interface IAutomationService {
     activate(): void
@@ -294,7 +323,9 @@ export interface IAutomationService {
     ): AutomationWorkflow
     updateWorkflow(
         workflowId: string,
-        updates: Partial<Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>>
+        updates: Partial<
+            Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>
+        >
     ): AutomationWorkflow | null
     deleteWorkflow(workflowId: string): boolean
     enableWorkflow(workflowId: string): boolean
@@ -302,7 +333,9 @@ export interface IAutomationService {
     getWorkflow(workflowId: string): AutomationWorkflow | undefined
     getWorkflows(): AutomationWorkflow[]
     getEnabledWorkflows(): AutomationWorkflow[]
-    getWorkflowsByTrigger(triggerType: AutomationTriggerType): AutomationWorkflow[]
+    getWorkflowsByTrigger(
+        triggerType: AutomationTriggerType
+    ): AutomationWorkflow[]
     executeWorkflow(
         workflowId: string,
         trigger: AutomationTrigger,
@@ -334,8 +367,17 @@ export interface AgentTask {
 export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed'
 
 export interface IAgentExecService {
-    executeAgent(command: string, args?: string[], cwd?: string, env?: Record<string, string>): Promise<string>
-    executeAgentScript(scriptPath: string, args?: string[], cwd?: string): Promise<string>
+    executeAgent(
+        command: string,
+        args?: string[],
+        cwd?: string,
+        env?: Record<string, string>
+    ): Promise<string>
+    executeAgentScript(
+        scriptPath: string,
+        args?: string[],
+        cwd?: string
+    ): Promise<string>
     executeAgentCommand(commandString: string, cwd?: string): Promise<string>
     getTask(taskId: string): AgentTask | undefined
     getTasks(): AgentTask[]

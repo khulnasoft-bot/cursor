@@ -11,88 +11,88 @@ export function setupLocalModeServiceIpcs() {
     const localModeService = getLocalModeService()
 
     // Enable local mode
-    ipcMain.handle(
-        'local-mode-service-enable',
-        async () => {
-            try {
-                localModeService.enableLocalMode()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to enable local mode:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-enable', async () => {
+        try {
+            localModeService.enableLocalMode()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to enable local mode:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Disable local mode
-    ipcMain.handle(
-        'local-mode-service-disable',
-        async () => {
-            try {
-                localModeService.disableLocalMode()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to disable local mode:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-disable', async () => {
+        try {
+            localModeService.disableLocalMode()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to disable local mode:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if local mode enabled
-    ipcMain.handle(
-        'local-mode-service-is-enabled',
-        async () => {
-            try {
-                const enabled = localModeService.isLocalModeEnabled()
-                return { success: true, enabled }
-            } catch (error) {
-                log.error('Failed to check local mode status:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-is-enabled', async () => {
+        try {
+            const enabled = localModeService.isLocalModeEnabled()
+            return { success: true, enabled }
+        } catch (error) {
+            log.error('Failed to check local mode status:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Enable offline mode
-    ipcMain.handle(
-        'local-mode-service-enable-offline',
-        async () => {
-            try {
-                localModeService.enableOfflineMode()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to enable offline mode:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-enable-offline', async () => {
+        try {
+            localModeService.enableOfflineMode()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to enable offline mode:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Disable offline mode
-    ipcMain.handle(
-        'local-mode-service-disable-offline',
-        async () => {
-            try {
-                localModeService.disableOfflineMode()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to disable offline mode:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-disable-offline', async () => {
+        try {
+            localModeService.disableOfflineMode()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to disable offline mode:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if offline mode
-    ipcMain.handle(
-        'local-mode-service-is-offline',
-        async () => {
-            try {
-                const offline = localModeService.isOfflineMode()
-                return { success: true, offline }
-            } catch (error) {
-                log.error('Failed to check offline mode status:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-is-offline', async () => {
+        try {
+            const offline = localModeService.isOfflineMode()
+            return { success: true, offline }
+        } catch (error) {
+            log.error('Failed to check offline mode status:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Cache data
     ipcMain.handle(
@@ -103,7 +103,13 @@ export function setupLocalModeServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to cache data:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -117,7 +123,13 @@ export function setupLocalModeServiceIpcs() {
                 return { success: true, data }
             } catch (error) {
                 log.error('Failed to get cached data:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -131,38 +143,44 @@ export function setupLocalModeServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to remove cached data:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Clear cache
-    ipcMain.handle(
-        'local-mode-service-clear-cache',
-        async () => {
-            try {
-                localModeService.clearCache()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to clear cache:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-clear-cache', async () => {
+        try {
+            localModeService.clearCache()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to clear cache:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get cache keys
-    ipcMain.handle(
-        'local-mode-service-get-cache-keys',
-        async () => {
-            try {
-                const keys = localModeService.getCacheKeys()
-                return { success: true, keys }
-            } catch (error) {
-                log.error('Failed to get cache keys:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('local-mode-service-get-cache-keys', async () => {
+        try {
+            const keys = localModeService.getCacheKeys()
+            return { success: true, keys }
+        } catch (error) {
+            log.error('Failed to get cache keys:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if data cached
     ipcMain.handle(
@@ -173,7 +191,13 @@ export function setupLocalModeServiceIpcs() {
                 return { success: true, cached }
             } catch (error) {
                 log.error('Failed to check if data cached:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -186,8 +210,17 @@ export function setupLocalModeServiceIpcs() {
                 const shouldUse = localModeService.shouldUseLocalResource(url)
                 return { success: true, shouldUse }
             } catch (error) {
-                log.error('Failed to check if should use local resource:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                log.error(
+                    'Failed to check if should use local resource:',
+                    error
+                )
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -201,7 +234,13 @@ export function setupLocalModeServiceIpcs() {
                 return { success: true, path }
             } catch (error) {
                 log.error('Failed to get local resource path:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

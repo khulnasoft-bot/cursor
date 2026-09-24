@@ -573,8 +573,10 @@ export class LanguageServerPlugin implements LanguageServerPluginInterface {
         // Get the current text
 
         const maybeResult = async (
-            resultFuture: Promise<// LSP.CompletionList | LSP.CompletionItem[] | null
-            LSP.CompletionList | null>
+            resultFuture: Promise<
+                // LSP.CompletionList | LSP.CompletionItem[] | null
+                LSP.CompletionList | null
+            >
         ) => {
             const multiOptions = await Promise.race([
                 resultFuture,
@@ -615,39 +617,40 @@ export class LanguageServerPlugin implements LanguageServerPluginInterface {
         }
 
         if (result == null || stillWaitFutureResult) {
-            const resultFuture =
-                new Promise<// LSP.CompletionList | LSP.CompletionItem[] | null
-                LSP.CompletionList | null>(async (resolve) => {
-                    const text = this.getDocText()
-                    this.client.sendChange({
-                        documentPath: this.getDocPath(),
-                        documentText: text,
-                    })
-
-                    const wordBefore = context.matchBefore(/\w+/)?.text
-                    const tosend = {
-                        textDocument: { uri: URI.file(path).toString() },
-                        position: { line, character },
-                        context: {
-                            triggerKind,
-                            triggerCharacter,
-                        },
-                        // Custom addition by me
-                        wordBefore: wordBefore ?? '',
-                    }
-
-                    const awaitedResult =
-                        await this.client.textDocumentCompletion(tosend)
-
-                    if (!awaitedResult) return null
-                    if (!Array.isArray(awaitedResult)) {
-                        // && !awaitedResult.isIncomplete) {
-                        // resolve([]);
-                        resolve(awaitedResult)
-                    } else {
-                        resolve(null)
-                    }
+            const resultFuture = new Promise<
+                // LSP.CompletionList | LSP.CompletionItem[] | null
+                LSP.CompletionList | null
+            >(async (resolve) => {
+                const text = this.getDocText()
+                this.client.sendChange({
+                    documentPath: this.getDocPath(),
+                    documentText: text,
                 })
+
+                const wordBefore = context.matchBefore(/\w+/)?.text
+                const tosend = {
+                    textDocument: { uri: URI.file(path).toString() },
+                    position: { line, character },
+                    context: {
+                        triggerKind,
+                        triggerCharacter,
+                    },
+                    // Custom addition by me
+                    wordBefore: wordBefore ?? '',
+                }
+
+                const awaitedResult =
+                    await this.client.textDocumentCompletion(tosend)
+
+                if (!awaitedResult) return null
+                if (!Array.isArray(awaitedResult)) {
+                    // && !awaitedResult.isIncomplete) {
+                    // resolve([]);
+                    resolve(awaitedResult)
+                } else {
+                    resolve(null)
+                }
+            })
             const clientName = this.client.getName()
 
             if (clientName && !['python', 'csharp'].includes(clientName)) {

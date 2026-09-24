@@ -24,7 +24,8 @@ export interface CloudAgentConfig {
 export interface CloudAgentInstance {
     id: string
     configId: string
-    status: 'pending' | 'starting' | 'running' | 'stopping' | 'stopped' | 'failed'
+    status:
+        'pending' | 'starting' | 'running' | 'stopping' | 'stopped' | 'failed'
     createdAt: Date
     startedAt?: Date
     stoppedAt?: Date
@@ -80,14 +81,17 @@ export class CloudAgentService {
     createConfig(config: Omit<CloudAgentConfig, 'id'>): CloudAgentConfig {
         const newConfig: CloudAgentConfig = {
             ...config,
-            id: `config-${++this.configCounter}`
+            id: `config-${++this.configCounter}`,
         }
         this.configs.set(newConfig.id, newConfig)
         log.info(`Created cloud agent config: ${newConfig.name}`)
         return newConfig
     }
 
-    updateConfig(configId: string, updates: Partial<CloudAgentConfig>): CloudAgentConfig | null {
+    updateConfig(
+        configId: string,
+        updates: Partial<CloudAgentConfig>
+    ): CloudAgentConfig | null {
         const config = this.configs.get(configId)
         if (!config) return null
 
@@ -129,9 +133,9 @@ export class CloudAgentService {
             resources: {
                 cpu: 2,
                 memory: 4096,
-                storage: 20
+                storage: 20,
             },
-            tasks: []
+            tasks: [],
         }
 
         this.instances.set(instanceId, instance)
@@ -144,17 +148,20 @@ export class CloudAgentService {
             return instance
         } catch (error) {
             instance.status = 'failed'
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Failed to provision instance ${instanceId}: ${errorMsg}`)
             throw new Error(`Instance provisioning failed: ${errorMsg}`)
         }
     }
 
-    private async simulateProvisioning(instance: CloudAgentInstance): Promise<void> {
+    private async simulateProvisioning(
+        instance: CloudAgentInstance
+    ): Promise<void> {
         try {
             // Placeholder for actual cloud provisioning
             // TODO: Implement actual cloud provisioning with proper error handling
-            await new Promise(resolve => setTimeout(resolve, 2000))
+            await new Promise((resolve) => setTimeout(resolve, 2000))
 
             instance.status = 'running'
             instance.startedAt = new Date()
@@ -163,7 +170,8 @@ export class CloudAgentService {
 
             log.info(`Cloud agent instance ${instance.id} is now running`)
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Provisioning simulation failed: ${errorMsg}`)
             throw error
         }
@@ -179,7 +187,7 @@ export class CloudAgentService {
         try {
             // Simulate deprovisioning process
             // TODO: Implement actual deprovisioning with proper error handling
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 1000))
 
             instance.status = 'stopped'
             instance.stoppedAt = new Date()
@@ -188,8 +196,11 @@ export class CloudAgentService {
             return true
         } catch (error) {
             instance.status = 'failed'
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-            log.error(`Failed to deprovision instance ${instanceId}: ${errorMsg}`)
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
+            log.error(
+                `Failed to deprovision instance ${instanceId}: ${errorMsg}`
+            )
             throw new Error(`Instance deprovisioning failed: ${errorMsg}`)
         }
     }
@@ -203,14 +214,19 @@ export class CloudAgentService {
     }
 
     getInstancesByConfig(configId: string): CloudAgentInstance[] {
-        return this.getInstances().filter(i => i.configId === configId)
+        return this.getInstances().filter((i) => i.configId === configId)
     }
 
     getRunningInstances(): CloudAgentInstance[] {
-        return this.getInstances().filter(i => i.status === 'running')
+        return this.getInstances().filter((i) => i.status === 'running')
     }
 
-    async submitTask(instanceId: string, payload: any, priority: number = 0, maxRetries: number = 3): Promise<CloudAgentTask> {
+    async submitTask(
+        instanceId: string,
+        payload: any,
+        priority: number = 0,
+        maxRetries: number = 3
+    ): Promise<CloudAgentTask> {
         const instance = this.instances.get(instanceId)
         if (!instance || instance.status !== 'running') {
             throw new Error(`Instance not available: ${instanceId}`)
@@ -226,7 +242,7 @@ export class CloudAgentService {
             payload,
             createdAt: new Date(),
             retryCount: 0,
-            maxRetries
+            maxRetries,
         }
 
         this.tasks.set(taskId, task)
@@ -252,7 +268,7 @@ export class CloudAgentService {
 
             try {
                 // Placeholder for actual task execution
-                await new Promise(resolve => setTimeout(resolve, 1000))
+                await new Promise((resolve) => setTimeout(resolve, 1000))
 
                 // Simulate random failure for retry demonstration
                 if (Math.random() < 0.2 && attempt <= maxRetries) {
@@ -261,29 +277,41 @@ export class CloudAgentService {
 
                 task.status = 'completed'
                 task.completedAt = new Date()
-                task.executionTime = task.completedAt.getTime() - task.startedAt.getTime()
+                task.executionTime =
+                    task.completedAt.getTime() - task.startedAt.getTime()
                 task.result = { success: true, output: 'Task completed' }
 
-                log.info(`Task ${task.id} completed in ${task.executionTime}ms (attempt ${attempt})`)
+                log.info(
+                    `Task ${task.id} completed in ${task.executionTime}ms (attempt ${attempt})`
+                )
                 return
             } catch (error) {
-                lastError = error instanceof Error ? error : new Error('Unknown error')
+                lastError =
+                    error instanceof Error ? error : new Error('Unknown error')
                 task.retryCount = attempt
                 task.error = lastError.message
 
-                log.warn(`Task ${task.id} failed on attempt ${attempt}: ${lastError.message}`)
+                log.warn(
+                    `Task ${task.id} failed on attempt ${attempt}: ${lastError.message}`
+                )
 
                 if (attempt >= maxRetries) {
                     task.status = 'failed'
                     task.completedAt = new Date()
-                    task.executionTime = task.completedAt.getTime() - task.startedAt.getTime()
-                    log.error(`Task ${task.id} failed after ${maxRetries} retries`)
+                    task.executionTime =
+                        task.completedAt.getTime() - task.startedAt.getTime()
+                    log.error(
+                        `Task ${task.id} failed after ${maxRetries} retries`
+                    )
                     return
                 }
 
                 // Exponential backoff
-                const backoffTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000)
-                await new Promise(resolve => setTimeout(resolve, backoffTime))
+                const backoffTime = Math.min(
+                    1000 * Math.pow(2, attempt - 1),
+                    10000
+                )
+                await new Promise((resolve) => setTimeout(resolve, backoffTime))
             }
         }
     }
@@ -306,11 +334,11 @@ export class CloudAgentService {
     }
 
     getTasksByInstance(instanceId: string): CloudAgentTask[] {
-        return this.getTasks().filter(t => t.instanceId === instanceId)
+        return this.getTasks().filter((t) => t.instanceId === instanceId)
     }
 
     getTasksByStatus(status: CloudAgentTask['status']): CloudAgentTask[] {
-        return this.getTasks().filter(t => t.status === status)
+        return this.getTasks().filter((t) => t.status === status)
     }
 
     getStatistics(): {
@@ -325,19 +353,24 @@ export class CloudAgentService {
         const instances = this.getInstances()
         const tasks = this.getTasks()
 
-        const completedTasks = tasks.filter(t => t.status === 'completed')
-        const averageExecutionTime = completedTasks.length > 0
-            ? completedTasks.reduce((sum, t) => sum + (t.executionTime || 0), 0) / completedTasks.length
-            : 0
+        const completedTasks = tasks.filter((t) => t.status === 'completed')
+        const averageExecutionTime =
+            completedTasks.length > 0
+                ? completedTasks.reduce(
+                      (sum, t) => sum + (t.executionTime || 0),
+                      0
+                  ) / completedTasks.length
+                : 0
 
         return {
             totalConfigs: this.configs.size,
             totalInstances: instances.length,
-            runningInstances: instances.filter(i => i.status === 'running').length,
+            runningInstances: instances.filter((i) => i.status === 'running')
+                .length,
             totalTasks: tasks.length,
             completedTasks: completedTasks.length,
-            failedTasks: tasks.filter(t => t.status === 'failed').length,
-            averageExecutionTime
+            failedTasks: tasks.filter((t) => t.status === 'failed').length,
+            averageExecutionTime,
         }
     }
 

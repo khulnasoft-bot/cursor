@@ -14,11 +14,14 @@ export interface ModelSettings {
     fallbackProvider?: AIProvider
     customEndpoints: Map<AIProvider, string>
     apiKeys: Map<AIProvider, string>
-    modelPreferences: Map<string, {
-        temperature?: number
-        maxTokens?: number
-        topP?: number
-    }>
+    modelPreferences: Map<
+        string,
+        {
+            temperature?: number
+            maxTokens?: number
+            topP?: number
+        }
+    >
 }
 
 class ModelConfigManager {
@@ -35,8 +38,8 @@ class ModelConfigManager {
                 fallbackProvider: 'anthropic',
                 customEndpoints: {},
                 apiKeys: {},
-                modelPreferences: {}
-            }
+                modelPreferences: {},
+            },
         })
 
         this.settings = this.loadSettings()
@@ -47,18 +50,27 @@ class ModelConfigManager {
             const data = this.store.store as any
             return {
                 preferredModel: (data.preferredModel as string) || 'gpt-4o',
-                preferredProvider: (data.preferredProvider as AIProvider) || 'openai',
+                preferredProvider:
+                    (data.preferredProvider as AIProvider) || 'openai',
                 fallbackEnabled: (data.fallbackEnabled as boolean) ?? true,
-                fallbackProvider: data.fallbackProvider as AIProvider | undefined,
+                fallbackProvider: data.fallbackProvider as
+                    AIProvider | undefined,
                 customEndpoints: new Map<AIProvider, string>(
-                    Object.entries(data.customEndpoints || {}).map(([k, v]) => [k as AIProvider, v as string])
+                    Object.entries(data.customEndpoints || {}).map(([k, v]) => [
+                        k as AIProvider,
+                        v as string,
+                    ])
                 ),
                 apiKeys: new Map<AIProvider, string>(
-                    Object.entries(data.apiKeys || {}).map(([k, v]) => [k as AIProvider, v as string])
+                    Object.entries(data.apiKeys || {}).map(([k, v]) => [
+                        k as AIProvider,
+                        v as string,
+                    ])
                 ),
-                modelPreferences: new Map<string, { temperature?: number; maxTokens?: number; topP?: number }>(
-                    Object.entries(data.modelPreferences || {})
-                )
+                modelPreferences: new Map<
+                    string,
+                    { temperature?: number; maxTokens?: number; topP?: number }
+                >(Object.entries(data.modelPreferences || {})),
             }
         } catch (error) {
             log.error('Failed to load model settings:', error)
@@ -74,7 +86,7 @@ class ModelConfigManager {
             fallbackProvider: 'anthropic',
             customEndpoints: new Map(),
             apiKeys: new Map(),
-            modelPreferences: new Map()
+            modelPreferences: new Map(),
         }
     }
 
@@ -85,9 +97,13 @@ class ModelConfigManager {
                 preferredProvider: this.settings.preferredProvider,
                 fallbackEnabled: this.settings.fallbackEnabled,
                 fallbackProvider: this.settings.fallbackProvider,
-                customEndpoints: Object.fromEntries(this.settings.customEndpoints),
+                customEndpoints: Object.fromEntries(
+                    this.settings.customEndpoints
+                ),
                 apiKeys: Object.fromEntries(this.settings.apiKeys),
-                modelPreferences: Object.fromEntries(this.settings.modelPreferences)
+                modelPreferences: Object.fromEntries(
+                    this.settings.modelPreferences
+                ),
             })
             log.info('Model settings saved successfully')
         } catch (error) {
@@ -180,11 +196,13 @@ class ModelConfigManager {
         log.info(`Preferences set for model: ${modelId}`)
     }
 
-    getModelPreference(modelId: string): {
-        temperature?: number
-        maxTokens?: number
-        topP?: number
-    } | undefined {
+    getModelPreference(modelId: string):
+        | {
+              temperature?: number
+              maxTokens?: number
+              topP?: number
+          }
+        | undefined {
         return this.settings.modelPreferences.get(modelId)
     }
 
@@ -205,15 +223,23 @@ class ModelConfigManager {
     }
 
     exportSettings(): string {
-        return JSON.stringify({
-            preferredModel: this.settings.preferredModel,
-            preferredProvider: this.settings.preferredProvider,
-            fallbackEnabled: this.settings.fallbackEnabled,
-            fallbackProvider: this.settings.fallbackProvider,
-            customEndpoints: Object.fromEntries(this.settings.customEndpoints),
-            modelPreferences: Object.fromEntries(this.settings.modelPreferences)
-            // Note: API keys are excluded from export for security
-        }, null, 2)
+        return JSON.stringify(
+            {
+                preferredModel: this.settings.preferredModel,
+                preferredProvider: this.settings.preferredProvider,
+                fallbackEnabled: this.settings.fallbackEnabled,
+                fallbackProvider: this.settings.fallbackProvider,
+                customEndpoints: Object.fromEntries(
+                    this.settings.customEndpoints
+                ),
+                modelPreferences: Object.fromEntries(
+                    this.settings.modelPreferences
+                ),
+                // Note: API keys are excluded from export for security
+            },
+            null,
+            2
+        )
     }
 
     importSettings(configJson: string, includeApiKeys: boolean = false): void {
@@ -233,10 +259,14 @@ class ModelConfigManager {
                 this.settings.fallbackProvider = config.fallbackProvider
             }
             if (config.customEndpoints) {
-                this.settings.customEndpoints = new Map(Object.entries(config.customEndpoints))
+                this.settings.customEndpoints = new Map(
+                    Object.entries(config.customEndpoints)
+                )
             }
             if (config.modelPreferences) {
-                this.settings.modelPreferences = new Map(Object.entries(config.modelPreferences))
+                this.settings.modelPreferences = new Map(
+                    Object.entries(config.modelPreferences)
+                )
             }
 
             // Only import API keys if explicitly requested
@@ -274,7 +304,7 @@ class ModelConfigManager {
             valid: errors.length === 0,
             hasApiKey,
             hasEndpoint,
-            errors
+            errors,
         }
     }
 
@@ -288,7 +318,7 @@ class ModelConfigManager {
             provider,
             apiKey: this.getApiKey(provider),
             endpoint: this.getCustomEndpoint(provider),
-            models: [] // Will be populated by the model registry
+            models: [], // Will be populated by the model registry
         }
     }
 }

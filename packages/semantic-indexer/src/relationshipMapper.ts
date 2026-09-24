@@ -3,11 +3,7 @@
  * Maps file relationships and dependencies in the codebase
  */
 
-import {
-    CodeChunk,
-    FileRelationship,
-    RelationshipGraph
-} from './types'
+import { CodeChunk, FileRelationship, RelationshipGraph } from './types'
 import { Logger, ConsoleLogger } from './logger'
 
 export class RelationshipMapper {
@@ -18,23 +14,33 @@ export class RelationshipMapper {
         this.logger = logger || new ConsoleLogger()
         this.graph = {
             nodes: new Map(),
-            edges: new Map()
+            edges: new Map(),
         }
     }
 
     analyzeFile(filePath: string, content: string, language?: string): void {
         // Extract relationships from the file
-        const relationships = this.extractRelationships(filePath, content, language)
+        const relationships = this.extractRelationships(
+            filePath,
+            content,
+            language
+        )
 
         // Add nodes and edges to the graph
         for (const relationship of relationships) {
             this.addRelationship(relationship)
         }
 
-        this.logger.info(`Analyzed file: ${filePath}, relationships: ${relationships.length}`)
+        this.logger.info(
+            `Analyzed file: ${filePath}, relationships: ${relationships.length}`
+        )
     }
 
-    private extractRelationships(filePath: string, content: string, language?: string): FileRelationship[] {
+    private extractRelationships(
+        filePath: string,
+        content: string,
+        language?: string
+    ): FileRelationship[] {
         const relationships: FileRelationship[] = []
 
         // Extract imports
@@ -44,7 +50,7 @@ export class RelationshipMapper {
                 sourceFile: filePath,
                 targetFile: imp,
                 relationshipType: 'import',
-                strength: 0.8
+                strength: 0.8,
             })
         }
 
@@ -55,7 +61,7 @@ export class RelationshipMapper {
                 sourceFile: filePath,
                 targetFile: exp,
                 relationshipType: 'export',
-                strength: 0.7
+                strength: 0.7,
             })
         }
 
@@ -70,7 +76,7 @@ export class RelationshipMapper {
             /import\s+.*\s+from\s+['"]([^'"]+)['"]/g,
             /import\s+['"]([^'"]+)['"]/g,
             /require\(['"]([^'"]+)['"]\)/g,
-            /#include\s*[<"]([^>"]+)[>"]/g
+            /#include\s*[<"]([^>"]+)[>"]/g,
         ]
 
         for (const pattern of patterns) {
@@ -90,14 +96,14 @@ export class RelationshipMapper {
         const patterns = [
             /export\s+(?:default\s+)?(?:class|function|const|let|var)\s+(\w+)/g,
             /export\s*\{\s*([^}]+)\s*\}/g,
-            /module\.exports\s*=\s*(\w+)/g
+            /module\.exports\s*=\s*(\w+)/g,
         ]
 
         for (const pattern of patterns) {
             let match
             while ((match = pattern.exec(content)) !== null) {
                 if (match[1]) {
-                    const names = match[1].split(',').map(s => s.trim())
+                    const names = match[1].split(',').map((s) => s.trim())
                     exports.push(...names)
                 }
             }
@@ -123,18 +129,20 @@ export class RelationshipMapper {
             sourceFile: targetFile,
             targetFile: sourceFile,
             relationshipType: 'reference',
-            strength: relationship.strength * 0.5
+            strength: relationship.strength * 0.5,
         })
     }
 
     getDependents(filePath: string): FileRelationship[] {
         const edges = this.graph.edges.get(filePath) || new Set()
-        return Array.from(edges).filter(r => r.relationshipType === 'reference')
+        return Array.from(edges).filter(
+            (r) => r.relationshipType === 'reference'
+        )
     }
 
     getDependencies(filePath: string): FileRelationship[] {
         const edges = this.graph.edges.get(filePath) || new Set()
-        return Array.from(edges).filter(r => r.relationshipType === 'import')
+        return Array.from(edges).filter((r) => r.relationshipType === 'import')
     }
 
     getRelatedFiles(filePath: string, maxDepth: number = 2): string[] {
@@ -170,7 +178,10 @@ export class RelationshipMapper {
             if (!otherChunk.embedding) continue
 
             // Calculate similarity (placeholder - would use actual cosine similarity)
-            const similarity = this.calculateSimilarity(sourceChunk.embedding, otherChunk.embedding)
+            const similarity = this.calculateSimilarity(
+                sourceChunk.embedding,
+                otherChunk.embedding
+            )
 
             if (similarity >= threshold) {
                 similar.push(otherPath)
@@ -180,7 +191,10 @@ export class RelationshipMapper {
         return similar
     }
 
-    private calculateSimilarity(embedding1: number[], embedding2: number[]): number {
+    private calculateSimilarity(
+        embedding1: number[],
+        embedding2: number[]
+    ): number {
         // Placeholder for actual similarity calculation
         // In production, this would use cosine similarity
         if (embedding1.length !== embedding2.length) return 0
@@ -211,7 +225,7 @@ export class RelationshipMapper {
     getGraph(): RelationshipGraph {
         return {
             nodes: new Map(this.graph.nodes),
-            edges: new Map(this.graph.edges)
+            edges: new Map(this.graph.edges),
         }
     }
 
@@ -228,14 +242,14 @@ export class RelationshipMapper {
         return {
             totalNodes: this.graph.nodes.size,
             totalEdges: totalEdges,
-            totalFiles: this.graph.edges.size
+            totalFiles: this.graph.edges.size,
         }
     }
 
     clearGraph(): void {
         this.graph = {
             nodes: new Map(),
-            edges: new Map()
+            edges: new Map(),
         }
         this.logger.info('Relationship graph cleared')
     }

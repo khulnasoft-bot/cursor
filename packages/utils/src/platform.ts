@@ -37,7 +37,8 @@ export function getPlatformInfo(): PlatformInfo {
     let IS_LINUX: boolean
 
     // Handle cases where process might not be available (e.g., browser)
-    const platform = typeof process !== 'undefined' ? process.platform : 'unknown'
+    const platform =
+        typeof process !== 'undefined' ? process.platform : 'unknown'
 
     if (platform === 'win32') {
         PLATFORM_DELIMITER = '\\'
@@ -121,7 +122,7 @@ export function joinPathsAdvanced(a: string, b: string): string {
 export function normalizePath(path: string): string {
     const delimiter = getPlatformInfo().PLATFORM_DELIMITER
     const wrongDelimiter = delimiter === '/' ? '\\' : '/'
-    
+
     return path.split(wrongDelimiter).join(delimiter)
 }
 

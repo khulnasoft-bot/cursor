@@ -8,7 +8,7 @@ export {
     ComposerService,
     getComposerService,
     destroyComposerService,
-    createComposerService
+    createComposerService,
 } from './composerService'
 
 // Types
@@ -19,7 +19,7 @@ export type {
     ComposerRequest,
     ComposerResult,
     ComposerExecution,
-    ComposerConfig
+    ComposerConfig,
 } from './types'
 
 // Diff generator
@@ -27,46 +27,34 @@ export {
     DiffGenerator,
     getDiffGenerator,
     destroyDiffGenerator,
-    createDiffGenerator
+    createDiffGenerator,
 } from './diffGenerator'
 
-export type {
-    DiffHunk,
-    FileDiff,
-    MultiFileDiff
-} from './diffGenerator'
+export type { DiffHunk, FileDiff, MultiFileDiff } from './diffGenerator'
 
 // Change orchestrator
 export {
     ChangeOrchestrator,
     getChangeOrchestrator,
     destroyChangeOrchestrator,
-    createChangeOrchestrator
+    createChangeOrchestrator,
 } from './changeOrchestrator'
 
-export type {
-    OrchestrationPlan,
-    OrchestrationStep
-} from './changeOrchestrator'
+export type { OrchestrationPlan, OrchestrationStep } from './changeOrchestrator'
 
 // Context analyzer
 export {
     ContextAnalyzer,
     getContextAnalyzer,
     destroyContextAnalyzer,
-    createContextAnalyzer
+    createContextAnalyzer,
 } from './contextAnalyzer'
 
 export type {
     FileContext,
     SymbolInfo,
-    RelationshipGraph
+    RelationshipGraph,
 } from './contextAnalyzer'
 
 // Logger
-export {
-    Logger,
-    LogLevel,
-    ConsoleLogger,
-    NoOpLogger
-} from './logger'
+export { Logger, LogLevel, ConsoleLogger, NoOpLogger } from './logger'

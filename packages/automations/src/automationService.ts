@@ -12,7 +12,7 @@ import {
     ExecutionStatus,
     AutomationConfig,
     AutomationStatistics,
-    ActionResult
+    ActionResult,
 } from './types'
 import { Logger, ConsoleLogger } from './logger'
 
@@ -33,7 +33,7 @@ export class AutomationService {
             executionTimeoutMs: 300000, // 5 minutes
             retryEnabled: true,
             logLevel: 'info',
-            ...config
+            ...config,
         }
         this.maxConcurrentExecutions = this.config.maxConcurrentExecutions || 5
         this.logger = logger || new ConsoleLogger()
@@ -86,7 +86,7 @@ export class AutomationService {
             updatedAt: new Date(),
             runCount: 0,
             tags,
-            metadata
+            metadata,
         }
 
         this.workflows.set(workflowId, workflow)
@@ -96,7 +96,9 @@ export class AutomationService {
 
     updateWorkflow(
         workflowId: string,
-        updates: Partial<Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>>
+        updates: Partial<
+            Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>
+        >
     ): AutomationWorkflow | null {
         const workflow = this.workflows.get(workflowId)
         if (!workflow) return null
@@ -104,7 +106,7 @@ export class AutomationService {
         const updated: AutomationWorkflow = {
             ...workflow,
             ...updates,
-            updatedAt: new Date()
+            updatedAt: new Date(),
         }
 
         this.workflows.set(workflowId, updated)
@@ -147,17 +149,19 @@ export class AutomationService {
     }
 
     getEnabledWorkflows(): AutomationWorkflow[] {
-        return this.getWorkflows().filter(w => w.enabled)
+        return this.getWorkflows().filter((w) => w.enabled)
     }
 
-    getWorkflowsByTrigger(triggerType: AutomationTrigger['type']): AutomationWorkflow[] {
-        return this.getWorkflows().filter(w =>
-            w.triggers.some(t => t.type === triggerType && t.enabled)
+    getWorkflowsByTrigger(
+        triggerType: AutomationTrigger['type']
+    ): AutomationWorkflow[] {
+        return this.getWorkflows().filter((w) =>
+            w.triggers.some((t) => t.type === triggerType && t.enabled)
         )
     }
 
     getWorkflowsByTag(tag: string): AutomationWorkflow[] {
-        return this.getWorkflows().filter(w => w.tags?.includes(tag))
+        return this.getWorkflows().filter((w) => w.tags?.includes(tag))
     }
 
     async executeWorkflow(
@@ -181,7 +185,9 @@ export class AutomationService {
         // Check concurrency limit
         const runningCount = this.getActiveExecutions().length
         if (runningCount >= this.maxConcurrentExecutions) {
-            throw new Error(`Maximum concurrent executions (${this.maxConcurrentExecutions}) reached`)
+            throw new Error(
+                `Maximum concurrent executions (${this.maxConcurrentExecutions}) reached`
+            )
         }
 
         const executionId = `exec-${++this.executionCounter}`
@@ -193,7 +199,7 @@ export class AutomationService {
             status: 'pending',
             startTime: new Date(),
             results: [],
-            context
+            context,
         }
 
         this.executions.set(executionId, execution)
@@ -201,18 +207,25 @@ export class AutomationService {
 
         try {
             execution.status = 'running'
-            this.logger.info(`Starting execution of workflow: ${workflow.name} (${executionId})`)
+            this.logger.info(
+                `Starting execution of workflow: ${workflow.name} (${executionId})`
+            )
 
             // Execute actions in sequence
             for (const action of workflow.actions) {
                 if (!action.enabled) continue
 
-                const actionResult = await this.executeActionWithRetry(action, context)
+                const actionResult = await this.executeActionWithRetry(
+                    action,
+                    context
+                )
                 execution.results.push(actionResult)
 
                 // Stop on first failure if not configured to continue
                 if (!actionResult.success && this.shouldStopOnFailure(action)) {
-                    this.logger.warn(`Stopping workflow execution due to action failure: ${action.id}`)
+                    this.logger.warn(
+                        `Stopping workflow execution due to action failure: ${action.id}`
+                    )
                     break
                 }
             }
@@ -222,12 +235,18 @@ export class AutomationService {
             workflow.lastRun = execution.endTime
             workflow.runCount++
 
-            this.logger.info(`Completed execution of workflow: ${workflow.name} (${executionId})`)
+            this.logger.info(
+                `Completed execution of workflow: ${workflow.name} (${executionId})`
+            )
         } catch (error) {
             execution.status = 'failed'
-            execution.error = error instanceof Error ? error.message : 'Unknown error'
+            execution.error =
+                error instanceof Error ? error.message : 'Unknown error'
             execution.endTime = new Date()
-            this.logger.error(`Failed execution of workflow ${workflow.name} (${executionId}):`, error)
+            this.logger.error(
+                `Failed execution of workflow ${workflow.name} (${executionId}):`,
+                error
+            )
         } finally {
             const queueIndex = this.executionQueue.indexOf(executionId)
             if (queueIndex > -1) {
@@ -247,7 +266,8 @@ export class AutomationService {
         action: AutomationAction,
         context?: Record<string, any>
     ): Promise<ActionResult> {
-        const maxRetries = action.retryPolicy?.maxRetries ?? (this.config.retryEnabled ? 3 : 0)
+        const maxRetries =
+            action.retryPolicy?.maxRetries ?? (this.config.retryEnabled ? 3 : 0)
         const backoffMs = action.retryPolicy?.backoffMs ?? 1000
 
         let lastError: Error | undefined
@@ -266,23 +286,28 @@ export class AutomationService {
                     success: true,
                     output: result,
                     duration,
-                    retryCount
+                    retryCount,
                 }
             } catch (error) {
-                lastError = error instanceof Error ? error : new Error('Unknown error')
+                lastError =
+                    error instanceof Error ? error : new Error('Unknown error')
                 const duration = Date.now() - actionStartTime
 
                 if (i < maxRetries) {
-                    this.logger.warn(`Action ${action.id} failed, retrying (${i + 1}/${maxRetries}): ${lastError.message}`)
+                    this.logger.warn(
+                        `Action ${action.id} failed, retrying (${i + 1}/${maxRetries}): ${lastError.message}`
+                    )
                     await this.sleep(backoffMs * (i + 1)) // Exponential backoff
                 } else {
-                    this.logger.error(`Action ${action.id} failed after ${maxRetries} retries: ${lastError.message}`)
+                    this.logger.error(
+                        `Action ${action.id} failed after ${maxRetries} retries: ${lastError.message}`
+                    )
                     return {
                         actionId: action.id,
                         success: false,
                         error: lastError.message,
                         duration,
-                        retryCount
+                        retryCount,
                     }
                 }
             }
@@ -293,11 +318,14 @@ export class AutomationService {
             actionId: action.id,
             success: false,
             error: lastError?.message || 'Unknown error',
-            retryCount
+            retryCount,
         }
     }
 
-    private async executeAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         switch (action.type) {
             case 'command':
                 return this.executeCommandAction(action, context)
@@ -320,17 +348,26 @@ export class AutomationService {
         }
     }
 
-    private substituteVariables(template: string, context?: Record<string, any>): string {
+    private substituteVariables(
+        template: string,
+        context?: Record<string, any>
+    ): string {
         if (!context) return template
 
         let result = template
         for (const [key, value] of Object.entries(context)) {
-            result = result.replace(new RegExp(`\\$\\{${key}\\}`, 'g'), String(value))
+            result = result.replace(
+                new RegExp(`\\$\\{${key}\\}`, 'g'),
+                String(value)
+            )
         }
         return result
     }
 
-    private async executeCommandAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeCommandAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const command = action.config.command
         if (!command) throw new Error('Command not specified')
 
@@ -342,7 +379,10 @@ export class AutomationService {
         return `Executed: ${finalCommand}`
     }
 
-    private async executeScriptAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeScriptAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const scriptPath = action.config.scriptPath
         if (!scriptPath) throw new Error('Script path not specified')
 
@@ -351,7 +391,10 @@ export class AutomationService {
         return `Executed script: ${scriptPath}`
     }
 
-    private async executeAiTaskAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeAiTaskAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const prompt = action.config.prompt
         if (!prompt) throw new Error('Prompt not specified')
 
@@ -363,7 +406,10 @@ export class AutomationService {
         return `AI task completed: ${finalPrompt}`
     }
 
-    private async executeNotificationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeNotificationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const message = action.config.message
         if (!message) throw new Error('Message not specified')
 
@@ -374,7 +420,10 @@ export class AutomationService {
         return `Notification sent: ${finalMessage}`
     }
 
-    private async executeFileOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeFileOperationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
 
@@ -383,7 +432,10 @@ export class AutomationService {
         return `File operation completed: ${operation}`
     }
 
-    private async executeGitOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeGitOperationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
 
@@ -392,7 +444,10 @@ export class AutomationService {
         return `Git operation completed: ${operation}`
     }
 
-    private async executeHttpRequestAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeHttpRequestAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const url = action.config.url
         if (!url) throw new Error('URL not specified')
 
@@ -403,7 +458,10 @@ export class AutomationService {
         return `HTTP request completed: ${finalUrl}`
     }
 
-    private async executeCustomAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeCustomAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         const handler = action.config.handler
         if (!handler) throw new Error('Handler not specified')
 
@@ -413,7 +471,7 @@ export class AutomationService {
     }
 
     private sleep(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms))
+        return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
     getExecution(executionId: string): AutomationExecution | undefined {
@@ -425,11 +483,11 @@ export class AutomationService {
     }
 
     getExecutionsByWorkflow(workflowId: string): AutomationExecution[] {
-        return this.getExecutions().filter(e => e.workflowId === workflowId)
+        return this.getExecutions().filter((e) => e.workflowId === workflowId)
     }
 
     getActiveExecutions(): AutomationExecution[] {
-        return this.getExecutions().filter(e => e.status === 'running')
+        return this.getExecutions().filter((e) => e.status === 'running')
     }
 
     cancelExecution(executionId: string): boolean {
@@ -455,8 +513,8 @@ export class AutomationService {
     }
 
     clearOldExecutions(olderThan: Date): number {
-        const oldExecutions = this.getExecutions().filter(e =>
-            e.endTime && e.endTime < olderThan
+        const oldExecutions = this.getExecutions().filter(
+            (e) => e.endTime && e.endTime < olderThan
         )
         let count = 0
         for (const execution of oldExecutions) {
@@ -475,19 +533,23 @@ export class AutomationService {
         const workflows = this.getWorkflows()
         const executions = this.getExecutions()
 
-        const successfulExecutions = executions.filter(e => e.status === 'completed')
-        const averageExecutionTimeMs = successfulExecutions.length > 0
-            ? successfulExecutions.reduce((sum, e) => {
-                const duration = e.endTime && e.startTime
-                    ? e.endTime.getTime() - e.startTime.getTime()
-                    : 0
-                return sum + duration
-            }, 0) / successfulExecutions.length
-            : undefined
+        const successfulExecutions = executions.filter(
+            (e) => e.status === 'completed'
+        )
+        const averageExecutionTimeMs =
+            successfulExecutions.length > 0
+                ? successfulExecutions.reduce((sum, e) => {
+                      const duration =
+                          e.endTime && e.startTime
+                              ? e.endTime.getTime() - e.startTime.getTime()
+                              : 0
+                      return sum + duration
+                  }, 0) / successfulExecutions.length
+                : undefined
 
         // Find most triggered workflow
         const workflowRunCounts = new Map<string, number>()
-        executions.forEach(e => {
+        executions.forEach((e) => {
             const count = workflowRunCounts.get(e.workflowId) || 0
             workflowRunCounts.set(e.workflowId, count + 1)
         })
@@ -503,13 +565,17 @@ export class AutomationService {
 
         return {
             totalWorkflows: workflows.length,
-            enabledWorkflows: workflows.filter(w => w.enabled).length,
+            enabledWorkflows: workflows.filter((w) => w.enabled).length,
             totalExecutions: executions.length,
-            successfulExecutions: executions.filter(e => e.status === 'completed').length,
-            failedExecutions: executions.filter(e => e.status === 'failed').length,
-            runningExecutions: executions.filter(e => e.status === 'running').length,
+            successfulExecutions: executions.filter(
+                (e) => e.status === 'completed'
+            ).length,
+            failedExecutions: executions.filter((e) => e.status === 'failed')
+                .length,
+            runningExecutions: executions.filter((e) => e.status === 'running')
+                .length,
             averageExecutionTimeMs,
-            mostTriggeredWorkflow
+            mostTriggeredWorkflow,
         }
     }
 
@@ -546,7 +612,10 @@ export class AutomationService {
 // Singleton instance
 let automationService: AutomationService | null = null
 
-export function getAutomationService(config?: AutomationConfig, logger?: Logger): AutomationService {
+export function getAutomationService(
+    config?: AutomationConfig,
+    logger?: Logger
+): AutomationService {
     if (!automationService) {
         automationService = new AutomationService(config, logger)
     }
@@ -560,6 +629,9 @@ export function destroyAutomationService(): void {
     }
 }
 
-export function createAutomationService(config?: AutomationConfig, logger?: Logger): AutomationService {
+export function createAutomationService(
+    config?: AutomationConfig,
+    logger?: Logger
+): AutomationService {
     return new AutomationService(config, logger)
 }

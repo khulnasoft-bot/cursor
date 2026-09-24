@@ -21,38 +21,60 @@ export class ToolRegistry {
             name: 'read_file',
             description: 'Read the contents of a file',
             parameters: {
-                filePath: { type: 'string', required: true, description: 'Path to the file to read' }
+                filePath: {
+                    type: 'string',
+                    required: true,
+                    description: 'Path to the file to read',
+                },
             },
             execute: async (params) => {
                 // Placeholder for actual file reading
                 this.logger.info(`Reading file: ${params.filePath}`)
-                return { success: true, data: { content: `File content from ${params.filePath}` } }
-            }
+                return {
+                    success: true,
+                    data: { content: `File content from ${params.filePath}` },
+                }
+            },
         })
 
         this.registerTool({
             name: 'write_file',
             description: 'Write content to a file',
             parameters: {
-                filePath: { type: 'string', required: true, description: 'Path to the file to write' },
-                content: { type: 'string', required: true, description: 'Content to write' }
+                filePath: {
+                    type: 'string',
+                    required: true,
+                    description: 'Path to the file to write',
+                },
+                content: {
+                    type: 'string',
+                    required: true,
+                    description: 'Content to write',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Writing file: ${params.filePath}`)
-                return { success: true, data: { bytesWritten: params.content.length } }
-            }
+                return {
+                    success: true,
+                    data: { bytesWritten: params.content.length },
+                }
+            },
         })
 
         this.registerTool({
             name: 'delete_file',
             description: 'Delete a file',
             parameters: {
-                filePath: { type: 'string', required: true, description: 'Path to the file to delete' }
+                filePath: {
+                    type: 'string',
+                    required: true,
+                    description: 'Path to the file to delete',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Deleting file: ${params.filePath}`)
                 return { success: true, data: { deleted: true } }
-            }
+            },
         })
 
         // Directory operations
@@ -60,24 +82,35 @@ export class ToolRegistry {
             name: 'list_directory',
             description: 'List contents of a directory',
             parameters: {
-                dirPath: { type: 'string', required: true, description: 'Path to the directory' }
+                dirPath: {
+                    type: 'string',
+                    required: true,
+                    description: 'Path to the directory',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Listing directory: ${params.dirPath}`)
-                return { success: true, data: { files: ['file1.ts', 'file2.ts'] } }
-            }
+                return {
+                    success: true,
+                    data: { files: ['file1.ts', 'file2.ts'] },
+                }
+            },
         })
 
         this.registerTool({
             name: 'create_directory',
             description: 'Create a new directory',
             parameters: {
-                dirPath: { type: 'string', required: true, description: 'Path for the new directory' }
+                dirPath: {
+                    type: 'string',
+                    required: true,
+                    description: 'Path for the new directory',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Creating directory: ${params.dirPath}`)
                 return { success: true, data: { created: true } }
-            }
+            },
         })
 
         // Search operations
@@ -85,13 +118,26 @@ export class ToolRegistry {
             name: 'search_files',
             description: 'Search for files matching a pattern',
             parameters: {
-                directory: { type: 'string', required: true, description: 'Directory to search in' },
-                pattern: { type: 'string', required: true, description: 'Search pattern' }
+                directory: {
+                    type: 'string',
+                    required: true,
+                    description: 'Directory to search in',
+                },
+                pattern: {
+                    type: 'string',
+                    required: true,
+                    description: 'Search pattern',
+                },
             },
             execute: async (params) => {
-                this.logger.info(`Searching files in ${params.directory} for ${params.pattern}`)
-                return { success: true, data: { matches: ['file1.ts', 'file2.ts'] } }
-            }
+                this.logger.info(
+                    `Searching files in ${params.directory} for ${params.pattern}`
+                )
+                return {
+                    success: true,
+                    data: { matches: ['file1.ts', 'file2.ts'] },
+                }
+            },
         })
 
         // Analysis operations
@@ -99,12 +145,19 @@ export class ToolRegistry {
             name: 'analyze',
             description: 'Analyze a goal or task',
             parameters: {
-                goal: { type: 'string', required: true, description: 'Goal to analyze' }
+                goal: {
+                    type: 'string',
+                    required: true,
+                    description: 'Goal to analyze',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Analyzing goal: ${params.goal}`)
-                return { success: true, data: { analysis: 'Goal analysis result' } }
-            }
+                return {
+                    success: true,
+                    data: { analysis: 'Goal analysis result' },
+                }
+            },
         })
 
         // AI operations
@@ -112,13 +165,21 @@ export class ToolRegistry {
             name: 'ai_task',
             description: 'Execute an AI task',
             parameters: {
-                prompt: { type: 'string', required: true, description: 'Prompt for the AI' },
-                context: { type: 'object', required: false, description: 'Additional context' }
+                prompt: {
+                    type: 'string',
+                    required: true,
+                    description: 'Prompt for the AI',
+                },
+                context: {
+                    type: 'object',
+                    required: false,
+                    description: 'Additional context',
+                },
             },
             execute: async (params) => {
                 this.logger.info(`Executing AI task: ${params.prompt}`)
                 return { success: true, data: { result: 'AI task result' } }
-            }
+            },
         })
     }
 
@@ -143,7 +204,10 @@ export class ToolRegistry {
         return Array.from(this.tools.values())
     }
 
-    async executeTool(toolName: string, params: Record<string, any>): Promise<ToolResult> {
+    async executeTool(
+        toolName: string,
+        params: Record<string, any>
+    ): Promise<ToolResult> {
         const tool = this.tools.get(toolName)
         if (!tool) {
             throw new Error(`Tool not found: ${toolName}`)
@@ -154,7 +218,7 @@ export class ToolRegistry {
         if (!validation.valid) {
             return {
                 success: false,
-                error: `Invalid parameters: ${validation.errors.join(', ')}`
+                error: `Invalid parameters: ${validation.errors.join(', ')}`,
             }
         }
 
@@ -162,7 +226,10 @@ export class ToolRegistry {
         return await tool.execute(params)
     }
 
-    private validateParams(tool: Tool, params: Record<string, any>): { valid: boolean; errors: string[] } {
+    private validateParams(
+        tool: Tool,
+        params: Record<string, any>
+    ): { valid: boolean; errors: string[] } {
         const errors: string[] = []
 
         for (const [key, schema] of Object.entries(tool.parameters)) {
@@ -176,11 +243,20 @@ export class ToolRegistry {
 
                 if (expectedType === 'string' && typeof value !== 'string') {
                     errors.push(`Parameter ${key} must be a string`)
-                } else if (expectedType === 'number' && typeof value !== 'number') {
+                } else if (
+                    expectedType === 'number' &&
+                    typeof value !== 'number'
+                ) {
                     errors.push(`Parameter ${key} must be a number`)
-                } else if (expectedType === 'boolean' && typeof value !== 'boolean') {
+                } else if (
+                    expectedType === 'boolean' &&
+                    typeof value !== 'boolean'
+                ) {
                     errors.push(`Parameter ${key} must be a boolean`)
-                } else if (expectedType === 'object' && typeof value !== 'object') {
+                } else if (
+                    expectedType === 'object' &&
+                    typeof value !== 'object'
+                ) {
                     errors.push(`Parameter ${key} must be an object`)
                 }
             }
@@ -191,9 +267,10 @@ export class ToolRegistry {
 
     searchTools(query: string): Tool[] {
         const queryLower = query.toLowerCase()
-        return this.getTools().filter(tool =>
-            tool.name.toLowerCase().includes(queryLower) ||
-            tool.description.toLowerCase().includes(queryLower)
+        return this.getTools().filter(
+            (tool) =>
+                tool.name.toLowerCase().includes(queryLower) ||
+                tool.description.toLowerCase().includes(queryLower)
         )
     }
 

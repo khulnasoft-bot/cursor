@@ -9,7 +9,13 @@ export interface AutomationTemplate {
     id: string
     name: string
     description: string
-    category: 'development' | 'testing' | 'deployment' | 'maintenance' | 'productivity' | 'custom'
+    category:
+        | 'development'
+        | 'testing'
+        | 'deployment'
+        | 'maintenance'
+        | 'productivity'
+        | 'custom'
     workflow: AutomationWorkflow
 }
 
@@ -36,22 +42,22 @@ export class AutomationTemplates {
                         id: 'trigger-file-save',
                         type: 'file_save',
                         config: { filePattern: '*.{js,ts,jsx,tsx,py,go,rs}' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-format',
                         type: 'command',
                         config: { command: 'npm run format' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         this.addTemplate({
@@ -68,22 +74,22 @@ export class AutomationTemplates {
                         id: 'trigger-file-save',
                         type: 'file_save',
                         config: { filePattern: '*.{js,ts,jsx,tsx}' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-lint',
                         type: 'command',
                         config: { command: 'npm run lint' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         // Testing templates
@@ -101,28 +107,28 @@ export class AutomationTemplates {
                         id: 'trigger-file-change',
                         type: 'file_change',
                         config: { filePattern: '*.{js,ts,jsx,tsx,py}' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-test',
                         type: 'command',
                         config: { command: 'npm test' },
-                        enabled: true
+                        enabled: true,
                     },
                     {
                         id: 'action-notify',
                         type: 'notification',
                         config: { message: 'Tests completed' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         // Deployment templates
@@ -134,40 +140,41 @@ export class AutomationTemplates {
             workflow: {
                 id: 'template-deploy-on-commit',
                 name: 'Deploy on Commit',
-                description: 'Automatically deploy when committing to main branch',
+                description:
+                    'Automatically deploy when committing to main branch',
                 triggers: [
                     {
                         id: 'trigger-git-commit',
                         type: 'git_commit',
                         config: { branch: 'main' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-build',
                         type: 'command',
                         config: { command: 'npm run build' },
-                        enabled: true
+                        enabled: true,
                     },
                     {
                         id: 'action-deploy',
                         type: 'command',
                         config: { command: 'npm run deploy' },
-                        enabled: true
+                        enabled: true,
                     },
                     {
                         id: 'action-notify',
                         type: 'notification',
                         config: { message: 'Deployment completed' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         // Maintenance templates
@@ -185,28 +192,28 @@ export class AutomationTemplates {
                         id: 'trigger-time',
                         type: 'time',
                         config: { schedule: 'every 1 day' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-backup',
                         type: 'command',
                         config: { command: 'npm run backup' },
-                        enabled: true
+                        enabled: true,
                     },
                     {
                         id: 'action-notify',
                         type: 'notification',
                         config: { message: 'Backup completed' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         this.addTemplate({
@@ -223,22 +230,22 @@ export class AutomationTemplates {
                         id: 'trigger-time',
                         type: 'time',
                         config: { schedule: 'every 7 day' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-cleanup',
                         type: 'command',
                         config: { command: 'rm -rf /tmp/*' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         // Productivity templates
@@ -256,22 +263,24 @@ export class AutomationTemplates {
                         id: 'trigger-time',
                         type: 'time',
                         config: { schedule: 'every 2 hour' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-notify',
                         type: 'notification',
-                        config: { message: 'Don\'t forget to commit your changes!' },
-                        enabled: true
-                    }
+                        config: {
+                            message: "Don't forget to commit your changes!",
+                        },
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
 
         this.addTemplate({
@@ -288,28 +297,30 @@ export class AutomationTemplates {
                         id: 'trigger-time',
                         type: 'time',
                         config: { schedule: 'every 1 day' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 actions: [
                     {
                         id: 'action-ai-summary',
                         type: 'ai_task',
-                        config: { prompt: 'Generate a summary of today\'s work based on git commits' },
-                        enabled: true
+                        config: {
+                            prompt: "Generate a summary of today's work based on git commits",
+                        },
+                        enabled: true,
                     },
                     {
                         id: 'action-notify',
                         type: 'notification',
                         config: { message: 'Daily summary generated' },
-                        enabled: true
-                    }
+                        enabled: true,
+                    },
                 ],
                 enabled: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                runCount: 0
-            }
+                runCount: 0,
+            },
         })
     }
 
@@ -325,19 +336,25 @@ export class AutomationTemplates {
         return Array.from(this.templates.values())
     }
 
-    getTemplatesByCategory(category: AutomationTemplate['category']): AutomationTemplate[] {
-        return this.getTemplates().filter(t => t.category === category)
+    getTemplatesByCategory(
+        category: AutomationTemplate['category']
+    ): AutomationTemplate[] {
+        return this.getTemplates().filter((t) => t.category === category)
     }
 
     searchTemplates(query: string): AutomationTemplate[] {
         const queryLower = query.toLowerCase()
-        return this.getTemplates().filter(template =>
-            template.name.toLowerCase().includes(queryLower) ||
-            template.description.toLowerCase().includes(queryLower)
+        return this.getTemplates().filter(
+            (template) =>
+                template.name.toLowerCase().includes(queryLower) ||
+                template.description.toLowerCase().includes(queryLower)
         )
     }
 
-    async useTemplate(templateId: string, customizations?: Partial<AutomationWorkflow>): Promise<AutomationWorkflow> {
+    async useTemplate(
+        templateId: string,
+        customizations?: Partial<AutomationWorkflow>
+    ): Promise<AutomationWorkflow> {
         const template = this.getTemplate(templateId)
         if (!template) {
             throw new Error(`Template not found: ${templateId}`)
@@ -349,7 +366,7 @@ export class AutomationTemplates {
             ...customizations,
             createdAt: new Date(),
             updatedAt: new Date(),
-            runCount: 0
+            runCount: 0,
         }
 
         return workflow
@@ -366,7 +383,7 @@ export class AutomationTemplates {
             name,
             description,
             category,
-            workflow
+            workflow,
         }
         this.addTemplate(template)
         return template
@@ -416,13 +433,16 @@ export class AutomationTemplates {
         totalTemplates: number
         templatesByCategory: Record<AutomationTemplate['category'], number>
     } {
-        const templatesByCategory: Record<AutomationTemplate['category'], number> = {
+        const templatesByCategory: Record<
+            AutomationTemplate['category'],
+            number
+        > = {
             development: 0,
             testing: 0,
             deployment: 0,
             maintenance: 0,
             productivity: 0,
-            custom: 0
+            custom: 0,
         }
 
         for (const template of this.templates.values()) {
@@ -431,7 +451,7 @@ export class AutomationTemplates {
 
         return {
             totalTemplates: this.templates.size,
-            templatesByCategory
+            templatesByCategory,
         }
     }
 
@@ -444,7 +464,7 @@ export class AutomationTemplates {
             'maint-daily-backup',
             'maint-cleanup-temp',
             'prod-git-commit-reminder',
-            'prod-daily-summary'
+            'prod-daily-summary',
         ])
 
         for (const [id] of this.templates) {

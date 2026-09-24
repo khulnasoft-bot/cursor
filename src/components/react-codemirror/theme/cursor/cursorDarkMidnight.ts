@@ -94,11 +94,7 @@ export function cursorDarkMidnightInit(options?: any) {
                 color: '#bf616a',
             },
             {
-                tag: [
-                    t.special(t.string),
-                    t.string,
-                    t.inserted,
-                ],
+                tag: [t.special(t.string), t.string, t.inserted],
                 color: '#a3be8c',
             },
             { tag: [t.angleBracket], color: '#88c0d0' },

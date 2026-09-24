@@ -16,7 +16,8 @@ export * from './useCodeMirror'
 export * from './utils'
 
 export interface ReactCodeMirrorProps
-    extends Omit<EditorStateConfig, 'doc' | 'extensions'>,
+    extends
+        Omit<EditorStateConfig, 'doc' | 'extensions'>,
         Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'placeholder'> {
     viewKey: number
     /** value of the auto created model in the editor. */
@@ -37,7 +38,14 @@ export interface ReactCodeMirrorProps
      * `light` / `dark` / `cursor-dark` / `cursor-light` / `cursor-dark-midnight` / `none` / `Extension` Defaults to `light`.
      * @default light
      */
-    theme?: 'light' | 'dark' | 'cursor-dark' | 'cursor-light' | 'cursor-dark-midnight' | 'none' | Extension
+    theme?:
+        | 'light'
+        | 'dark'
+        | 'cursor-dark'
+        | 'cursor-light'
+        | 'cursor-dark-midnight'
+        | 'none'
+        | Extension
     /**
      * Whether to optional basicSetup by default
      * @default true

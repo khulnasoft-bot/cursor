@@ -101,7 +101,12 @@ class ProductConfigManager {
         const possiblePaths = [
             path.join(process.cwd(), 'config', 'product.json'),
             path.join(__dirname, '..', '..', '..', 'config', 'product.json'),
-            path.join(process.resourcesPath || '', 'app', 'config', 'product.json')
+            path.join(
+                process.resourcesPath || '',
+                'app',
+                'config',
+                'product.json'
+            ),
         ]
 
         for (const p of possiblePaths) {
@@ -113,7 +118,10 @@ class ProductConfigManager {
 
         if (!this.configPath) {
             this.configPath = possiblePaths[0]
-            log.warn('product.json not found, using default path:', this.configPath)
+            log.warn(
+                'product.json not found, using default path:',
+                this.configPath
+            )
         }
 
         this.loadConfig()
@@ -147,64 +155,64 @@ class ProductConfigManager {
                 maxTokens: 4096,
                 rateLimits: {
                     requestsPerMinute: 60,
-                    tokensPerMinute: 90000
-                }
+                    tokensPerMinute: 90000,
+                },
             },
             analytics: {
                 statsig: {
                     enabled: false,
-                    apiKey: ''
+                    apiKey: '',
                 },
                 posthog: {
                     enabled: false,
-                    apiKey: ''
-                }
+                    apiKey: '',
+                },
             },
             extensions: {
                 replacementMap: {},
                 versionConstraints: {
                     minimumVersion: '1.0.0',
-                    maximumVersion: '2.0.0'
+                    maximumVersion: '2.0.0',
                 },
                 marketplace: {
                     enabled: false,
-                    endpoint: ''
-                }
+                    endpoint: '',
+                },
             },
             server: {
                 tunnel: {
                     enabled: false,
-                    endpoint: ''
+                    endpoint: '',
                 },
                 remote: {
                     enabled: false,
-                    sshConfigPath: '~/.ssh/config'
-                }
+                    sshConfigPath: '~/.ssh/config',
+                },
             },
             updates: {
                 autoUpdate: true,
                 updateUrl: 'https://cursor.so/updates',
-                channel: 'stable'
+                channel: 'stable',
             },
             licensing: {
                 enabled: false,
                 endpoint: '',
-                trialDays: 30
+                trialDays: 30,
             },
             features: {
                 debugger: {
                     enabled: true,
-                    supportedLanguages: ['node', 'node2', 'python']
+                    supportedLanguages: ['node', 'node2', 'python'],
                 },
                 notebook: {
                     enabled: false,
-                    supportedKernels: ['python3']
+                    supportedKernels: ['python3'],
                 },
                 webview: {
                     enabled: false,
-                    securityPolicy: 'strict'
-                }
-            }
+                    securityPolicy: 'strict',
+                },
+            },
         }
     }
 

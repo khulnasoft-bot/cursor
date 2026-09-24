@@ -7,14 +7,21 @@ import log from 'electron-log'
 
 export interface AutomationTrigger {
     id: string
-    type: 'file_save' | 'file_change' | 'git_commit' | 'time' | 'manual' | 'event'
+    type:
+        'file_save' | 'file_change' | 'git_commit' | 'time' | 'manual' | 'event'
     config: Record<string, any>
     enabled: boolean
 }
 
 export interface AutomationAction {
     id: string
-    type: 'command' | 'script' | 'ai_task' | 'notification' | 'file_operation' | 'git_operation'
+    type:
+        | 'command'
+        | 'script'
+        | 'ai_task'
+        | 'notification'
+        | 'file_operation'
+        | 'git_operation'
     config: Record<string, any>
     enabled: boolean
 }
@@ -39,7 +46,13 @@ export interface AutomationExecution {
     status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
     startTime: Date
     endTime?: Date
-    results: Array<{ actionId: string; success: boolean; output?: string; error?: string; duration?: number }>
+    results: Array<{
+        actionId: string
+        success: boolean
+        output?: string
+        error?: string
+        duration?: number
+    }>
     error?: string
     context?: Record<string, any>
 }
@@ -82,7 +95,7 @@ export class AutomationService {
             enabled: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-            runCount: 0
+            runCount: 0,
         }
 
         this.workflows.set(workflowId, workflow)
@@ -92,7 +105,9 @@ export class AutomationService {
 
     updateWorkflow(
         workflowId: string,
-        updates: Partial<Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>>
+        updates: Partial<
+            Omit<AutomationWorkflow, 'id' | 'createdAt' | 'runCount'>
+        >
     ): AutomationWorkflow | null {
         const workflow = this.workflows.get(workflowId)
         if (!workflow) return null
@@ -100,7 +115,7 @@ export class AutomationService {
         const updated = {
             ...workflow,
             ...updates,
-            updatedAt: new Date()
+            updatedAt: new Date(),
         }
 
         this.workflows.set(workflowId, updated)
@@ -143,16 +158,22 @@ export class AutomationService {
     }
 
     getEnabledWorkflows(): AutomationWorkflow[] {
-        return this.getWorkflows().filter(w => w.enabled)
+        return this.getWorkflows().filter((w) => w.enabled)
     }
 
-    getWorkflowsByTrigger(triggerType: AutomationTrigger['type']): AutomationWorkflow[] {
-        return this.getWorkflows().filter(w =>
-            w.triggers.some(t => t.type === triggerType && t.enabled)
+    getWorkflowsByTrigger(
+        triggerType: AutomationTrigger['type']
+    ): AutomationWorkflow[] {
+        return this.getWorkflows().filter((w) =>
+            w.triggers.some((t) => t.type === triggerType && t.enabled)
         )
     }
 
-    async executeWorkflow(workflowId: string, trigger: AutomationTrigger, context?: Record<string, any>): Promise<AutomationExecution> {
+    async executeWorkflow(
+        workflowId: string,
+        trigger: AutomationTrigger,
+        context?: Record<string, any>
+    ): Promise<AutomationExecution> {
         const workflow = this.workflows.get(workflowId)
         if (!workflow) {
             throw new Error(`Workflow not found: ${workflowId}`)
@@ -171,7 +192,7 @@ export class AutomationService {
             status: 'pending',
             startTime: new Date(),
             results: [],
-            context
+            context,
         }
 
         this.executions.set(executionId, execution)
@@ -192,15 +213,18 @@ export class AutomationService {
                         actionId: action.id,
                         success: true,
                         output: result,
-                        duration
+                        duration,
                     })
                 } catch (error) {
                     const duration = Date.now() - actionStartTime
                     execution.results.push({
                         actionId: action.id,
                         success: false,
-                        error: error instanceof Error ? error.message : 'Unknown error',
-                        duration
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error',
+                        duration,
                     })
                 }
             }
@@ -213,7 +237,8 @@ export class AutomationService {
             log.info(`Completed execution of workflow: ${workflow.name}`)
         } catch (error) {
             execution.status = 'failed'
-            execution.error = error instanceof Error ? error.message : 'Unknown error'
+            execution.error =
+                error instanceof Error ? error.message : 'Unknown error'
             execution.endTime = new Date()
             log.error(`Failed execution of workflow ${workflow.name}:`, error)
         }
@@ -221,7 +246,10 @@ export class AutomationService {
         return execution
     }
 
-    private async executeAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         switch (action.type) {
             case 'command':
                 return this.executeCommandAction(action, context)
@@ -240,7 +268,10 @@ export class AutomationService {
         }
     }
 
-    private async executeCommandAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeCommandAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Execute shell command
         const command = action.config.command
         if (!command) throw new Error('Command not specified')
@@ -259,13 +290,17 @@ export class AutomationService {
             // TODO: Implement actual command execution with proper error handling
             return `Executed: ${finalCommand}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Command execution failed: ${errorMsg}`)
             throw new Error(`Command execution failed: ${errorMsg}`)
         }
     }
 
-    private async executeScriptAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeScriptAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Execute script file
         const scriptPath = action.config.scriptPath
         if (!scriptPath) throw new Error('Script path not specified')
@@ -276,13 +311,17 @@ export class AutomationService {
             // TODO: Implement actual script execution with proper error handling
             return `Executed script: ${scriptPath}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Script execution failed: ${errorMsg}`)
             throw new Error(`Script execution failed: ${errorMsg}`)
         }
     }
 
-    private async executeAiTaskAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeAiTaskAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Execute AI task
         const prompt = action.config.prompt
         if (!prompt) throw new Error('Prompt not specified')
@@ -301,13 +340,17 @@ export class AutomationService {
             // TODO: Implement actual AI task execution with proper error handling
             return `AI task completed: ${finalPrompt}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`AI task execution failed: ${errorMsg}`)
             throw new Error(`AI task execution failed: ${errorMsg}`)
         }
     }
 
-    private async executeNotificationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeNotificationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Send notification
         const message = action.config.message
         if (!message) throw new Error('Message not specified')
@@ -326,13 +369,17 @@ export class AutomationService {
             // TODO: Implement actual notification sending with proper error handling
             return `Notification sent: ${finalMessage}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Notification sending failed: ${errorMsg}`)
             throw new Error(`Notification sending failed: ${errorMsg}`)
         }
     }
 
-    private async executeFileOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeFileOperationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Execute file operation
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
@@ -343,13 +390,17 @@ export class AutomationService {
             // TODO: Implement actual file operation with proper error handling
             return `File operation completed: ${operation}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`File operation failed: ${errorMsg}`)
             throw new Error(`File operation failed: ${errorMsg}`)
         }
     }
 
-    private async executeGitOperationAction(action: AutomationAction, context?: Record<string, any>): Promise<string> {
+    private async executeGitOperationAction(
+        action: AutomationAction,
+        context?: Record<string, any>
+    ): Promise<string> {
         // Execute git operation
         const operation = action.config.operation
         if (!operation) throw new Error('Operation not specified')
@@ -360,7 +411,8 @@ export class AutomationService {
             // TODO: Implement actual git operation with proper error handling
             return `Git operation completed: ${operation}`
         } catch (error) {
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+            const errorMsg =
+                error instanceof Error ? error.message : 'Unknown error'
             log.error(`Git operation failed: ${errorMsg}`)
             throw new Error(`Git operation failed: ${errorMsg}`)
         }
@@ -375,11 +427,11 @@ export class AutomationService {
     }
 
     getExecutionsByWorkflow(workflowId: string): AutomationExecution[] {
-        return this.getExecutions().filter(e => e.workflowId === workflowId)
+        return this.getExecutions().filter((e) => e.workflowId === workflowId)
     }
 
     getActiveExecutions(): AutomationExecution[] {
-        return this.getExecutions().filter(e => e.status === 'running')
+        return this.getExecutions().filter((e) => e.status === 'running')
     }
 
     cancelExecution(executionId: string): boolean {
@@ -398,8 +450,8 @@ export class AutomationService {
     }
 
     clearOldExecutions(olderThan: Date): number {
-        const oldExecutions = this.getExecutions().filter(e =>
-            e.endTime && e.endTime < olderThan
+        const oldExecutions = this.getExecutions().filter(
+            (e) => e.endTime && e.endTime < olderThan
         )
         let count = 0
         for (const execution of oldExecutions) {
@@ -423,11 +475,15 @@ export class AutomationService {
 
         return {
             totalWorkflows: workflows.length,
-            enabledWorkflows: workflows.filter(w => w.enabled).length,
+            enabledWorkflows: workflows.filter((w) => w.enabled).length,
             totalExecutions: executions.length,
-            successfulExecutions: executions.filter(e => e.status === 'completed').length,
-            failedExecutions: executions.filter(e => e.status === 'failed').length,
-            runningExecutions: executions.filter(e => e.status === 'running').length
+            successfulExecutions: executions.filter(
+                (e) => e.status === 'completed'
+            ).length,
+            failedExecutions: executions.filter((e) => e.status === 'failed')
+                .length,
+            runningExecutions: executions.filter((e) => e.status === 'running')
+                .length,
         }
     }
 

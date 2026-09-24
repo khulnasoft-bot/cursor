@@ -714,24 +714,30 @@ function CopilotPanel() {
 
 function AIModelSettingsPanel() {
     const dispatch = useAppDispatch()
-    const [provider, setProvider] = useState<'openai' | 'anthropic' | 'google' | 'custom'>('openai')
+    const [provider, setProvider] = useState<
+        'openai' | 'anthropic' | 'google' | 'custom'
+    >('openai')
     const [model, setModel] = useState('gpt-4o')
     const [apiKey, setApiKey] = useState('')
     const [customEndpoint, setCustomEndpoint] = useState('')
     const [fallbackEnabled, setFallbackEnabled] = useState(true)
-    const [fallbackProvider, setFallbackProvider] = useState<'openai' | 'anthropic' | 'google' | 'custom'>('anthropic')
+    const [fallbackProvider, setFallbackProvider] = useState<
+        'openai' | 'anthropic' | 'google' | 'custom'
+    >('anthropic')
     const [temperature, setTemperature] = useState(0.7)
     const [maxTokens, setMaxTokens] = useState(4096)
     const [showApiKey, setShowApiKey] = useState(false)
     const [availableModels, setAvailableModels] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
-    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
+    const [saveStatus, setSaveStatus] = useState<
+        'idle' | 'saving' | 'success' | 'error'
+    >('idle')
 
     const providerOptions = [
         { value: 'openai', label: 'OpenAI' },
         { value: 'anthropic', label: 'Anthropic' },
         { value: 'google', label: 'Google' },
-        { value: 'custom', label: 'Custom' }
+        { value: 'custom', label: 'Custom' },
     ]
 
     // Load available models on mount
@@ -743,7 +749,9 @@ function AIModelSettingsPanel() {
     const loadAvailableModels = async () => {
         try {
             // @ts-ignore
-            const result = await window.electron.ipcRenderer.invoke('ai-service-get-models')
+            const result = await window.electron.ipcRenderer.invoke(
+                'ai-service-get-models'
+            )
             if (result.success) {
                 setAvailableModels(result.models)
             }
@@ -755,18 +763,26 @@ function AIModelSettingsPanel() {
     const loadCurrentSettings = async () => {
         try {
             // @ts-ignore
-            const result = await window.electron.ipcRenderer.invoke('model-config-get-all-settings')
+            const result = await window.electron.ipcRenderer.invoke(
+                'model-config-get-all-settings'
+            )
             if (result.success) {
                 const settings = result.settings
-                if (settings.preferredProvider) setProvider(settings.preferredProvider)
+                if (settings.preferredProvider)
+                    setProvider(settings.preferredProvider)
                 if (settings.preferredModel) setModel(settings.preferredModel)
-                if (settings.fallbackEnabled !== undefined) setFallbackEnabled(settings.fallbackEnabled)
-                if (settings.fallbackProvider) setFallbackProvider(settings.fallbackProvider)
+                if (settings.fallbackEnabled !== undefined)
+                    setFallbackEnabled(settings.fallbackEnabled)
+                if (settings.fallbackProvider)
+                    setFallbackProvider(settings.fallbackProvider)
 
                 // Load API key for current provider
                 if (settings.preferredProvider) {
                     // @ts-ignore
-                    const keyResult = await window.electron.ipcRenderer.invoke('model-config-get-api-key', settings.preferredProvider)
+                    const keyResult = await window.electron.ipcRenderer.invoke(
+                        'model-config-get-api-key',
+                        settings.preferredProvider
+                    )
                     if (keyResult.success && keyResult.apiKey) {
                         setApiKey(keyResult.apiKey)
                     }
@@ -779,8 +795,8 @@ function AIModelSettingsPanel() {
 
     const modelOptions = useMemo(() => {
         const providerModels = availableModels
-            .filter(m => m.provider === provider)
-            .map(m => ({ value: m.id, label: m.name }))
+            .filter((m) => m.provider === provider)
+            .map((m) => ({ value: m.id, label: m.name }))
 
         if (providerModels.length > 0) {
             return providerModels
@@ -792,17 +808,15 @@ function AIModelSettingsPanel() {
                 return [
                     { value: 'gpt-4o', label: 'GPT-4o' },
                     { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-                    { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+                    { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
                 ]
             case 'anthropic':
                 return [
                     { value: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
-                    { value: 'claude-3-opus', label: 'Claude 3 Opus' }
+                    { value: 'claude-3-opus', label: 'Claude 3 Opus' },
                 ]
             case 'google':
-                return [
-                    { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' }
-                ]
+                return [{ value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' }]
             default:
                 return []
         }
@@ -819,7 +833,10 @@ function AIModelSettingsPanel() {
         // Load API key for new provider
         try {
             // @ts-ignore
-            const keyResult = await window.electron.ipcRenderer.invoke('model-config-get-api-key', value)
+            const keyResult = await window.electron.ipcRenderer.invoke(
+                'model-config-get-api-key',
+                value
+            )
             if (keyResult.success && keyResult.apiKey) {
                 setApiKey(keyResult.apiKey)
             } else {
@@ -838,33 +855,54 @@ function AIModelSettingsPanel() {
             // Save API key
             if (apiKey) {
                 // @ts-ignore
-                await window.electron.ipcRenderer.invoke('model-config-set-api-key', provider, apiKey)
+                await window.electron.ipcRenderer.invoke(
+                    'model-config-set-api-key',
+                    provider,
+                    apiKey
+                )
             }
 
             // Save custom endpoint if provided
             if (customEndpoint && provider === 'custom') {
                 // @ts-ignore
-                await window.electron.ipcRenderer.invoke('model-config-set-custom-endpoint', provider, customEndpoint)
+                await window.electron.ipcRenderer.invoke(
+                    'model-config-set-custom-endpoint',
+                    provider,
+                    customEndpoint
+                )
             }
 
             // Save model selection
             // @ts-ignore
-            await window.electron.ipcRenderer.invoke('ai-service-set-model', model)
+            await window.electron.ipcRenderer.invoke(
+                'ai-service-set-model',
+                model
+            )
 
             // Save fallback settings
             // @ts-ignore
-            await window.electron.ipcRenderer.invoke('model-config-set-fallback-enabled', fallbackEnabled)
+            await window.electron.ipcRenderer.invoke(
+                'model-config-set-fallback-enabled',
+                fallbackEnabled
+            )
             if (fallbackEnabled) {
                 // @ts-ignore
-                await window.electron.ipcRenderer.invoke('model-config-set-fallback-provider', fallbackProvider)
+                await window.electron.ipcRenderer.invoke(
+                    'model-config-set-fallback-provider',
+                    fallbackProvider
+                )
             }
 
             // Save model preferences
             // @ts-ignore
-            await window.electron.ipcRenderer.invoke('model-config-set-model-preference', model, {
-                temperature,
-                maxTokens
-            })
+            await window.electron.ipcRenderer.invoke(
+                'model-config-set-model-preference',
+                model,
+                {
+                    temperature,
+                    maxTokens,
+                }
+            )
 
             setSaveStatus('success')
             setTimeout(() => setSaveStatus('idle'), 2000)
@@ -879,9 +917,7 @@ function AIModelSettingsPanel() {
 
     return (
         <div className="settings__item">
-            <div className="settings__item_title">
-                AI Model Configuration
-            </div>
+            <div className="settings__item_title">AI Model Configuration</div>
             <div className="settings__item_description">
                 Configure AI provider and model settings
             </div>
@@ -928,7 +964,9 @@ function AIModelSettingsPanel() {
 
             {provider === 'custom' && (
                 <div className="settings__subitem">
-                    <div className="settings__subitem_title">Custom Endpoint</div>
+                    <div className="settings__subitem_title">
+                        Custom Endpoint
+                    </div>
                     <input
                         className="settings__item_textarea"
                         placeholder="https://api.example.com/v1"
@@ -940,7 +978,9 @@ function AIModelSettingsPanel() {
             )}
 
             <div className="settings__subitem">
-                <div className="settings__subitem_title">Temperature: {temperature}</div>
+                <div className="settings__subitem_title">
+                    Temperature: {temperature}
+                </div>
                 <input
                     type="range"
                     min="0"
@@ -953,7 +993,9 @@ function AIModelSettingsPanel() {
             </div>
 
             <div className="settings__subitem">
-                <div className="settings__subitem_title">Max Tokens: {maxTokens}</div>
+                <div className="settings__subitem_title">
+                    Max Tokens: {maxTokens}
+                </div>
                 <input
                     type="number"
                     min="1"
@@ -977,7 +1019,9 @@ function AIModelSettingsPanel() {
                         <span
                             aria-hidden="true"
                             className={`${
-                                fallbackEnabled ? 'translate-x-7' : 'translate-x-0'
+                                fallbackEnabled
+                                    ? 'translate-x-7'
+                                    : 'translate-x-0'
                             } pointer-events-none inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
                         />
                     </Switch>
@@ -987,9 +1031,13 @@ function AIModelSettingsPanel() {
 
             {fallbackEnabled && (
                 <div className="settings__subitem">
-                    <div className="settings__subitem_title">Fallback Provider</div>
+                    <div className="settings__subitem_title">
+                        Fallback Provider
+                    </div>
                     <Dropdown
-                        options={providerOptions.filter(p => p.value !== provider)}
+                        options={providerOptions.filter(
+                            (p) => p.value !== provider
+                        )}
                         onChange={(e) => setFallbackProvider(e.value as any)}
                         value={fallbackProvider}
                     />

@@ -16,11 +16,18 @@ export function setupExtensionServiceIpcs() {
         'extension-service-install',
         async (_event: IpcMainInvokeEvent, extensionPath: string) => {
             try {
-                const extensionId = await extensionService.installExtension(extensionPath)
+                const extensionId =
+                    await extensionService.installExtension(extensionPath)
                 return { success: true, extensionId }
             } catch (error) {
                 log.error('Failed to install extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -34,7 +41,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to uninstall extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -48,7 +61,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to enable extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -62,7 +81,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to disable extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,38 +101,44 @@ export function setupExtensionServiceIpcs() {
                 return { success: true, extension }
             } catch (error) {
                 log.error('Failed to get extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get all extensions
-    ipcMain.handle(
-        'extension-service-get-all',
-        async () => {
-            try {
-                const extensions = extensionService.getExtensions()
-                return { success: true, extensions }
-            } catch (error) {
-                log.error('Failed to get extensions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('extension-service-get-all', async () => {
+        try {
+            const extensions = extensionService.getExtensions()
+            return { success: true, extensions }
+        } catch (error) {
+            log.error('Failed to get extensions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get enabled extensions
-    ipcMain.handle(
-        'extension-service-get-enabled',
-        async () => {
-            try {
-                const extensions = extensionService.getEnabledExtensions()
-                return { success: true, extensions }
-            } catch (error) {
-                log.error('Failed to get enabled extensions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('extension-service-get-enabled', async () => {
+        try {
+            const extensions = extensionService.getEnabledExtensions()
+            return { success: true, extensions }
+        } catch (error) {
+            log.error('Failed to get enabled extensions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Load extension
     ipcMain.handle(
@@ -118,7 +149,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to load extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -132,7 +169,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to unload extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -146,7 +189,13 @@ export function setupExtensionServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to register extension manifest:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -156,56 +205,70 @@ export function setupExtensionServiceIpcs() {
         'extension-service-get-manifest',
         async (_event: IpcMainInvokeEvent, extensionId: string) => {
             try {
-                const manifest = extensionService.getExtensionManifest(extensionId)
+                const manifest =
+                    extensionService.getExtensionManifest(extensionId)
                 return { success: true, manifest }
             } catch (error) {
                 log.error('Failed to get extension manifest:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get registry extensions
-    ipcMain.handle(
-        'extension-service-get-registry',
-        async () => {
-            try {
-                const extensions = extensionService.getRegistryExtensions()
-                return { success: true, extensions }
-            } catch (error) {
-                log.error('Failed to get registry extensions:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('extension-service-get-registry', async () => {
+        try {
+            const extensions = extensionService.getRegistryExtensions()
+            return { success: true, extensions }
+        } catch (error) {
+            log.error('Failed to get registry extensions:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Validate extension
     ipcMain.handle(
         'extension-service-validate',
         async (_event: IpcMainInvokeEvent, extensionPath: string) => {
             try {
-                const isValid = await extensionService.validateExtension(extensionPath)
+                const isValid =
+                    await extensionService.validateExtension(extensionPath)
                 return { success: true, isValid }
             } catch (error) {
                 log.error('Failed to validate extension:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get extensions path
-    ipcMain.handle(
-        'extension-service-get-path',
-        async () => {
-            try {
-                const extensionsPath = extensionService.getExtensionsPath()
-                return { success: true, extensionsPath }
-            } catch (error) {
-                log.error('Failed to get extensions path:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('extension-service-get-path', async () => {
+        try {
+            const extensionsPath = extensionService.getExtensionsPath()
+            return { success: true, extensionsPath }
+        } catch (error) {
+            log.error('Failed to get extensions path:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('Extension service IPC handlers registered')
 }

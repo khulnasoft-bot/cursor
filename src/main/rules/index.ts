@@ -7,5 +7,9 @@ export { setupRulesIpcs } from './ipcHandlers'
 export type { Rule, RuleSet, ParsedRules } from './ruleParser'
 export type { RuleViolation, RuleApplicationResult } from './ruleService'
 export type { RuleTemplate } from './ruleTemplates'
-export type { TestCodeSample, ValidationResult, TestResult } from './ruleValidator'
+export type {
+    TestCodeSample,
+    ValidationResult,
+    TestResult,
+} from './ruleValidator'
 export type { SyncConfig, SyncStatus } from './ruleSync'

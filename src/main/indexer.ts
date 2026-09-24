@@ -286,9 +286,8 @@ export class CodebaseIndexer {
         const listRecursive = async (folderPath: string) => {
             let folderContents
             try {
-                folderContents = await fileSystem.readdirSyncWithIsDir(
-                    folderPath
-                )
+                folderContents =
+                    await fileSystem.readdirSyncWithIsDir(folderPath)
             } catch (e) {
                 return []
             }

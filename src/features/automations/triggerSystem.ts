@@ -17,7 +17,8 @@ export interface TriggerEvent {
 export class TriggerSystem extends EventEmitter {
     private automationService = getAutomationService()
     private active: boolean = false
-    private triggerListeners: Map<string, Set<(...args: any[]) => void>> = new Map()
+    private triggerListeners: Map<string, Set<(...args: any[]) => void>> =
+        new Map()
 
     activate(): void {
         this.active = true
@@ -63,7 +64,10 @@ export class TriggerSystem extends EventEmitter {
         log.info('Event listeners torn down')
     }
 
-    registerListener(eventType: string, callback: (...args: any[]) => void): void {
+    registerListener(
+        eventType: string,
+        callback: (...args: any[]) => void
+    ): void {
         if (!this.triggerListeners.has(eventType)) {
             this.triggerListeners.set(eventType, new Set())
         }
@@ -71,7 +75,10 @@ export class TriggerSystem extends EventEmitter {
         log.info(`Registered listener for event: ${eventType}`)
     }
 
-    unregisterListener(eventType: string, callback: (...args: any[]) => void): void {
+    unregisterListener(
+        eventType: string,
+        callback: (...args: any[]) => void
+    ): void {
         const listeners = this.triggerListeners.get(eventType)
         if (listeners) {
             listeners.delete(callback)
@@ -82,27 +89,41 @@ export class TriggerSystem extends EventEmitter {
         }
     }
 
-    async fireTrigger(eventType: string, data: Record<string, any> = {}): Promise<void> {
+    async fireTrigger(
+        eventType: string,
+        data: Record<string, any> = {}
+    ): Promise<void> {
         if (!this.active) return
 
         const event: TriggerEvent = {
             type: eventType,
             data,
-            timestamp: new Date()
+            timestamp: new Date(),
         }
 
         log.info(`Firing trigger: ${eventType}`, data)
 
         // Find workflows with matching triggers
-        const workflows = this.automationService.getWorkflowsByTrigger(eventType as any)
+        const workflows = this.automationService.getWorkflowsByTrigger(
+            eventType as any
+        )
 
         for (const workflow of workflows) {
-            const trigger = workflow.triggers.find(t => t.type === eventType && t.enabled)
+            const trigger = workflow.triggers.find(
+                (t) => t.type === eventType && t.enabled
+            )
             if (trigger && this.matchesTriggerConfig(trigger, data)) {
                 try {
-                    await this.automationService.executeWorkflow(workflow.id, trigger, data)
+                    await this.automationService.executeWorkflow(
+                        workflow.id,
+                        trigger,
+                        data
+                    )
                 } catch (error) {
-                    log.error(`Failed to execute workflow ${workflow.name} on trigger ${eventType}:`, error)
+                    log.error(
+                        `Failed to execute workflow ${workflow.name} on trigger ${eventType}:`,
+                        error
+                    )
                 }
             }
         }
@@ -111,7 +132,10 @@ export class TriggerSystem extends EventEmitter {
         this.emit(eventType, event)
     }
 
-    private matchesTriggerConfig(trigger: AutomationTrigger, data: Record<string, any>): boolean {
+    private matchesTriggerConfig(
+        trigger: AutomationTrigger,
+        data: Record<string, any>
+    ): boolean {
         // Check if trigger configuration matches the event data
         for (const [key, expectedValue] of Object.entries(trigger.config)) {
             if (data[key] !== expectedValue) {
@@ -122,23 +146,39 @@ export class TriggerSystem extends EventEmitter {
     }
 
     // Event handlers
-    private async handleFileSave(data: { filePath: string; content: string }): Promise<void> {
+    private async handleFileSave(data: {
+        filePath: string
+        content: string
+    }): Promise<void> {
         await this.fireTrigger('file-save', data)
     }
 
-    private async handleFileChange(data: { filePath: string; oldContent: string; newContent: string }): Promise<void> {
+    private async handleFileChange(data: {
+        filePath: string
+        oldContent: string
+        newContent: string
+    }): Promise<void> {
         await this.fireTrigger('file-change', data)
     }
 
-    private async handleGitCommit(data: { message: string; files: string[] }): Promise<void> {
+    private async handleGitCommit(data: {
+        message: string
+        files: string[]
+    }): Promise<void> {
         await this.fireTrigger('git-commit', data)
     }
 
-    private async handleGitPush(data: { branch: string; remote: string }): Promise<void> {
+    private async handleGitPush(data: {
+        branch: string
+        remote: string
+    }): Promise<void> {
         await this.fireTrigger('git-push', data)
     }
 
-    private async handleGitPull(data: { branch: string; remote: string }): Promise<void> {
+    private async handleGitPull(data: {
+        branch: string
+        remote: string
+    }): Promise<void> {
         await this.fireTrigger('git-pull', data)
     }
 
@@ -146,11 +186,16 @@ export class TriggerSystem extends EventEmitter {
         await this.fireTrigger('time-trigger', data)
     }
 
-    private async handleManualTrigger(data: { workflowId?: string }): Promise<void> {
+    private async handleManualTrigger(data: {
+        workflowId?: string
+    }): Promise<void> {
         await this.fireTrigger('manual-trigger', data)
     }
 
-    private async handleCustomEvent(data: { eventName: string; eventData: any }): Promise<void> {
+    private async handleCustomEvent(data: {
+        eventName: string
+        eventData: any
+    }): Promise<void> {
         await this.fireTrigger('custom-event', data)
     }
 
@@ -159,8 +204,16 @@ export class TriggerSystem extends EventEmitter {
         await this.fireTrigger('file-save', { filePath, content })
     }
 
-    async triggerFileChange(filePath: string, oldContent: string, newContent: string): Promise<void> {
-        await this.fireTrigger('file-change', { filePath, oldContent, newContent })
+    async triggerFileChange(
+        filePath: string,
+        oldContent: string,
+        newContent: string
+    ): Promise<void> {
+        await this.fireTrigger('file-change', {
+            filePath,
+            oldContent,
+            newContent,
+        })
     }
 
     async triggerGitCommit(message: string, files: string[]): Promise<void> {
@@ -186,7 +239,11 @@ export class TriggerSystem extends EventEmitter {
     // Schedule-based triggers
     private scheduledTriggers: Map<string, NodeJS.Timeout> = new Map()
 
-    scheduleTrigger(triggerId: string, schedule: string, callback: () => void): void {
+    scheduleTrigger(
+        triggerId: string,
+        schedule: string,
+        callback: () => void
+    ): void {
         // Parse schedule (cron-like format)
         // For simplicity, this is a placeholder - would need proper cron parsing
         const interval = this.parseSchedule(schedule)
@@ -194,7 +251,9 @@ export class TriggerSystem extends EventEmitter {
         if (interval) {
             const timeout = setInterval(callback, interval)
             this.scheduledTriggers.set(triggerId, timeout)
-            log.info(`Scheduled trigger ${triggerId} with interval ${interval}ms`)
+            log.info(
+                `Scheduled trigger ${triggerId} with interval ${interval}ms`
+            )
         }
     }
 

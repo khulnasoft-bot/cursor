@@ -5,7 +5,10 @@
 
 import { createAIService } from './packages/ai-service/src/index'
 import { createComposerService } from './packages/composer/src/index'
-import { createAgentExecService, createToolRegistry } from './packages/agent-exec/src/index'
+import {
+    createAgentExecService,
+    createToolRegistry,
+} from './packages/agent-exec/src/index'
 import { createSemanticIndexer } from './packages/semantic-indexer/src/index'
 import { createAutomationsService } from './packages/automations/src/index'
 import { createRuleService } from './packages/rules-service/src/index'
@@ -18,11 +21,11 @@ async function testAIService() {
     try {
         const aiService = createAIService()
         console.log('✅ AI Service created successfully')
-        
+
         // Test provider setting
         aiService.setProvider('openai', 'test-key')
         console.log('✅ Provider set successfully')
-        
+
         return true
     } catch (error) {
         console.error('❌ AI Service test failed:', error)
@@ -36,12 +39,12 @@ async function testComposerService() {
     try {
         const composer = createComposerService()
         console.log('✅ Composer Service created successfully')
-        
+
         // Test AI service integration
         const aiService = createAIService()
         composer.setAIService(aiService)
         console.log('✅ AI Service integrated with Composer')
-        
+
         return true
     } catch (error) {
         console.error('❌ Composer Service test failed:', error)
@@ -55,16 +58,16 @@ async function testAgentExecService() {
     try {
         const agentExec = createAgentExecService()
         console.log('✅ Agent Exec Service created successfully')
-        
+
         // Test tool registry integration
         const toolRegistry = createToolRegistry()
         agentExec.setToolRegistry(toolRegistry)
         console.log('✅ Tool Registry integrated with Agent Exec')
-        
+
         // Test tool availability
         const tools = agentExec.getAvailableTools()
         console.log(`✅ Available tools: ${tools.length}`)
-        
+
         return true
     } catch (error) {
         console.error('❌ Agent Exec Service test failed:', error)
@@ -78,15 +81,22 @@ async function testSemanticIndexer() {
     try {
         const indexer = createSemanticIndexer()
         console.log('✅ Semantic Indexer created successfully')
-        
+
         // Test file indexing
-        await indexer.indexFile('./test.ts', 'function test() { return true; }', 'typescript')
+        await indexer.indexFile(
+            './test.ts',
+            'function test() { return true; }',
+            'typescript'
+        )
         console.log('✅ File indexed successfully')
-        
+
         // Test search
-        const results = await indexer.search({ query: 'test function', limit: 5 })
+        const results = await indexer.search({
+            query: 'test function',
+            limit: 5,
+        })
         console.log(`✅ Search returned ${results.length} results`)
-        
+
         return true
     } catch (error) {
         console.error('❌ Semantic Indexer test failed:', error)
@@ -100,11 +110,16 @@ async function testAutomationsService() {
     try {
         const automationService = createAutomationsService()
         console.log('✅ Automations Service created successfully')
-        
+
         // Test workflow creation
-        const workflow = automationService.createWorkflow('Test Workflow', 'Description', [], [])
+        const workflow = automationService.createWorkflow(
+            'Test Workflow',
+            'Description',
+            [],
+            []
+        )
         console.log('✅ Workflow created successfully')
-        
+
         return true
     } catch (error) {
         console.error('❌ Automations Service test failed:', error)
@@ -118,11 +133,11 @@ async function testRuleService() {
     try {
         const ruleService = createRuleService()
         console.log('✅ Rules Service created successfully')
-        
+
         // Test rule loading
         await ruleService.loadRules('./')
         console.log('✅ Rules loaded successfully')
-        
+
         return true
     } catch (error) {
         console.error('❌ Rules Service test failed:', error)
@@ -142,13 +157,13 @@ async function testPackageIntegration() {
         const indexer = createSemanticIndexer()
         const automationService = createAutomationsService()
         const ruleService = createRuleService()
-        
+
         // Wire up integrations
         composer.setAIService(aiService)
         agentExec.setToolRegistry(toolRegistry)
-        
+
         console.log('✅ All services created and integrated')
-        
+
         return true
     } catch (error) {
         console.error('❌ Package integration test failed:', error)
@@ -159,7 +174,7 @@ async function testPackageIntegration() {
 // Run all tests
 async function runAllTests() {
     const results = []
-    
+
     results.push(await testAIService())
     results.push(await testComposerService())
     results.push(await testAgentExecService())
@@ -167,17 +182,17 @@ async function runAllTests() {
     results.push(await testAutomationsService())
     results.push(await testRuleService())
     results.push(await testPackageIntegration())
-    
-    const passed = results.filter(r => r).length
+
+    const passed = results.filter((r) => r).length
     const total = results.length
-    
+
     console.log('\n==========================================')
     console.log('Integration Test Summary')
     console.log('==========================================')
     console.log(`Total tests: ${total}`)
     console.log(`Passed: ${passed}`)
     console.log(`Failed: ${total - passed}`)
-    
+
     if (passed === total) {
         console.log('\n✅ All integration tests passed!')
     } else {

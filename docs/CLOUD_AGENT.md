@@ -64,11 +64,11 @@ const config = cloudAgentService.createConfig({
         cpu: 4,
         memory: 16384,
         storage: 100,
-        gpu: 1
+        gpu: 1,
     },
     maxConcurrentAgents: 10,
     autoScaling: true,
-    securityEnabled: true
+    securityEnabled: true,
 })
 ```
 
@@ -90,8 +90,8 @@ const task = cloudAgentService.createTask({
     priority: 'high',
     config: {
         model: 'gpt-4',
-        prompt: 'Hello, world!'
-    }
+        prompt: 'Hello, world!',
+    },
 })
 
 const result = await cloudAgentService.executeTask(task.id)
@@ -129,13 +129,13 @@ const environment = executionEnvironment.createEnvironment({
     resources: {
         cpu: 2,
         memory: 4096,
-        storage: 50
+        storage: 50,
     },
     environmentVariables: {
-        PYTHONPATH: '/app'
+        PYTHONPATH: '/app',
     },
     dependencies: ['numpy', 'pandas'],
-    startupCommand: 'python main.py'
+    startupCommand: 'python main.py',
 })
 ```
 
@@ -152,7 +152,7 @@ const quota = resourceManager.createQuota({
     maxCpu: 100,
     maxMemory: 512000,
     maxStorage: 5000,
-    maxInstances: 50
+    maxInstances: 50,
 })
 
 // Create resource pool
@@ -164,16 +164,16 @@ const pool = resourceManager.createPool({
     availableResources: {
         cpu: 100,
         memory: 512000,
-        storage: 5000
-    }
+        storage: 5000,
+    },
 })
 
 // Allocate resources
-const allocation = resourceManager.allocateResources(
-    instance.id,
-    pool.id,
-    { cpu: 4, memory: 16384, storage: 100 }
-)
+const allocation = resourceManager.allocateResources(instance.id, pool.id, {
+    cpu: 4,
+    memory: 16384,
+    storage: 100,
+})
 ```
 
 ### Auto-Scaling
@@ -193,7 +193,7 @@ const policy = scalingManager.createScalingPolicy({
     targetMemoryUtilization: 80,
     scaleUpCooldown: 300,
     scaleDownCooldown: 600,
-    enabled: true
+    enabled: true,
 })
 
 // Create load balancer
@@ -203,7 +203,7 @@ const loadBalancer = scalingManager.createLoadBalancer({
     healthCheckInterval: 30,
     unhealthyThreshold: 3,
     healthyThreshold: 2,
-    enabled: true
+    enabled: true,
 })
 
 // Select instance for task
@@ -227,8 +227,8 @@ const monitorConfig = cloudMonitor.createMonitorConfig({
         cpuUtilization: 90,
         memoryUtilization: 90,
         errorRate: 5,
-        responseTime: 5000
-    }
+        responseTime: 5000,
+    },
 })
 
 // Get metrics
@@ -373,6 +373,7 @@ const health = cloudMonitor.getInstanceHealth(instance.id)
 The Cloud Agent Platform provides IPC handlers for communication between the main and renderer processes:
 
 ### Cloud Agent Service
+
 - `cloud-agent-activate`: Activate cloud agent service
 - `cloud-agent-deactivate`: Deactivate cloud agent service
 - `cloud-agent-create-config`: Create a configuration
@@ -382,12 +383,14 @@ The Cloud Agent Platform provides IPC handlers for communication between the mai
 - `cloud-agent-get-instances`: Get all instances
 
 ### Cloud Security
+
 - `cloud-security-activate`: Activate cloud security
 - `cloud-security-create-api-key`: Create an API key
 - `cloud-security-validate-api-key`: Validate an API key
 - `cloud-security-get-api-keys`: Get all API keys
 
 ### Execution Environment
+
 - `execution-environment-activate`: Activate execution environment
 - `execution-environment-create`: Create an environment
 - `execution-environment-get-environments`: Get all environments
@@ -395,6 +398,7 @@ The Cloud Agent Platform provides IPC handlers for communication between the mai
 - `execution-environment-start`: Start an environment
 
 ### Resource Manager
+
 - `resource-manager-activate`: Activate resource manager
 - `resource-manager-create-quota`: Create a quota
 - `resource-manager-get-quotas`: Get all quotas
@@ -402,12 +406,14 @@ The Cloud Agent Platform provides IPC handlers for communication between the mai
 - `resource-manager-get-usage`: Get resource usage
 
 ### Scaling Manager
+
 - `scaling-manager-activate`: Activate scaling manager
 - `scaling-manager-create-policy`: Create a scaling policy
 - `scaling-manager-get-policies`: Get all scaling policies
 - `scaling-manager-create-load-balancer`: Create a load balancer
 
 ### Cloud Monitor
+
 - `cloud-monitor-activate`: Activate cloud monitor
 - `cloud-monitor-create-config`: Create a monitor configuration
 - `cloud-monitor-get-metrics`: Get metrics
@@ -433,7 +439,7 @@ const config = cloudAgentService.createConfig({
     resources: { cpu: 2, memory: 4096, storage: 50 },
     maxConcurrentAgents: 5,
     autoScaling: false,
-    securityEnabled: true
+    securityEnabled: true,
 })
 
 // Provision instance
@@ -452,7 +458,7 @@ const config = cloudAgentService.createConfig({
     resources: { cpu: 4, memory: 16384, storage: 100 },
     maxConcurrentAgents: 20,
     autoScaling: true,
-    securityEnabled: true
+    securityEnabled: true,
 })
 
 // Create scaling policy
@@ -465,7 +471,7 @@ const policy = scalingManager.createScalingPolicy({
     targetMemoryUtilization: 80,
     scaleUpCooldown: 300,
     scaleDownCooldown: 600,
-    enabled: true
+    enabled: true,
 })
 
 // Activate scaling manager
@@ -484,15 +490,15 @@ const environment = executionEnvironment.createEnvironment({
     resources: { cpu: 4, memory: 8192, storage: 200 },
     environmentVariables: {
         PYTHONPATH: '/app',
-        MLFLOW_TRACKING_URI: 'http://localhost:5000'
+        MLFLOW_TRACKING_URI: 'http://localhost:5000',
     },
     dependencies: ['numpy', 'pandas', 'scikit-learn', 'torch'],
     startupCommand: 'python app.py',
     healthCheck: {
         path: '/health',
         interval: 30,
-        timeout: 10
-    }
+        timeout: 10,
+    },
 })
 
 // Execute task in environment
@@ -500,7 +506,7 @@ const task = cloudAgentService.createTask({
     instanceId: instance.id,
     type: 'training',
     priority: 'high',
-    config: { model: 'my-model' }
+    config: { model: 'my-model' },
 })
 
 await executionEnvironment.executeTask(environment.id, task)
@@ -515,7 +521,7 @@ const quota = resourceManager.createQuota({
     maxCpu: 50,
     maxMemory: 256000,
     maxStorage: 2000,
-    maxInstances: 25
+    maxInstances: 25,
 })
 
 // Create pool
@@ -524,15 +530,15 @@ const pool = resourceManager.createPool({
     type: 'shared',
     provider: 'aws',
     region: 'us-east-1',
-    availableResources: { cpu: 50, memory: 256000, storage: 2000 }
+    availableResources: { cpu: 50, memory: 256000, storage: 2000 },
 })
 
 // Allocate resources for instance
-const allocation = resourceManager.allocateResources(
-    instance.id,
-    pool.id,
-    { cpu: 4, memory: 16384, storage: 100 }
-)
+const allocation = resourceManager.allocateResources(instance.id, pool.id, {
+    cpu: 4,
+    memory: 16384,
+    storage: 100,
+})
 
 // Check resource usage
 const usage = resourceManager.getResourceUsage()
@@ -553,8 +559,8 @@ const monitorConfig = cloudMonitor.createMonitorConfig({
         cpuUtilization: 90,
         memoryUtilization: 90,
         errorRate: 5,
-        responseTime: 5000
-    }
+        responseTime: 5000,
+    },
 })
 
 // Activate monitoring
@@ -568,7 +574,7 @@ if (!health.healthy) {
 
 // Get recent alerts
 const recentAlerts = cloudMonitor.getRecentAlerts(60)
-const criticalAlerts = recentAlerts.filter(a => a.severity === 'critical')
+const criticalAlerts = recentAlerts.filter((a) => a.severity === 'critical')
 ```
 
 ## Best Practices

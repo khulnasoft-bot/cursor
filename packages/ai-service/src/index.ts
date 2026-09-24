@@ -4,11 +4,7 @@
  */
 
 // Main AI service
-export {
-    getAIService,
-    destroyAIService,
-    createAIService
-} from './ai-service'
+export { getAIService, destroyAIService, createAIService } from './ai-service'
 
 // Types
 export type {
@@ -19,7 +15,7 @@ export type {
     AIProvider,
     Tool,
     ModelConfig,
-    ModelCapabilities
+    ModelCapabilities,
 } from './ai-service'
 
 // HTTP client
@@ -28,11 +24,8 @@ export {
     FetchHttpClient,
     MockHttpClient,
     HttpError,
-    createHttpError
+    createHttpError,
 } from './http-client'
 
 // Provider registry
-export {
-    ProviderRegistry,
-    AIProviderImplementation
-} from './provider-registry'
+export { ProviderRegistry, AIProviderImplementation } from './provider-registry'

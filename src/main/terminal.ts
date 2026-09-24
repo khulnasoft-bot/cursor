@@ -29,20 +29,26 @@ class TerminalService {
         cols: 80,
         rows: 24,
         shellIntegration: true,
-        theme: 'default'
+        theme: 'default',
     }
 
     createSession(rootPath?: string, config?: Partial<TerminalConfig>): string {
         const sessionId = `terminal-${++this.sessionIdCounter}`
         const terminalConfig = { ...this.defaultConfig, ...config }
 
-        const shells = os.platform() === 'win32' ? ['powershell.exe'] : ['zsh', 'bash']
-        const filteredEnv: { [key: string]: string } = Object.entries(process.env).reduce((acc, [key, value]) => {
-            if (typeof value === 'string') {
-                acc[key] = value
-            }
-            return acc
-        }, {} as { [key: string]: string })
+        const shells =
+            os.platform() === 'win32' ? ['powershell.exe'] : ['zsh', 'bash']
+        const filteredEnv: { [key: string]: string } = Object.entries(
+            process.env
+        ).reduce(
+            (acc, [key, value]) => {
+                if (typeof value === 'string') {
+                    acc[key] = value
+                }
+                return acc
+            },
+            {} as { [key: string]: string }
+        )
 
         let ptyProcess: any = null
         let selectedShell = ''
@@ -68,7 +74,9 @@ class TerminalService {
         }
 
         if (ptyProcess == null) {
-            throw new Error('Failed to create terminal session - no suitable shell found')
+            throw new Error(
+                'Failed to create terminal session - no suitable shell found'
+            )
         }
 
         const session: TerminalSession = {
@@ -78,13 +86,15 @@ class TerminalService {
             shell: selectedShell,
             commandHistory: [],
             currentDirectory: rootPath || process.env.HOME,
-            theme: terminalConfig.theme
+            theme: terminalConfig.theme,
         }
 
         this.sessions.set(sessionId, session)
         this.setupSessionHandlers(sessionId)
 
-        log.info(`Created terminal session: ${sessionId} with shell: ${selectedShell}`)
+        log.info(
+            `Created terminal session: ${sessionId} with shell: ${selectedShell}`
+        )
         return sessionId
     }
 
@@ -111,7 +121,10 @@ class TerminalService {
             if (path.isAbsolute(newPath)) {
                 session.currentDirectory = newPath
             } else {
-                session.currentDirectory = path.join(session.currentDirectory, newPath)
+                session.currentDirectory = path.join(
+                    session.currentDirectory,
+                    newPath
+                )
             }
         }
     }
@@ -158,7 +171,7 @@ class TerminalService {
             throw new Error(`Terminal session not found: ${sessionId}`)
         }
 
-        return session.commandHistory.filter(cmd =>
+        return session.commandHistory.filter((cmd) =>
             cmd.toLowerCase().includes(query.toLowerCase())
         )
     }
@@ -257,15 +270,27 @@ export function setupTerminal(mainWindow: any, rootPath?: string) {
         })
 
         // New enhanced features
-        ipcMain.handle('terminal-create-session', (event, rootPath?: string, config?: any) => {
-            try {
-                const newSessionId = terminalService.createSession(rootPath, config)
-                return { success: true, sessionId: newSessionId }
-            } catch (error) {
-                log.error('Failed to create terminal session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+        ipcMain.handle(
+            'terminal-create-session',
+            (event, rootPath?: string, config?: any) => {
+                try {
+                    const newSessionId = terminalService.createSession(
+                        rootPath,
+                        config
+                    )
+                    return { success: true, sessionId: newSessionId }
+                } catch (error) {
+                    log.error('Failed to create terminal session:', error)
+                    return {
+                        success: false,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error',
+                    }
+                }
             }
-        })
+        )
 
         ipcMain.handle('terminal-close-session', (event, sessionId: string) => {
             try {
@@ -273,7 +298,13 @@ export function setupTerminal(mainWindow: any, rootPath?: string) {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to close terminal session:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         })
 
@@ -283,19 +314,37 @@ export function setupTerminal(mainWindow: any, rootPath?: string) {
                 return { success: true, history }
             } catch (error) {
                 log.error('Failed to get command history:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         })
 
-        ipcMain.handle('terminal-search-history', (event, sessionId: string, query: string) => {
-            try {
-                const results = terminalService.searchCommandHistory(sessionId, query)
-                return { success: true, results }
-            } catch (error) {
-                log.error('Failed to search command history:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+        ipcMain.handle(
+            'terminal-search-history',
+            (event, sessionId: string, query: string) => {
+                try {
+                    const results = terminalService.searchCommandHistory(
+                        sessionId,
+                        query
+                    )
+                    return { success: true, results }
+                } catch (error) {
+                    log.error('Failed to search command history:', error)
+                    return {
+                        success: false,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error',
+                    }
+                }
             }
-        })
+        )
 
         ipcMain.handle('terminal-get-directory', (event, sessionId: string) => {
             try {
@@ -303,19 +352,34 @@ export function setupTerminal(mainWindow: any, rootPath?: string) {
                 return { success: true, directory }
             } catch (error) {
                 log.error('Failed to get current directory:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         })
 
-        ipcMain.handle('terminal-set-theme', (event, sessionId: string, theme: string) => {
-            try {
-                terminalService.setTheme(sessionId, theme)
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to set terminal theme:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+        ipcMain.handle(
+            'terminal-set-theme',
+            (event, sessionId: string, theme: string) => {
+                try {
+                    terminalService.setTheme(sessionId, theme)
+                    return { success: true }
+                } catch (error) {
+                    log.error('Failed to set terminal theme:', error)
+                    return {
+                        success: false,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error',
+                    }
+                }
             }
-        })
+        )
 
         ipcMain.handle('terminal-get-theme', (event, sessionId: string) => {
             try {
@@ -323,7 +387,13 @@ export function setupTerminal(mainWindow: any, rootPath?: string) {
                 return { success: true, theme }
             } catch (error) {
                 log.error('Failed to get terminal theme:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         })
 

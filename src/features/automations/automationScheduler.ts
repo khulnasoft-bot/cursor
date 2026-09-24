@@ -68,7 +68,7 @@ export class AutomationScheduler {
             workflowId,
             schedule,
             nextRun,
-            enabled: true
+            enabled: true,
         }
 
         this.scheduledTasks.set(_taskId, task)
@@ -165,7 +165,9 @@ export class AutomationScheduler {
                     task.lastRun = now
                     task.nextRun = this.calculateNextRun(task.schedule)
 
-                    log.info(`Task ${task.id} completed, next run: ${task.nextRun}`)
+                    log.info(
+                        `Task ${task.id} completed, next run: ${task.nextRun}`
+                    )
                 } catch (error) {
                     log.error(`Failed to run scheduled task ${task.id}:`, error)
                 }
@@ -176,12 +178,16 @@ export class AutomationScheduler {
     private async runScheduledTask(task: ScheduledTask): Promise<void> {
         const workflow = this.automationService.getWorkflow(task.workflowId)
         if (!workflow) {
-            log.error(`Workflow not found for task ${task.id}: ${task.workflowId}`)
+            log.error(
+                `Workflow not found for task ${task.id}: ${task.workflowId}`
+            )
             return
         }
 
         if (!workflow.enabled) {
-            log.info(`Workflow ${workflow.name} is disabled, skipping scheduled execution`)
+            log.info(
+                `Workflow ${workflow.name} is disabled, skipping scheduled execution`
+            )
             return
         }
 
@@ -190,7 +196,7 @@ export class AutomationScheduler {
             id: `trigger-${Date.now()}`,
             type: 'time' as const,
             config: { schedule: task.schedule },
-            enabled: true
+            enabled: true,
         }
 
         await this.automationService.executeWorkflow(workflow.id, trigger)
@@ -201,7 +207,9 @@ export class AutomationScheduler {
     }
 
     getScheduledTasksForWorkflow(workflowId: string): ScheduledTask[] {
-        return this.getScheduledTasks().filter(t => t.workflowId === workflowId)
+        return this.getScheduledTasks().filter(
+            (t) => t.workflowId === workflowId
+        )
     }
 
     getTask(taskId: string): ScheduledTask | undefined {
@@ -231,9 +239,11 @@ export class AutomationScheduler {
 
         return {
             totalTasks: tasks.length,
-            enabledTasks: tasks.filter(t => t.enabled).length,
-            disabledTasks: tasks.filter(t => !t.enabled).length,
-            tasksDueSoon: tasks.filter(t => t.enabled && t.nextRun <= oneHourFromNow).length
+            enabledTasks: tasks.filter((t) => t.enabled).length,
+            disabledTasks: tasks.filter((t) => !t.enabled).length,
+            tasksDueSoon: tasks.filter(
+                (t) => t.enabled && t.nextRun <= oneHourFromNow
+            ).length,
         }
     }
 

@@ -20,7 +20,13 @@ export function setupExplorerServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to set workspace:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -28,13 +34,26 @@ export function setupExplorerServiceIpcs() {
     // Get directory tree
     ipcMain.handle(
         'explorer-service-get-tree',
-        async (_event: IpcMainInvokeEvent, dirPath: string, options: ExplorerOptions = {}) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            dirPath: string,
+            options: ExplorerOptions = {}
+        ) => {
             try {
-                const tree = await explorerService.getDirectoryTree(dirPath, options)
+                const tree = await explorerService.getDirectoryTree(
+                    dirPath,
+                    options
+                )
                 return { success: true, tree }
             } catch (error) {
                 log.error('Failed to get directory tree:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -44,11 +63,20 @@ export function setupExplorerServiceIpcs() {
         'explorer-service-search',
         async (_event: IpcMainInvokeEvent, query: string, rootNode: any) => {
             try {
-                const results = await explorerService.searchNodes(query, rootNode)
+                const results = await explorerService.searchNodes(
+                    query,
+                    rootNode
+                )
                 return { success: true, results }
             } catch (error) {
                 log.error('Failed to search nodes:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -56,44 +84,57 @@ export function setupExplorerServiceIpcs() {
     // Get node by path
     ipcMain.handle(
         'explorer-service-get-node',
-        async (_event: IpcMainInvokeEvent, targetPath: string, rootNode: any) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            targetPath: string,
+            rootNode: any
+        ) => {
             try {
-                const node = await explorerService.getNodeByPath(targetPath, rootNode)
+                const node = await explorerService.getNodeByPath(
+                    targetPath,
+                    rootNode
+                )
                 return { success: true, node }
             } catch (error) {
                 log.error('Failed to get node:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get workspace root
-    ipcMain.handle(
-        'explorer-service-get-workspace',
-        async () => {
-            try {
-                const root = explorerService.getWorkspaceRoot()
-                return { success: true, root }
-            } catch (error) {
-                log.error('Failed to get workspace root:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('explorer-service-get-workspace', async () => {
+        try {
+            const root = explorerService.getWorkspaceRoot()
+            return { success: true, root }
+        } catch (error) {
+            log.error('Failed to get workspace root:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Clear cache
-    ipcMain.handle(
-        'explorer-service-clear-cache',
-        async () => {
-            try {
-                explorerService.clearCache()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to clear cache:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('explorer-service-clear-cache', async () => {
+        try {
+            explorerService.clearCache()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to clear cache:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('Explorer service IPC handlers registered')
 }

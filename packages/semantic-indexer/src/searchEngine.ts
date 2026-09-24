@@ -3,11 +3,7 @@
  * High-performance semantic search with hybrid capabilities
  */
 
-import {
-    CodeChunk,
-    SearchQuery,
-    SearchResult
-} from './types'
+import { CodeChunk, SearchQuery, SearchResult } from './types'
 import { EmbeddingGenerator } from './embeddingGenerator'
 import { Logger, ConsoleLogger } from './logger'
 
@@ -24,14 +20,18 @@ export class SearchEngine {
     private options: SearchOptions
     private logger: Logger
 
-    constructor(embeddingGenerator: EmbeddingGenerator, options: SearchOptions = {}, logger?: Logger) {
+    constructor(
+        embeddingGenerator: EmbeddingGenerator,
+        options: SearchOptions = {},
+        logger?: Logger
+    ) {
         this.embeddingGenerator = embeddingGenerator
         this.options = {
             enableHybridSearch: true,
             enableCache: true,
             maxResults: 10,
             minSimilarity: 0.7,
-            ...options
+            ...options,
         }
         this.queryCache = new Map()
         this.logger = logger || new ConsoleLogger()
@@ -41,11 +41,21 @@ export class SearchEngine {
         chunks: Map<string, CodeChunk>,
         query: SearchQuery
     ): Promise<SearchResult[]> {
-        const { query: searchQuery, limit = 10, threshold = 0.7, filePaths, languages } = query
+        const {
+            query: searchQuery,
+            limit = 10,
+            threshold = 0.7,
+            filePaths,
+            languages,
+        } = query
 
         // Check cache
         if (this.options.enableCache) {
-            const cacheKey = this.generateCacheKey(searchQuery, filePaths, languages)
+            const cacheKey = this.generateCacheKey(
+                searchQuery,
+                filePaths,
+                languages
+            )
             if (this.queryCache.has(cacheKey)) {
                 this.logger.debug('Returning cached search results')
                 return this.queryCache.get(cacheKey)!.slice(0, limit)
@@ -53,19 +63,29 @@ export class SearchEngine {
         }
 
         // Generate embedding for the search query
-        const queryEmbedding = await this.embeddingGenerator.generateEmbedding(searchQuery)
+        const queryEmbedding =
+            await this.embeddingGenerator.generateEmbedding(searchQuery)
 
         // Calculate similarity scores for all chunks
         const results: SearchResult[] = []
 
         for (const [id, chunk] of chunks) {
             // Filter by file paths if specified
-            if (filePaths && filePaths.length > 0 && !filePaths.includes(chunk.filePath)) {
+            if (
+                filePaths &&
+                filePaths.length > 0 &&
+                !filePaths.includes(chunk.filePath)
+            ) {
                 continue
             }
 
             // Filter by languages if specified
-            if (languages && languages.length > 0 && chunk.language && !languages.includes(chunk.language)) {
+            if (
+                languages &&
+                languages.length > 0 &&
+                chunk.language &&
+                !languages.includes(chunk.language)
+            ) {
                 continue
             }
 
@@ -74,14 +94,17 @@ export class SearchEngine {
                 continue
             }
 
-            const similarity = this.embeddingGenerator.cosineSimilarity(queryEmbedding, chunk.embedding)
+            const similarity = this.embeddingGenerator.cosineSimilarity(
+                queryEmbedding,
+                chunk.embedding
+            )
 
             if (similarity >= threshold) {
                 results.push({
                     chunk,
                     similarity,
                     filePath: chunk.filePath,
-                    lineRange: { start: chunk.startLine, end: chunk.endLine }
+                    lineRange: { start: chunk.startLine, end: chunk.endLine },
                 })
             }
         }
@@ -92,7 +115,11 @@ export class SearchEngine {
 
         // Cache results
         if (this.options.enableCache) {
-            const cacheKey = this.generateCacheKey(searchQuery, filePaths, languages)
+            const cacheKey = this.generateCacheKey(
+                searchQuery,
+                filePaths,
+                languages
+            )
             this.queryCache.set(cacheKey, finalResults)
         }
 
@@ -119,7 +146,7 @@ export class SearchEngine {
             const key = `${result.filePath}:${result.lineRange.start}`
             combined.set(key, {
                 ...result,
-                similarity: result.similarity * 0.7
+                similarity: result.similarity * 0.7,
             })
         }
 
@@ -130,12 +157,12 @@ export class SearchEngine {
             if (existing) {
                 combined.set(key, {
                     ...existing,
-                    similarity: existing.similarity + (result.similarity * 0.3)
+                    similarity: existing.similarity + result.similarity * 0.3,
                 })
             } else {
                 combined.set(key, {
                     ...result,
-                    similarity: result.similarity * 0.3
+                    similarity: result.similarity * 0.3,
                 })
             }
         }
@@ -165,9 +192,9 @@ export class SearchEngine {
             if (distance <= radius) {
                 results.push({
                     chunk,
-                    similarity: 1 - (distance / radius), // Higher similarity for closer chunks
+                    similarity: 1 - distance / radius, // Higher similarity for closer chunks
                     filePath: chunk.filePath,
-                    lineRange: { start: chunk.startLine, end: chunk.endLine }
+                    lineRange: { start: chunk.startLine, end: chunk.endLine },
                 })
             }
         }
@@ -201,7 +228,7 @@ export class SearchEngine {
                     chunk,
                     similarity,
                     filePath: chunk.filePath,
-                    lineRange: { start: chunk.startLine, end: chunk.endLine }
+                    lineRange: { start: chunk.startLine, end: chunk.endLine },
                 })
             }
         }
@@ -210,7 +237,11 @@ export class SearchEngine {
         return results.slice(0, limit)
     }
 
-    private generateCacheKey(query: string, filePaths?: string[], languages?: string[]): string {
+    private generateCacheKey(
+        query: string,
+        filePaths?: string[],
+        languages?: string[]
+    ): string {
         const parts = [query]
         if (filePaths) parts.push(...filePaths.sort())
         if (languages) parts.push(...languages.sort())
@@ -228,7 +259,7 @@ export class SearchEngine {
     } {
         return {
             size: this.queryCache.size,
-            keys: Array.from(this.queryCache.keys())
+            keys: Array.from(this.queryCache.keys()),
         }
     }
 

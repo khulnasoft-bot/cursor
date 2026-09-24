@@ -12,7 +12,7 @@ import {
     AIProvider,
     Tool,
     ModelConfig,
-    ModelCapabilities
+    ModelCapabilities,
 } from './types'
 import { HttpClient, FetchHttpClient, HttpError } from './http-client'
 import { ProviderRegistry } from './provider-registry'
@@ -23,7 +23,7 @@ class AIService {
         temperature: 0.7,
         maxTokens: 4096,
         provider: 'openai',
-        fallbackEnabled: true
+        fallbackEnabled: true,
     }
     private conversationHistory: Map<string, AIMessage[]> = new Map()
     private availableTools: Tool[] = []
@@ -44,12 +44,16 @@ class AIService {
         }
     }
 
-    setProvider(provider: AIProvider, apiKey?: string, endpoint?: string): void {
+    setProvider(
+        provider: AIProvider,
+        apiKey?: string,
+        endpoint?: string
+    ): void {
         const providerConfig: any = {
             provider,
             apiKey,
             endpoint,
-            models: this.providerRegistry.getModelsByProvider(provider)
+            models: this.providerRegistry.getModelsByProvider(provider),
         }
         this.providerConfigs.set(provider, providerConfig)
         this.config.provider = provider
@@ -86,7 +90,9 @@ class AIService {
     }
 
     unregisterTool(toolName: string): void {
-        this.availableTools = this.availableTools.filter(t => t.name !== toolName)
+        this.availableTools = this.availableTools.filter(
+            (t) => t.name !== toolName
+        )
     }
 
     getTools(): Tool[] {
@@ -111,7 +117,7 @@ class AIService {
         // Add user message
         messages.push({
             role: 'user',
-            content: message
+            content: message,
         })
 
         try {
@@ -120,7 +126,7 @@ class AIService {
             // Add assistant response to history
             messages.push({
                 role: 'assistant',
-                content: response
+                content: response,
             })
 
             this.saveConversationMessages(conversationId, messages)
@@ -154,7 +160,7 @@ class AIService {
 
         messages.push({
             role: 'user',
-            content: message
+            content: message,
         })
 
         try {
@@ -169,7 +175,7 @@ class AIService {
 
             messages.push({
                 role: 'assistant',
-                content: fullResponse
+                content: fullResponse,
             })
 
             this.saveConversationMessages(conversationId, messages)
@@ -199,7 +205,7 @@ class AIService {
 
         return {
             role: 'system',
-            content: systemPrompt
+            content: systemPrompt,
         }
     }
 
@@ -208,12 +214,22 @@ class AIService {
         const model = this.currentModel
 
         try {
-            const response = await this.callProvider(provider, model, messages, false)
+            const response = await this.callProvider(
+                provider,
+                model,
+                messages,
+                false
+            )
             return response
         } catch (error) {
             if (this.config.fallbackEnabled && this.config.fallbackProvider) {
                 try {
-                    return await this.callProvider(this.config.fallbackProvider, model, messages, false)
+                    return await this.callProvider(
+                        this.config.fallbackProvider,
+                        model,
+                        messages,
+                        false
+                    )
                 } catch (fallbackError) {
                     throw error
                 }
@@ -234,7 +250,13 @@ class AIService {
         } catch (error) {
             if (this.config.fallbackEnabled && this.config.fallbackProvider) {
                 try {
-                    await this.callProvider(this.config.fallbackProvider, model, messages, true, onChunk)
+                    await this.callProvider(
+                        this.config.fallbackProvider,
+                        model,
+                        messages,
+                        true,
+                        onChunk
+                    )
                 } catch (fallbackError) {
                     throw error
                 }
@@ -252,7 +274,8 @@ class AIService {
     ): Promise<string> {
         const providerConfig = this.providerConfigs.get(provider)
         const apiKey = providerConfig?.apiKey || this.config.apiKey
-        const endpoint = providerConfig?.endpoint || this.getDefaultEndpoint(provider)
+        const endpoint =
+            providerConfig?.endpoint || this.getDefaultEndpoint(provider)
 
         if (!apiKey) {
             throw new Error(`No API key configured for provider: ${provider}`)
@@ -262,11 +285,24 @@ class AIService {
             case 'openai':
                 return this.callOpenAI(apiKey, model, messages, stream, onChunk)
             case 'anthropic':
-                return this.callAnthropic(apiKey, model, messages, stream, onChunk)
+                return this.callAnthropic(
+                    apiKey,
+                    model,
+                    messages,
+                    stream,
+                    onChunk
+                )
             case 'google':
                 return this.callGoogle(apiKey, model, messages, stream, onChunk)
             case 'custom':
-                return this.callCustom(endpoint, apiKey, model, messages, stream, onChunk)
+                return this.callCustom(
+                    endpoint,
+                    apiKey,
+                    model,
+                    messages,
+                    stream,
+                    onChunk
+                )
             default:
                 throw new Error(`Unsupported provider: ${provider}`)
         }
@@ -292,18 +328,26 @@ class AIService {
         stream: boolean,
         onChunk?: (chunk: AIStreamChunk) => void
     ): Promise<string> {
-        const endpoint = this.config.endpoint || this.getDefaultEndpoint('openai')
+        const endpoint =
+            this.config.endpoint || this.getDefaultEndpoint('openai')
         const url = `${endpoint}/chat/completions`
 
-        const response = await this.httpClient.post(url, {
-            model,
-            messages: messages.map(m => ({ role: m.role, content: m.content })),
-            temperature: this.config.temperature,
-            max_tokens: this.config.maxTokens,
-            stream
-        }, {
-            'Authorization': `Bearer ${apiKey}`
-        })
+        const response = await this.httpClient.post(
+            url,
+            {
+                model,
+                messages: messages.map((m) => ({
+                    role: m.role,
+                    content: m.content,
+                })),
+                temperature: this.config.temperature,
+                max_tokens: this.config.maxTokens,
+                stream,
+            },
+            {
+                Authorization: `Bearer ${apiKey}`,
+            }
+        )
 
         if (stream && onChunk) {
             return this.handleOpenAIStream(response.data, onChunk)
@@ -330,23 +374,31 @@ class AIService {
         stream: boolean,
         onChunk?: (chunk: AIStreamChunk) => void
     ): Promise<string> {
-        const endpoint = this.config.endpoint || this.getDefaultEndpoint('anthropic')
+        const endpoint =
+            this.config.endpoint || this.getDefaultEndpoint('anthropic')
         const url = `${endpoint}/messages`
 
-        const systemMessages = messages.filter(m => m.role === 'system')
-        const chatMessages = messages.filter(m => m.role !== 'system')
+        const systemMessages = messages.filter((m) => m.role === 'system')
+        const chatMessages = messages.filter((m) => m.role !== 'system')
 
-        const response = await this.httpClient.post(url, {
-            model,
-            system: systemMessages.map(m => m.content).join('\n'),
-            messages: chatMessages.map(m => ({ role: m.role, content: m.content })),
-            max_tokens: this.config.maxTokens || 4096,
-            temperature: this.config.temperature,
-            stream
-        }, {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01'
-        })
+        const response = await this.httpClient.post(
+            url,
+            {
+                model,
+                system: systemMessages.map((m) => m.content).join('\n'),
+                messages: chatMessages.map((m) => ({
+                    role: m.role,
+                    content: m.content,
+                })),
+                max_tokens: this.config.maxTokens || 4096,
+                temperature: this.config.temperature,
+                stream,
+            },
+            {
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+            }
+        )
 
         if (stream && onChunk) {
             return this.handleAnthropicStream(response.data, onChunk)
@@ -372,20 +424,21 @@ class AIService {
         stream: boolean,
         onChunk?: (chunk: AIStreamChunk) => void
     ): Promise<string> {
-        const endpoint = this.config.endpoint || this.getDefaultEndpoint('google')
+        const endpoint =
+            this.config.endpoint || this.getDefaultEndpoint('google')
         const url = `${endpoint}/models/${model}:generateContent?key=${apiKey}`
 
-        const contents = messages.map(m => ({
+        const contents = messages.map((m) => ({
             role: m.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: m.content }]
+            parts: [{ text: m.content }],
         }))
 
         const response = await this.httpClient.post(url, {
             contents,
             generationConfig: {
                 temperature: this.config.temperature,
-                maxOutputTokens: this.config.maxTokens
-            }
+                maxOutputTokens: this.config.maxTokens,
+            },
         })
 
         return response.data.candidates[0].content.parts[0].text
@@ -401,15 +454,22 @@ class AIService {
     ): Promise<string> {
         const url = `${endpoint}/chat/completions`
 
-        const response = await this.httpClient.post(url, {
-            model,
-            messages: messages.map(m => ({ role: m.role, content: m.content })),
-            temperature: this.config.temperature,
-            max_tokens: this.config.maxTokens,
-            stream
-        }, {
-            'Authorization': `Bearer ${apiKey}`
-        })
+        const response = await this.httpClient.post(
+            url,
+            {
+                model,
+                messages: messages.map((m) => ({
+                    role: m.role,
+                    content: m.content,
+                })),
+                temperature: this.config.temperature,
+                max_tokens: this.config.maxTokens,
+                stream,
+            },
+            {
+                Authorization: `Bearer ${apiKey}`,
+            }
+        )
 
         if (stream && onChunk) {
             return this.handleOpenAIStream(response.data, onChunk)
@@ -423,7 +483,10 @@ class AIService {
         return this.conversationHistory.get(id) || []
     }
 
-    private saveConversationMessages(conversationId: string | undefined, messages: AIMessage[]): void {
+    private saveConversationMessages(
+        conversationId: string | undefined,
+        messages: AIMessage[]
+    ): void {
         const id = conversationId || 'default'
         this.conversationHistory.set(id, messages)
     }
@@ -441,7 +504,7 @@ class AIService {
     }
 
     async callTool(toolName: string, parameters: any): Promise<any> {
-        const tool = this.availableTools.find(t => t.name === toolName)
+        const tool = this.availableTools.find((t) => t.name === toolName)
         if (!tool) {
             throw new Error(`Tool not found: ${toolName}`)
         }
@@ -490,5 +553,5 @@ export type {
     AIProvider,
     Tool,
     ModelConfig,
-    ModelCapabilities
+    ModelCapabilities,
 }

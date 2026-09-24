@@ -21,10 +21,13 @@ class ShadowWorkspaceService {
 
     async createShadowWorkspace(originalPath: string): Promise<string> {
         const workspaceId = `shadow-${++this.workspaceIdCounter}`
-        
+
         try {
-            const shadowPath = path.join(path.dirname(originalPath), `.shadow-${path.basename(originalPath)}`)
-            
+            const shadowPath = path.join(
+                path.dirname(originalPath),
+                `.shadow-${path.basename(originalPath)}`
+            )
+
             // Create shadow directory
             if (!fs.existsSync(shadowPath)) {
                 fs.mkdirSync(shadowPath, { recursive: true })
@@ -35,7 +38,7 @@ class ShadowWorkspaceService {
                 originalPath,
                 shadowPath,
                 isActive: true,
-                createdAt: new Date()
+                createdAt: new Date(),
             }
 
             this.workspaces.set(workspaceId, workspace)

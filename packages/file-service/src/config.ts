@@ -85,10 +85,18 @@ export interface FileServiceConfig {
  */
 export const DEFAULT_INDEXING_OPTIONS: IndexingOptions = {
     includePatterns: ['*'],
-    excludePatterns: ['node_modules', '.git', '.webpack', 'dist', 'build', 'out', 'coverage'],
+    excludePatterns: [
+        'node_modules',
+        '.git',
+        '.webpack',
+        'dist',
+        'build',
+        'out',
+        'coverage',
+    ],
     maxFileSize: 1024 * 1024, // 1MB
     followSymlinks: false,
-    maxDepth: 100
+    maxDepth: 100,
 }
 
 /**
@@ -98,5 +106,5 @@ export const DEFAULT_FILE_SERVICE_CONFIG: FileServiceConfig = {
     cachePath: undefined, // Will be set dynamically if not provided
     defaultIndexingOptions: DEFAULT_INDEXING_OPTIONS,
     enableCache: true,
-    logger: undefined // Will use console logger if not provided
+    logger: undefined, // Will use console logger if not provided
 }

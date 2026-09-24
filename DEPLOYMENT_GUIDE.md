@@ -132,35 +132,35 @@ Create `.github/workflows/publish.yml`:
 name: Publish Packages
 
 on:
-  push:
-    tags:
-      - 'v*'
+    push:
+        tags:
+            - 'v*'
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build packages
-        run: ./build-all-packages.sh
-      
-      - name: Validate packages
-        run: ./validate-all-packages.sh
-      
-      - name: Publish packages
-        run: ./publish-all.sh
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build packages
+              run: ./build-all-packages.sh
+
+            - name: Validate packages
+              run: ./validate-all-packages.sh
+
+            - name: Publish packages
+              run: ./publish-all.sh
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
 ### GitLab CI
@@ -169,16 +169,16 @@ Create `.gitlab-ci.yml`:
 
 ```yaml
 publish:
-  stage: deploy
-  only:
-    - tags
-  script:
-    - npm ci
-    - ./build-all-packages.sh
-    - ./validate-all-packages.sh
-    - ./publish-all.sh
-  variables:
-    NPM_TOKEN: $NPM_TOKEN
+    stage: deploy
+    only:
+        - tags
+    script:
+        - npm ci
+        - ./build-all-packages.sh
+        - ./validate-all-packages.sh
+        - ./publish-all.sh
+    variables:
+        NPM_TOKEN: $NPM_TOKEN
 ```
 
 ---
@@ -188,6 +188,7 @@ publish:
 ### Semantic Versioning
 
 Follow semantic versioning:
+
 - **Major**: Breaking changes
 - **Minor**: New features, backward compatible
 - **Patch**: Bug fixes, backward compatible
@@ -213,6 +214,7 @@ Maintain a `CHANGELOG.md` for each package:
 ## [1.0.0] - 2026-08-04
 
 ### Added
+
 - Initial release
 - Core functionality
 ```
@@ -348,6 +350,7 @@ npx tsc --noEmit
 ## Support
 
 For deployment issues:
+
 - Check npm documentation
 - Review CI/CD logs
 - Check package.json configuration

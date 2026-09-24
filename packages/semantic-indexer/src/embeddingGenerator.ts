@@ -22,7 +22,7 @@ export class EmbeddingGenerator {
             dimension: config.dimension || 1536, // Standard OpenAI embedding size
             model: config.model || 'text-embedding-3-small',
             batchSize: config.batchSize || 100,
-            cacheSize: config.cacheSize || 10000
+            cacheSize: config.cacheSize || 10000,
         }
         this.cache = new Map()
         this.logger = logger || new ConsoleLogger()
@@ -48,7 +48,9 @@ export class EmbeddingGenerator {
             try {
                 embedding = await this.embeddingService.generateEmbedding(text)
             } catch (error) {
-                this.logger.warn('Failed to generate embedding with AI service, using fallback')
+                this.logger.warn(
+                    'Failed to generate embedding with AI service, using fallback'
+                )
                 embedding = this.generatePlaceholderEmbedding(text)
             }
         } else {
@@ -74,7 +76,7 @@ export class EmbeddingGenerator {
         for (let i = 0; i < texts.length; i += batchSize) {
             const batch = texts.slice(i, i + batchSize)
             const batchEmbeddings = await Promise.all(
-                batch.map(text => this.generateEmbedding(text))
+                batch.map((text) => this.generateEmbedding(text))
             )
             embeddings.push(...batchEmbeddings)
         }
@@ -101,7 +103,7 @@ export class EmbeddingGenerator {
         let hash = 0
         for (let i = 0; i < text.length; i++) {
             const char = text.charCodeAt(i)
-            hash = ((hash << 5) - hash) + char
+            hash = (hash << 5) - hash + char
             hash = hash & hash // Convert to 32bit integer
         }
         return hash.toString(36)
@@ -114,7 +116,9 @@ export class EmbeddingGenerator {
         for (const key of toRemove) {
             this.cache.delete(key)
         }
-        this.logger.debug(`Pruned embedding cache, removed ${toRemove.length} entries`)
+        this.logger.debug(
+            `Pruned embedding cache, removed ${toRemove.length} entries`
+        )
     }
 
     cosineSimilarity(a: number[], b: number[]): number {
@@ -167,7 +171,7 @@ export class EmbeddingGenerator {
         return {
             size: this.cache.size,
             maxSize,
-            utilization: this.cache.size / maxSize
+            utilization: this.cache.size / maxSize,
         }
     }
 
@@ -180,7 +184,10 @@ export class EmbeddingGenerator {
 // Singleton instance
 let embeddingGenerator: EmbeddingGenerator | null = null
 
-export function getEmbeddingGenerator(config?: EmbeddingConfig, logger?: Logger): EmbeddingGenerator {
+export function getEmbeddingGenerator(
+    config?: EmbeddingConfig,
+    logger?: Logger
+): EmbeddingGenerator {
     if (!embeddingGenerator) {
         embeddingGenerator = new EmbeddingGenerator(config, logger)
     }
@@ -194,6 +201,9 @@ export function destroyEmbeddingGenerator(): void {
     }
 }
 
-export function createEmbeddingGenerator(config?: EmbeddingConfig, logger?: Logger): EmbeddingGenerator {
+export function createEmbeddingGenerator(
+    config?: EmbeddingConfig,
+    logger?: Logger
+): EmbeddingGenerator {
     return new EmbeddingGenerator(config, logger)
 }

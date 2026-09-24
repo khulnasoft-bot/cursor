@@ -14,13 +14,28 @@ export function setupMCPServiceIpcs() {
     // Start MCP server
     ipcMain.handle(
         'mcp-service-start-server',
-        async (_event: IpcMainInvokeEvent, name: string, command: string, args: string[] = []) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            name: string,
+            command: string,
+            args: string[] = []
+        ) => {
             try {
-                const serverId = await mcpService.startServer(name, command, args)
+                const serverId = await mcpService.startServer(
+                    name,
+                    command,
+                    args
+                )
                 return { success: true, serverId }
             } catch (error) {
                 log.error('Failed to start MCP server:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -34,7 +49,13 @@ export function setupMCPServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to initialize MCP server:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -42,13 +63,23 @@ export function setupMCPServiceIpcs() {
     // Send message to MCP server
     ipcMain.handle(
         'mcp-service-send-message',
-        async (_event: IpcMainInvokeEvent, serverId: string, message: MCPMessage) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            serverId: string,
+            message: MCPMessage
+        ) => {
             try {
                 const response = await mcpService.sendMessage(serverId, message)
                 return { success: true, response }
             } catch (error) {
                 log.error('Failed to send MCP message:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -56,13 +87,28 @@ export function setupMCPServiceIpcs() {
     // Call tool on MCP server
     ipcMain.handle(
         'mcp-service-call-tool',
-        async (_event: IpcMainInvokeEvent, serverId: string, toolName: string, params: any = {}) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            serverId: string,
+            toolName: string,
+            params: any = {}
+        ) => {
             try {
-                const result = await mcpService.callTool(serverId, toolName, params)
+                const result = await mcpService.callTool(
+                    serverId,
+                    toolName,
+                    params
+                )
                 return { success: true, result }
             } catch (error) {
                 log.error('Failed to call MCP tool:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,7 +122,13 @@ export function setupMCPServiceIpcs() {
                 return { success: true, tools }
             } catch (error) {
                 log.error('Failed to list MCP tools:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -90,38 +142,44 @@ export function setupMCPServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to stop MCP server:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Stop all MCP servers
-    ipcMain.handle(
-        'mcp-service-stop-all',
-        async () => {
-            try {
-                mcpService.stopAllServers()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to stop all MCP servers:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('mcp-service-stop-all', async () => {
+        try {
+            mcpService.stopAllServers()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to stop all MCP servers:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get all MCP servers
-    ipcMain.handle(
-        'mcp-service-get-servers',
-        async () => {
-            try {
-                const servers = mcpService.getServers()
-                return { success: true, servers }
-            } catch (error) {
-                log.error('Failed to get MCP servers:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('mcp-service-get-servers', async () => {
+        try {
+            const servers = mcpService.getServers()
+            return { success: true, servers }
+        } catch (error) {
+            log.error('Failed to get MCP servers:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if server is connected
     ipcMain.handle(
@@ -132,7 +190,13 @@ export function setupMCPServiceIpcs() {
                 return { success: true, connected }
             } catch (error) {
                 log.error('Failed to check MCP connection:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

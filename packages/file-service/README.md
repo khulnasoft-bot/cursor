@@ -14,14 +14,17 @@ npm install @cursor/file-service
 import { createFileService, ConsoleLogger } from '@cursor/file-service'
 
 // Create a file service instance
-const fileService = createFileService({
-    cachePath: './.file-cache',
-    enableCache: true,
-    defaultIndexingOptions: {
-        excludePatterns: ['node_modules', '.git', 'dist'],
-        maxFileSize: 1024 * 1024 // 1MB
-    }
-}, new ConsoleLogger())
+const fileService = createFileService(
+    {
+        cachePath: './.file-cache',
+        enableCache: true,
+        defaultIndexingOptions: {
+            excludePatterns: ['node_modules', '.git', 'dist'],
+            maxFileSize: 1024 * 1024, // 1MB
+        },
+    },
+    new ConsoleLogger()
+)
 
 // Index a directory
 await fileService.indexDirectory('./my-project')
@@ -30,7 +33,7 @@ await fileService.indexDirectory('./my-project')
 const results = await fileService.search({
     query: 'function',
     caseSensitive: false,
-    fileTypes: ['typescript', 'javascript']
+    fileTypes: ['typescript', 'javascript'],
 })
 
 // Get file content
@@ -54,6 +57,7 @@ fileService.clearIndex()
 ## Features
 
 ### File Indexing
+
 - Recursive directory traversal
 - Incremental updates based on file modification time
 - Configurable include/exclude patterns
@@ -62,6 +66,7 @@ fileService.clearIndex()
 - Depth-limited traversal
 
 ### Search Capabilities
+
 - Content search with regex support
 - Case-sensitive and case-insensitive search
 - Filter by file type
@@ -69,12 +74,14 @@ fileService.clearIndex()
 - Configurable result limits
 
 ### Caching
+
 - Automatic index caching to disk
 - Fast startup with cached index
 - Configurable cache location
 - Can be disabled for memory-only operation
 
 ### Logging
+
 - Multiple logger implementations (Console, NoOp, Memory)
 - Configurable log levels
 - Debug information for troubleshooting
@@ -86,68 +93,71 @@ fileService.clearIndex()
 #### Methods
 
 - `indexDirectory(directoryPath: string, options?: IndexingOptions): Promise<void>`
-  - Index a directory and its contents
-  - Options: includePatterns, excludePatterns, maxFileSize, followSymlinks, maxDepth
+    - Index a directory and its contents
+    - Options: includePatterns, excludePatterns, maxFileSize, followSymlinks, maxDepth
 
 - `search(options: SearchOptions): Promise<SearchResult[]>`
-  - Search indexed files for content
-  - Options: query, caseSensitive, regex, fileTypes, maxResults
+    - Search indexed files for content
+    - Options: query, caseSensitive, regex, fileTypes, maxResults
 
 - `getFileContent(filePath: string): string | null`
-  - Get cached content of a file
+    - Get cached content of a file
 
 - `updateFile(filePath: string): Promise<void>`
-  - Update a specific file in the index
+    - Update a specific file in the index
 
 - `removeFile(filePath: string): Promise<void>`
-  - Remove a file from the index
+    - Remove a file from the index
 
 - `clearIndex(): void`
-  - Clear the entire index
+    - Clear the entire index
 
 - `getIndexStats(): { totalFiles: number; totalSize: number; languages: Record<string, number> }`
-  - Get statistics about the current index
+    - Get statistics about the current index
 
 - `isIndexing(): boolean`
-  - Check if indexing is currently in progress
+    - Check if indexing is currently in progress
 
 - `getIndexedFiles(): string[]`
-  - Get list of all indexed file paths
+    - Get list of all indexed file paths
 
 - `getIndexSize(): number`
-  - Get the number of indexed files
+    - Get the number of indexed files
 
 ### Configuration
 
 #### IndexingOptions
+
 ```typescript
 interface IndexingOptions {
-    includePatterns?: string[]      // Glob patterns to include
-    excludePatterns?: string[]      // Glob patterns to exclude
-    maxFileSize?: number           // Maximum file size in bytes
-    followSymlinks?: boolean       // Whether to follow symbolic links
-    maxDepth?: number              // Maximum directory depth
+    includePatterns?: string[] // Glob patterns to include
+    excludePatterns?: string[] // Glob patterns to exclude
+    maxFileSize?: number // Maximum file size in bytes
+    followSymlinks?: boolean // Whether to follow symbolic links
+    maxDepth?: number // Maximum directory depth
 }
 ```
 
 #### SearchOptions
+
 ```typescript
 interface SearchOptions {
-    query: string                   // Search query
-    caseSensitive?: boolean        // Case-sensitive search
-    regex?: boolean                 // Regex search
-    fileTypes?: string[]           // Filter by file type
-    maxResults?: number            // Maximum results to return
+    query: string // Search query
+    caseSensitive?: boolean // Case-sensitive search
+    regex?: boolean // Regex search
+    fileTypes?: string[] // Filter by file type
+    maxResults?: number // Maximum results to return
 }
 ```
 
 #### FileServiceConfig
+
 ```typescript
 interface FileServiceConfig {
-    cachePath?: string             // Path to cache file
+    cachePath?: string // Path to cache file
     defaultIndexingOptions?: IndexingOptions
-    enableCache?: boolean          // Enable/disable caching
-    logger?: Logger                // Logger instance
+    enableCache?: boolean // Enable/disable caching
+    logger?: Logger // Logger instance
 }
 ```
 
@@ -183,6 +193,7 @@ The service automatically detects programming languages based on file extensions
 ## Logger Implementations
 
 ### ConsoleLogger
+
 Outputs to console with level prefixes.
 
 ```typescript
@@ -193,6 +204,7 @@ logger.setEnabled(false) // Disable logging
 ```
 
 ### NoOpLogger
+
 Silent logger, useful for testing or disabling logs.
 
 ```typescript
@@ -202,6 +214,7 @@ const logger = new NoOpLogger()
 ```
 
 ### MemoryLogger
+
 Stores logs in memory for testing and debugging.
 
 ```typescript
@@ -216,6 +229,7 @@ logger.clearLogs()
 ## Examples
 
 ### Basic Usage
+
 ```typescript
 import { createFileService } from '@cursor/file-service'
 
@@ -225,38 +239,45 @@ const results = await service.search({ query: 'export' })
 ```
 
 ### Advanced Configuration
+
 ```typescript
 import { createFileService, ConsoleLogger } from '@cursor/file-service'
 
-const service = createFileService({
-    cachePath: './.my-cache',
-    enableCache: true,
-    defaultIndexingOptions: {
-        excludePatterns: ['node_modules', '.git', 'dist', 'build'],
-        maxFileSize: 2 * 1024 * 1024, // 2MB
-        maxDepth: 10
-    }
-}, new ConsoleLogger())
+const service = createFileService(
+    {
+        cachePath: './.my-cache',
+        enableCache: true,
+        defaultIndexingOptions: {
+            excludePatterns: ['node_modules', '.git', 'dist', 'build'],
+            maxFileSize: 2 * 1024 * 1024, // 2MB
+            maxDepth: 10,
+        },
+    },
+    new ConsoleLogger()
+)
 ```
 
 ### Regex Search
+
 ```typescript
 const results = await service.search({
     query: 'function.*\\(.*\\)',
     regex: true,
-    caseSensitive: false
+    caseSensitive: false,
 })
 ```
 
 ### Filter by File Type
+
 ```typescript
 const results = await service.search({
     query: 'interface',
-    fileTypes: ['typescript', 'javascript']
+    fileTypes: ['typescript', 'javascript'],
 })
 ```
 
 ### Statistics
+
 ```typescript
 const stats = service.getIndexStats()
 console.log(`Total files: ${stats.totalFiles}`)

@@ -3,7 +3,13 @@ import log from 'electron-log'
 import path from 'path'
 
 export interface DeeplinkAction {
-    type: 'open-file' | 'open-folder' | 'run-command' | 'settings' | 'chat' | 'auth'
+    type:
+        | 'open-file'
+        | 'open-folder'
+        | 'run-command'
+        | 'settings'
+        | 'chat'
+        | 'auth'
     params: Record<string, string>
 }
 
@@ -79,7 +85,7 @@ function parseDeeplink(url: string): DeeplinkAction | null {
 
         return {
             type: actionType,
-            params
+            params,
         }
     } catch (error) {
         log.error('Error parsing deeplink:', error)

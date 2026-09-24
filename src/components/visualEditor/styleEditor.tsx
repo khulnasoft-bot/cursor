@@ -8,7 +8,11 @@ import type { VisualElement } from '../../features/visualEditor'
 
 interface StyleEditorProps {
     selectedElement: VisualElement | null
-    onUpdateStyle: (elementId: string, styleProperty: string, value: string) => void
+    onUpdateStyle: (
+        elementId: string,
+        styleProperty: string,
+        value: string
+    ) => void
 }
 
 interface StylePreset {
@@ -16,7 +20,10 @@ interface StylePreset {
     styles: Record<string, string>
 }
 
-export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps) {
+export function StyleEditor({
+    selectedElement,
+    onUpdateStyle,
+}: StyleEditorProps) {
     const [styles, setStyles] = useState<Record<string, string>>({})
     const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
     const [customStyle, setCustomStyle] = useState({ property: '', value: '' })
@@ -35,8 +42,8 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '1rem'
-            }
+                gap: '1rem',
+            },
         },
         {
             name: 'Flex Column',
@@ -44,16 +51,16 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                gap: '1rem'
-            }
+                gap: '1rem',
+            },
         },
         {
             name: 'Grid Container',
             styles: {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '1rem'
-            }
+                gap: '1rem',
+            },
         },
         {
             name: 'Card',
@@ -62,8 +69,8 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                 border: '1px solid #e0e0e0',
                 borderRadius: '8px',
                 padding: '1rem',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            },
         },
         {
             name: 'Button',
@@ -73,17 +80,17 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                 padding: '0.5rem 1rem',
                 borderRadius: '4px',
                 border: 'none',
-                cursor: 'pointer'
-            }
+                cursor: 'pointer',
+            },
         },
         {
             name: 'Centered',
             styles: {
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-            }
-        }
+                justifyContent: 'center',
+            },
+        },
     ]
 
     const colorPresets = [
@@ -94,13 +101,22 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
         { name: 'Warning', value: '#ffc107' },
         { name: 'Info', value: '#17a2b8' },
         { name: 'Light', value: '#f8f9fa' },
-        { name: 'Dark', value: '#343a40' }
+        { name: 'Dark', value: '#343a40' },
     ]
 
-    const spacingPresets = ['0', '0.25rem', '0.5rem', '1rem', '1.5rem', '2rem', '3rem', '4rem']
+    const spacingPresets = [
+        '0',
+        '0.25rem',
+        '0.5rem',
+        '1rem',
+        '1.5rem',
+        '2rem',
+        '3rem',
+        '4rem',
+    ]
 
     const handleStyleChange = (styleProperty: string, value: string) => {
-        setStyles(prev => ({ ...prev, [styleProperty]: value }))
+        setStyles((prev) => ({ ...prev, [styleProperty]: value }))
         if (selectedElement) {
             onUpdateStyle(selectedElement.id, styleProperty, value)
         }
@@ -148,7 +164,7 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
             <div className="style-editor__presets">
                 <h4>Style Presets</h4>
                 <div className="style-editor__preset-list">
-                    {stylePresets.map(preset => (
+                    {stylePresets.map((preset) => (
                         <button
                             key={preset.name}
                             className={`style-editor__preset ${selectedPreset === preset.name ? 'active' : ''}`}
@@ -168,7 +184,9 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Display</label>
                             <select
                                 value={styles.display || ''}
-                                onChange={(e) => handleStyleChange('display', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange('display', e.target.value)
+                                }
                             >
                                 <option value="">Default</option>
                                 <option value="block">Block</option>
@@ -179,29 +197,48 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             </select>
                         </div>
 
-                        {(styles.display === 'flex' || styles.display === 'inline-flex') && (
+                        {(styles.display === 'flex' ||
+                            styles.display === 'inline-flex') && (
                             <>
                                 <div className="style-editor__control">
                                     <label>Flex Direction</label>
                                     <select
                                         value={styles.flexDirection || ''}
-                                        onChange={(e) => handleStyleChange('flexDirection', e.target.value)}
+                                        onChange={(e) =>
+                                            handleStyleChange(
+                                                'flexDirection',
+                                                e.target.value
+                                            )
+                                        }
                                     >
                                         <option value="row">Row</option>
                                         <option value="column">Column</option>
-                                        <option value="row-reverse">Row Reverse</option>
-                                        <option value="column-reverse">Column Reverse</option>
+                                        <option value="row-reverse">
+                                            Row Reverse
+                                        </option>
+                                        <option value="column-reverse">
+                                            Column Reverse
+                                        </option>
                                     </select>
                                 </div>
                                 <div className="style-editor__control">
                                     <label>Align Items</label>
                                     <select
                                         value={styles.alignItems || ''}
-                                        onChange={(e) => handleStyleChange('alignItems', e.target.value)}
+                                        onChange={(e) =>
+                                            handleStyleChange(
+                                                'alignItems',
+                                                e.target.value
+                                            )
+                                        }
                                     >
-                                        <option value="flex-start">Flex Start</option>
+                                        <option value="flex-start">
+                                            Flex Start
+                                        </option>
                                         <option value="center">Center</option>
-                                        <option value="flex-end">Flex End</option>
+                                        <option value="flex-end">
+                                            Flex End
+                                        </option>
                                         <option value="stretch">Stretch</option>
                                     </select>
                                 </div>
@@ -209,13 +246,26 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                                     <label>Justify Content</label>
                                     <select
                                         value={styles.justifyContent || ''}
-                                        onChange={(e) => handleStyleChange('justifyContent', e.target.value)}
+                                        onChange={(e) =>
+                                            handleStyleChange(
+                                                'justifyContent',
+                                                e.target.value
+                                            )
+                                        }
                                     >
-                                        <option value="flex-start">Flex Start</option>
+                                        <option value="flex-start">
+                                            Flex Start
+                                        </option>
                                         <option value="center">Center</option>
-                                        <option value="flex-end">Flex End</option>
-                                        <option value="space-between">Space Between</option>
-                                        <option value="space-around">Space Around</option>
+                                        <option value="flex-end">
+                                            Flex End
+                                        </option>
+                                        <option value="space-between">
+                                            Space Between
+                                        </option>
+                                        <option value="space-around">
+                                            Space Around
+                                        </option>
                                     </select>
                                 </div>
                             </>
@@ -230,11 +280,15 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Padding</label>
                             <select
                                 value={styles.padding || ''}
-                                onChange={(e) => handleStyleChange('padding', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange('padding', e.target.value)
+                                }
                             >
                                 <option value="">Default</option>
-                                {spacingPresets.map(value => (
-                                    <option key={value} value={value}>{value}</option>
+                                {spacingPresets.map((value) => (
+                                    <option key={value} value={value}>
+                                        {value}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -242,11 +296,15 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Margin</label>
                             <select
                                 value={styles.margin || ''}
-                                onChange={(e) => handleStyleChange('margin', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange('margin', e.target.value)
+                                }
                             >
                                 <option value="">Default</option>
-                                {spacingPresets.map(value => (
-                                    <option key={value} value={value}>{value}</option>
+                                {spacingPresets.map((value) => (
+                                    <option key={value} value={value}>
+                                        {value}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -254,11 +312,15 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Gap</label>
                             <select
                                 value={styles.gap || ''}
-                                onChange={(e) => handleStyleChange('gap', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange('gap', e.target.value)
+                                }
                             >
                                 <option value="">Default</option>
-                                {spacingPresets.map(value => (
-                                    <option key={value} value={value}>{value}</option>
+                                {spacingPresets.map((value) => (
+                                    <option key={value} value={value}>
+                                        {value}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -274,22 +336,39 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                                 <input
                                     type="color"
                                     value={styles.color || '#000000'}
-                                    onChange={(e) => handleStyleChange('color', e.target.value)}
+                                    onChange={(e) =>
+                                        handleStyleChange(
+                                            'color',
+                                            e.target.value
+                                        )
+                                    }
                                 />
                                 <input
                                     type="text"
                                     value={styles.color || ''}
-                                    onChange={(e) => handleStyleChange('color', e.target.value)}
+                                    onChange={(e) =>
+                                        handleStyleChange(
+                                            'color',
+                                            e.target.value
+                                        )
+                                    }
                                     placeholder="#000000"
                                 />
                             </div>
                             <div className="style-editor__color-presets">
-                                {colorPresets.map(preset => (
+                                {colorPresets.map((preset) => (
                                     <button
                                         key={preset.name}
                                         className="style-editor__color-preset"
-                                        style={{ backgroundColor: preset.value }}
-                                        onClick={() => handleStyleChange('color', preset.value)}
+                                        style={{
+                                            backgroundColor: preset.value,
+                                        }}
+                                        onClick={() =>
+                                            handleStyleChange(
+                                                'color',
+                                                preset.value
+                                            )
+                                        }
                                         title={preset.name}
                                     />
                                 ))}
@@ -301,22 +380,39 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                                 <input
                                     type="color"
                                     value={styles.backgroundColor || '#ffffff'}
-                                    onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                                    onChange={(e) =>
+                                        handleStyleChange(
+                                            'backgroundColor',
+                                            e.target.value
+                                        )
+                                    }
                                 />
                                 <input
                                     type="text"
                                     value={styles.backgroundColor || ''}
-                                    onChange={(e) => handleStyleChange('backgroundColor', e.target.value)}
+                                    onChange={(e) =>
+                                        handleStyleChange(
+                                            'backgroundColor',
+                                            e.target.value
+                                        )
+                                    }
                                     placeholder="#ffffff"
                                 />
                             </div>
                             <div className="style-editor__color-presets">
-                                {colorPresets.map(preset => (
+                                {colorPresets.map((preset) => (
                                     <button
                                         key={preset.name}
                                         className="style-editor__color-preset"
-                                        style={{ backgroundColor: preset.value }}
-                                        onClick={() => handleStyleChange('backgroundColor', preset.value)}
+                                        style={{
+                                            backgroundColor: preset.value,
+                                        }}
+                                        onClick={() =>
+                                            handleStyleChange(
+                                                'backgroundColor',
+                                                preset.value
+                                            )
+                                        }
                                         title={preset.name}
                                     />
                                 ))}
@@ -333,7 +429,12 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <input
                                 type="text"
                                 value={styles.fontSize || ''}
-                                onChange={(e) => handleStyleChange('fontSize', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange(
+                                        'fontSize',
+                                        e.target.value
+                                    )
+                                }
                                 placeholder="16px"
                             />
                         </div>
@@ -341,7 +442,12 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Font Weight</label>
                             <select
                                 value={styles.fontWeight || ''}
-                                onChange={(e) => handleStyleChange('fontWeight', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange(
+                                        'fontWeight',
+                                        e.target.value
+                                    )
+                                }
                             >
                                 <option value="">Default</option>
                                 <option value="100">Thin (100)</option>
@@ -357,7 +463,12 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <label>Text Align</label>
                             <select
                                 value={styles.textAlign || ''}
-                                onChange={(e) => handleStyleChange('textAlign', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange(
+                                        'textAlign',
+                                        e.target.value
+                                    )
+                                }
                             >
                                 <option value="">Default</option>
                                 <option value="left">Left</option>
@@ -377,7 +488,9 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <input
                                 type="text"
                                 value={styles.border || ''}
-                                onChange={(e) => handleStyleChange('border', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange('border', e.target.value)
+                                }
                                 placeholder="1px solid #ccc"
                             />
                         </div>
@@ -386,7 +499,12 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                             <input
                                 type="text"
                                 value={styles.borderRadius || ''}
-                                onChange={(e) => handleStyleChange('borderRadius', e.target.value)}
+                                onChange={(e) =>
+                                    handleStyleChange(
+                                        'borderRadius',
+                                        e.target.value
+                                    )
+                                }
                                 placeholder="4px"
                             />
                         </div>
@@ -401,15 +519,28 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                         type="text"
                         placeholder="Property (e.g., opacity)"
                         value={customStyle.property}
-                        onChange={(e) => setCustomStyle({ ...customStyle, property: e.target.value })}
+                        onChange={(e) =>
+                            setCustomStyle({
+                                ...customStyle,
+                                property: e.target.value,
+                            })
+                        }
                     />
                     <input
                         type="text"
                         placeholder="Value (e.g., 0.5)"
                         value={customStyle.value}
-                        onChange={(e) => setCustomStyle({ ...customStyle, value: e.target.value })}
+                        onChange={(e) =>
+                            setCustomStyle({
+                                ...customStyle,
+                                value: e.target.value,
+                            })
+                        }
                     />
-                    <button onClick={addCustomStyle} className="style-editor__add">
+                    <button
+                        onClick={addCustomStyle}
+                        className="style-editor__add"
+                    >
                         Add
                     </button>
                 </div>
@@ -422,7 +553,10 @@ export function StyleEditor({ selectedElement, onUpdateStyle }: StyleEditorProps
                 ) : (
                     <div className="style-editor__current-list">
                         {Object.entries(styles).map(([property, value]) => (
-                            <div key={property} className="style-editor__current-item">
+                            <div
+                                key={property}
+                                className="style-editor__current-item"
+                            >
                                 <label>{property}:</label>
                                 <span>{value}</span>
                                 <button

@@ -1,10 +1,27 @@
-export { getAutomationService, destroyAutomationService } from './automationService'
+export {
+    getAutomationService,
+    destroyAutomationService,
+} from './automationService'
 export { getTriggerSystem, destroyTriggerSystem } from './triggerSystem'
 export { getActionRegistry, destroyActionRegistry } from './actionRegistry'
-export { getAutomationScheduler, destroyAutomationScheduler } from './automationScheduler'
-export { getAutomationTemplates, destroyAutomationTemplates } from './automationTemplates'
-export { getAutomationLogger, destroyAutomationLogger } from './automationLogger'
-export type { AutomationTrigger, AutomationAction, AutomationWorkflow, AutomationExecution } from './automationService'
+export {
+    getAutomationScheduler,
+    destroyAutomationScheduler,
+} from './automationScheduler'
+export {
+    getAutomationTemplates,
+    destroyAutomationTemplates,
+} from './automationTemplates'
+export {
+    getAutomationLogger,
+    destroyAutomationLogger,
+} from './automationLogger'
+export type {
+    AutomationTrigger,
+    AutomationAction,
+    AutomationWorkflow,
+    AutomationExecution,
+} from './automationService'
 export type { TriggerEvent } from './triggerSystem'
 export type { ActionDefinition } from './actionRegistry'
 export type { ScheduledTask } from './automationScheduler'

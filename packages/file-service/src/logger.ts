@@ -80,14 +80,19 @@ export class NoOpLogger implements Logger {
  * Stores log messages in memory for testing and debugging
  */
 export class MemoryLogger implements Logger {
-    private logs: Array<{ level: string; message: string; args: any[]; timestamp: Date }> = []
+    private logs: Array<{
+        level: string
+        message: string
+        args: any[]
+        timestamp: Date
+    }> = []
 
     info(message: string, ...args: any[]): void {
         this.logs.push({
             level: 'info',
             message,
             args,
-            timestamp: new Date()
+            timestamp: new Date(),
         })
     }
 
@@ -96,7 +101,7 @@ export class MemoryLogger implements Logger {
             level: 'warn',
             message,
             args,
-            timestamp: new Date()
+            timestamp: new Date(),
         })
     }
 
@@ -105,7 +110,7 @@ export class MemoryLogger implements Logger {
             level: 'error',
             message,
             args,
-            timestamp: new Date()
+            timestamp: new Date(),
         })
     }
 
@@ -114,11 +119,16 @@ export class MemoryLogger implements Logger {
             level: 'debug',
             message,
             args,
-            timestamp: new Date()
+            timestamp: new Date(),
         })
     }
 
-    getLogs(): Array<{ level: string; message: string; args: any[]; timestamp: Date }> {
+    getLogs(): Array<{
+        level: string
+        message: string
+        args: any[]
+        timestamp: Date
+    }> {
         return [...this.logs]
     }
 
@@ -126,7 +136,9 @@ export class MemoryLogger implements Logger {
         this.logs = []
     }
 
-    getLogsByLevel(level: string): Array<{ level: string; message: string; args: any[]; timestamp: Date }> {
-        return this.logs.filter(log => log.level === level)
+    getLogsByLevel(
+        level: string
+    ): Array<{ level: string; message: string; args: any[]; timestamp: Date }> {
+        return this.logs.filter((log) => log.level === level)
     }
 }

@@ -3,12 +3,7 @@
  * Memory and context management for autonomous agents
  */
 
-import {
-    MemoryEntry,
-    MemoryType,
-    MemoryQuery,
-    AgentConfig
-} from '../types'
+import { MemoryEntry, MemoryType, MemoryQuery, AgentConfig } from '../types'
 import { Logger, ConsoleLogger } from '../logger'
 
 export class AgentMemory {
@@ -31,14 +26,14 @@ export class AgentMemory {
         importance: number = 0.5
     ): MemoryEntry {
         const memoryId = `memory-${++this.memoryCounter}`
-        
+
         const memory: MemoryEntry = {
             id: memoryId,
             type,
             content,
             timestamp: new Date(),
             metadata,
-            importance
+            importance,
         }
 
         this.memories.set(memoryId, memory)
@@ -48,27 +43,49 @@ export class AgentMemory {
             this.pruneMemories()
         }
 
-        this.logger.info(`Added memory ${memoryId}: ${type} (importance: ${importance})`)
+        this.logger.info(
+            `Added memory ${memoryId}: ${type} (importance: ${importance})`
+        )
         return memory
     }
 
-    addObservation(content: string, metadata?: Record<string, any>, importance?: number): MemoryEntry {
+    addObservation(
+        content: string,
+        metadata?: Record<string, any>,
+        importance?: number
+    ): MemoryEntry {
         return this.addMemory('observation', content, metadata, importance)
     }
 
-    addAction(content: string, metadata?: Record<string, any>, importance?: number): MemoryEntry {
+    addAction(
+        content: string,
+        metadata?: Record<string, any>,
+        importance?: number
+    ): MemoryEntry {
         return this.addMemory('action', content, metadata, importance || 0.7)
     }
 
-    addResult(content: string, metadata?: Record<string, any>, importance?: number): MemoryEntry {
+    addResult(
+        content: string,
+        metadata?: Record<string, any>,
+        importance?: number
+    ): MemoryEntry {
         return this.addMemory('result', content, metadata, importance || 0.8)
     }
 
-    addContext(content: string, metadata?: Record<string, any>, importance?: number): MemoryEntry {
+    addContext(
+        content: string,
+        metadata?: Record<string, any>,
+        importance?: number
+    ): MemoryEntry {
         return this.addMemory('context', content, metadata, importance || 0.6)
     }
 
-    addGoal(content: string, metadata?: Record<string, any>, importance?: number): MemoryEntry {
+    addGoal(
+        content: string,
+        metadata?: Record<string, any>,
+        importance?: number
+    ): MemoryEntry {
         return this.addMemory('goal', content, metadata, importance || 0.9)
     }
 
@@ -81,7 +98,7 @@ export class AgentMemory {
     }
 
     getMemoriesByType(type: MemoryType): MemoryEntry[] {
-        return this.getMemories().filter(m => m.type === type)
+        return this.getMemories().filter((m) => m.type === type)
     }
 
     getRecentMemories(count: number = 10): MemoryEntry[] {
@@ -90,8 +107,10 @@ export class AgentMemory {
             .slice(0, count)
     }
 
-    getImportantMemories(threshold: number = this.importanceThreshold): MemoryEntry[] {
-        return this.getMemories().filter(m => m.importance >= threshold)
+    getImportantMemories(
+        threshold: number = this.importanceThreshold
+    ): MemoryEntry[] {
+        return this.getMemories().filter((m) => m.importance >= threshold)
     }
 
     searchMemories(query: MemoryQuery): MemoryEntry[] {
@@ -99,28 +118,34 @@ export class AgentMemory {
 
         // Filter by type
         if (query.type) {
-            results = results.filter(m => m.type === query.type)
+            results = results.filter((m) => m.type === query.type)
         }
 
         // Filter by importance
         if (query.minImportance !== undefined) {
-            results = results.filter(m => m.importance >= query.minImportance!)
+            results = results.filter(
+                (m) => m.importance >= query.minImportance!
+            )
         }
 
         // Filter by time range
         if (query.timeRange) {
-            results = results.filter(m => 
-                m.timestamp >= query.timeRange!.start && 
-                m.timestamp <= query.timeRange!.end
+            results = results.filter(
+                (m) =>
+                    m.timestamp >= query.timeRange!.start &&
+                    m.timestamp <= query.timeRange!.end
             )
         }
 
         // Simple text search (could be enhanced with embeddings)
         if (query.query) {
             const queryLower = query.query.toLowerCase()
-            results = results.filter(m => 
-                m.content.toLowerCase().includes(queryLower) ||
-                JSON.stringify(m.metadata || {}).toLowerCase().includes(queryLower)
+            results = results.filter(
+                (m) =>
+                    m.content.toLowerCase().includes(queryLower) ||
+                    JSON.stringify(m.metadata || {})
+                        .toLowerCase()
+                        .includes(queryLower)
             )
         }
 
@@ -141,12 +166,15 @@ export class AgentMemory {
         return results
     }
 
-    getContextForTask(taskDescription: string, limit: number = 20): MemoryEntry[] {
+    getContextForTask(
+        taskDescription: string,
+        limit: number = 20
+    ): MemoryEntry[] {
         // Get relevant memories for a specific task
         const query: MemoryQuery = {
             query: taskDescription,
             limit,
-            minImportance: 0.4
+            minImportance: 0.4,
         }
         return this.searchMemories(query)
     }
@@ -186,7 +214,9 @@ export class AgentMemory {
     }
 
     clearOldMemories(olderThan: Date): number {
-        const oldMemories = this.getMemories().filter(m => m.timestamp < olderThan)
+        const oldMemories = this.getMemories().filter(
+            (m) => m.timestamp < olderThan
+        )
         let count = 0
         for (const memory of oldMemories) {
             if (this.deleteMemory(memory.id)) {
@@ -206,7 +236,7 @@ export class AgentMemory {
     private pruneMemories(): void {
         // Remove least important memories when exceeding limit
         const memories = this.getMemories()
-        
+
         // Sort by importance (ascending) and recency (descending)
         memories.sort((a, b) => {
             const importanceDiff = a.importance - b.importance
@@ -238,7 +268,7 @@ export class AgentMemory {
             action: 0,
             result: 0,
             context: 0,
-            goal: 0
+            goal: 0,
         }
 
         let totalImportance = 0
@@ -260,9 +290,10 @@ export class AgentMemory {
         return {
             total: memories.length,
             byType,
-            averageImportance: memories.length > 0 ? totalImportance / memories.length : 0,
+            averageImportance:
+                memories.length > 0 ? totalImportance / memories.length : 0,
             oldestMemory: oldest,
-            newestMemory: newest
+            newestMemory: newest,
         }
     }
 
@@ -297,7 +328,10 @@ export class AgentMemory {
 // Singleton instance
 let agentMemory: AgentMemory | null = null
 
-export function getAgentMemory(config?: AgentConfig, logger?: Logger): AgentMemory {
+export function getAgentMemory(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentMemory {
     if (!agentMemory) {
         agentMemory = new AgentMemory(config, logger)
     }
@@ -311,6 +345,9 @@ export function destroyAgentMemory(): void {
     }
 }
 
-export function createAgentMemory(config?: AgentConfig, logger?: Logger): AgentMemory {
+export function createAgentMemory(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentMemory {
     return new AgentMemory(config, logger)
 }

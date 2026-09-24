@@ -58,14 +58,14 @@ export const startCompletion = createAsyncThunk(
                     language: undefined, // Will be detected from file extension
                     projectPath: state.global.rootPath,
                     cursorLine,
-                    cursorColumn
+                    cursorColumn,
                 }
 
                 const result = await enhancedService.getCompletion({
                     context: completionContext,
                     maxLines: 10,
                     includeImports: true,
-                    predictNextEdit: true
+                    predictNextEdit: true,
                 })
 
                 if (result.completion) {
@@ -73,8 +73,12 @@ export const startCompletion = createAsyncThunk(
                     if (getTab().interrupted) return
 
                     // Insert suggested imports if any
-                    if (result.suggestedImports && result.suggestedImports.length > 0) {
-                        const importText = result.suggestedImports.join('\n') + '\n'
+                    if (
+                        result.suggestedImports &&
+                        result.suggestedImports.length > 0
+                    ) {
+                        const importText =
+                            result.suggestedImports.join('\n') + '\n'
                         dispatch(
                             addTransaction({
                                 tabId: tabId,
@@ -105,11 +109,17 @@ export const startCompletion = createAsyncThunk(
                     // Store next edit location prediction for future use
                     if (result.nextEditLocation) {
                         // Could store this in state for highlighting
-                        console.log('Next edit location predicted:', result.nextEditLocation)
+                        console.log(
+                            'Next edit location predicted:',
+                            result.nextEditLocation
+                        )
                     }
                 }
             } catch (enhancedError) {
-                console.warn('Enhanced completion failed, falling back to worker:', enhancedError)
+                console.warn(
+                    'Enhanced completion failed, falling back to worker:',
+                    enhancedError
+                )
 
                 // Fallback to worker manager
                 const workerManager = getAgentWorkerManager()
@@ -122,7 +132,9 @@ export const startCompletion = createAsyncThunk(
                         (progress) => {
                             if (notStarted && progress > 0) {
                                 notStarted = false
-                                dispatch(generationSlice.actions.starting(tabId))
+                                dispatch(
+                                    generationSlice.actions.starting(tabId)
+                                )
                             }
                         }
                     )
@@ -145,7 +157,10 @@ export const startCompletion = createAsyncThunk(
                     }
                 } catch (workerError) {
                     // Final fallback to API
-                    console.warn('Agent worker failed, falling back to API:', workerError)
+                    console.warn(
+                        'Agent worker failed, falling back to API:',
+                        workerError
+                    )
 
                     const path = API_ROOT + API_ENDPOINT
                     const data = {

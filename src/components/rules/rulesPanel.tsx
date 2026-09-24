@@ -19,7 +19,9 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
     const [selectedRule, setSelectedRule] = useState<Rule | null>(null)
     const [violations, setViolations] = useState<RuleViolation[]>([])
     const [loading, setLoading] = useState(false)
-    const [tab, setTab] = useState<'rules' | 'violations' | 'templates'>('rules')
+    const [tab, setTab] = useState<'rules' | 'violations' | 'templates'>(
+        'rules'
+    )
 
     useEffect(() => {
         if (isOpen) {
@@ -62,7 +64,7 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
             name: `custom-${Date.now()}`,
             version: '1.0.0',
             description: 'Custom rule set',
-            rules: []
+            rules: [],
         }
         try {
             // const response = await window.api.rulesCreateRuleSet(newRuleSet, projectPath)
@@ -106,7 +108,9 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
         <div className="rules-panel">
             <div className="rules-panel__header">
                 <h2>Team Rules</h2>
-                <button onClick={onClose} className="rules-panel__close">×</button>
+                <button onClick={onClose} className="rules-panel__close">
+                    ×
+                </button>
             </div>
 
             <div className="rules-panel__tabs">
@@ -134,10 +138,16 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                 {tab === 'rules' && (
                     <div className="rules-panel__rules">
                         <div className="rules-panel__actions">
-                            <button onClick={handleCreateRuleSet} className="rules-panel__button">
+                            <button
+                                onClick={handleCreateRuleSet}
+                                className="rules-panel__button"
+                            >
                                 + New Rule Set
                             </button>
-                            <button onClick={handleRunRules} className="rules-panel__button rules-panel__button--primary">
+                            <button
+                                onClick={handleRunRules}
+                                className="rules-panel__button rules-panel__button--primary"
+                            >
                                 Run Rules
                             </button>
                         </div>
@@ -145,21 +155,29 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                         <div className="rules-panel__rule-sets">
                             <h3>Rule Sets ({ruleSets.length})</h3>
                             {loading ? (
-                                <div className="rules-panel__loading">Loading...</div>
+                                <div className="rules-panel__loading">
+                                    Loading...
+                                </div>
                             ) : (
                                 <div className="rules-panel__rule-set-list">
-                                    {ruleSets.map(ruleSet => (
+                                    {ruleSets.map((ruleSet) => (
                                         <div
                                             key={ruleSet.name}
                                             className={`rules-panel__rule-set ${selectedRuleSet?.name === ruleSet.name ? 'selected' : ''}`}
-                                            onClick={() => setSelectedRuleSet(ruleSet)}
+                                            onClick={() =>
+                                                setSelectedRuleSet(ruleSet)
+                                            }
                                         >
                                             <div className="rules-panel__rule-set-header">
-                                                <span className="rules-panel__rule-set-name">{ruleSet.name}</span>
+                                                <span className="rules-panel__rule-set-name">
+                                                    {ruleSet.name}
+                                                </span>
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation()
-                                                        handleDeleteRuleSet(ruleSet.name)
+                                                        handleDeleteRuleSet(
+                                                            ruleSet.name
+                                                        )
                                                     }}
                                                     className="rules-panel__delete-button"
                                                 >
@@ -182,18 +200,26 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                             <div className="rules-panel__rules-list">
                                 <h3>Rules in {selectedRuleSet.name}</h3>
                                 <div className="rules-panel__rule-items">
-                                    {selectedRuleSet.rules.map(rule => (
+                                    {selectedRuleSet.rules.map((rule) => (
                                         <div
                                             key={rule.id}
                                             className={`rules-panel__rule-item ${selectedRule?.id === rule.id ? 'selected' : ''}`}
-                                            onClick={() => setSelectedRule(rule)}
+                                            onClick={() =>
+                                                setSelectedRule(rule)
+                                            }
                                         >
                                             <div className="rules-panel__rule-header">
-                                                <span className={`rules-panel__rule-status ${rule.enabled ? 'enabled' : 'disabled'}`}>
+                                                <span
+                                                    className={`rules-panel__rule-status ${rule.enabled ? 'enabled' : 'disabled'}`}
+                                                >
                                                     {rule.enabled ? '●' : '○'}
                                                 </span>
-                                                <span className="rules-panel__rule-name">{rule.name}</span>
-                                                <span className={`rules-panel__rule-severity severity-${rule.severity}`}>
+                                                <span className="rules-panel__rule-name">
+                                                    {rule.name}
+                                                </span>
+                                                <span
+                                                    className={`rules-panel__rule-severity severity-${rule.severity}`}
+                                                >
                                                     {rule.severity}
                                                 </span>
                                             </div>
@@ -202,10 +228,17 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                                             </div>
                                             <div className="rules-panel__rule-actions">
                                                 <button
-                                                    onClick={() => handleToggleRule(rule.id, !rule.enabled)}
+                                                    onClick={() =>
+                                                        handleToggleRule(
+                                                            rule.id,
+                                                            !rule.enabled
+                                                        )
+                                                    }
                                                     className="rules-panel__toggle-button"
                                                 >
-                                                    {rule.enabled ? 'Disable' : 'Enable'}
+                                                    {rule.enabled
+                                                        ? 'Disable'
+                                                        : 'Enable'}
                                                 </button>
                                             </div>
                                         </div>
@@ -232,17 +265,21 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                                 <div className="rules-panel__rule-detail">
                                     <label>Patterns:</label>
                                     <div className="rules-panel__rule-patterns">
-                                        {selectedRule.patterns.map((pattern, i) => (
-                                            <code key={i}>{pattern}</code>
-                                        ))}
+                                        {selectedRule.patterns.map(
+                                            (pattern, i) => (
+                                                <code key={i}>{pattern}</code>
+                                            )
+                                        )}
                                     </div>
                                 </div>
                                 <div className="rules-panel__rule-detail">
                                     <label>Applies to:</label>
                                     <div className="rules-panel__rule-applies">
-                                        {selectedRule.appliesTo.map((pattern, i) => (
-                                            <span key={i}>{pattern}</span>
-                                        ))}
+                                        {selectedRule.appliesTo.map(
+                                            (pattern, i) => (
+                                                <span key={i}>{pattern}</span>
+                                            )
+                                        )}
                                     </div>
                                 </div>
                                 <div className="rules-panel__rule-detail">
@@ -263,23 +300,37 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                 {tab === 'violations' && (
                     <div className="rules-panel__violations">
                         <div className="rules-panel__actions">
-                            <button onClick={handleRunRules} className="rules-panel__button rules-panel__button--primary">
+                            <button
+                                onClick={handleRunRules}
+                                className="rules-panel__button rules-panel__button--primary"
+                            >
                                 Run Rules
                             </button>
                         </div>
 
                         <h3>Rule Violations ({violations.length})</h3>
                         {loading ? (
-                            <div className="rules-panel__loading">Running rules...</div>
+                            <div className="rules-panel__loading">
+                                Running rules...
+                            </div>
                         ) : violations.length === 0 ? (
-                            <div className="rules-panel__no-violations">No violations found</div>
+                            <div className="rules-panel__no-violations">
+                                No violations found
+                            </div>
                         ) : (
                             <div className="rules-panel__violation-list">
                                 {violations.map((violation, index) => (
-                                    <div key={index} className={`rules-panel__violation severity-${violation.severity}`}>
+                                    <div
+                                        key={index}
+                                        className={`rules-panel__violation severity-${violation.severity}`}
+                                    >
                                         <div className="rules-panel__violation-header">
-                                            <span className="rules-panel__violation-rule">{violation.ruleName}</span>
-                                            <span className={`rules-panel__violation-severity severity-${violation.severity}`}>
+                                            <span className="rules-panel__violation-rule">
+                                                {violation.ruleName}
+                                            </span>
+                                            <span
+                                                className={`rules-panel__violation-severity severity-${violation.severity}`}
+                                            >
                                                 {violation.severity}
                                             </span>
                                         </div>
@@ -287,11 +338,13 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                                             {violation.message}
                                         </div>
                                         <div className="rules-panel__violation-location">
-                                            {violation.filePath}:{violation.lineNumber}
+                                            {violation.filePath}:
+                                            {violation.lineNumber}
                                         </div>
                                         {violation.fix && (
                                             <div className="rules-panel__violation-fix">
-                                                <strong>Fix:</strong> {violation.fix}
+                                                <strong>Fix:</strong>{' '}
+                                                {violation.fix}
                                             </div>
                                         )}
                                     </div>
@@ -307,23 +360,34 @@ export function RulesPanel({ isOpen, onClose, projectPath }: RulesPanelProps) {
                         <div className="rules-panel__template-list">
                             <div className="rules-panel__template">
                                 <h4>JavaScript Best Practices</h4>
-                                <p>Standard JavaScript/TypeScript coding standards</p>
-                                <button className="rules-panel__button">Use Template</button>
+                                <p>
+                                    Standard JavaScript/TypeScript coding
+                                    standards
+                                </p>
+                                <button className="rules-panel__button">
+                                    Use Template
+                                </button>
                             </div>
                             <div className="rules-panel__template">
                                 <h4>Python Style Guide</h4>
                                 <p>PEP 8 compliant Python coding standards</p>
-                                <button className="rules-panel__button">Use Template</button>
+                                <button className="rules-panel__button">
+                                    Use Template
+                                </button>
                             </div>
                             <div className="rules-panel__template">
                                 <h4>Security Standards</h4>
                                 <p>Security-focused coding rules</p>
-                                <button className="rules-panel__button">Use Template</button>
+                                <button className="rules-panel__button">
+                                    Use Template
+                                </button>
                             </div>
                             <div className="rules-panel__template">
                                 <h4>Performance Guidelines</h4>
                                 <p>Performance optimization rules</p>
-                                <button className="rules-panel__button">Use Template</button>
+                                <button className="rules-panel__button">
+                                    Use Template
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -32,12 +32,21 @@ export class RuleService {
 
     async initialize(projectPath: string): Promise<void> {
         log.info('Initializing rule service for project:', projectPath)
-        this.currentRules = await this.ruleParser.loadRulesFromDirectory(projectPath)
+        this.currentRules =
+            await this.ruleParser.loadRulesFromDirectory(projectPath)
     }
 
-    async applyRulesToCode(code: string, filePath: string): Promise<RuleApplicationResult> {
+    async applyRulesToCode(
+        code: string,
+        filePath: string
+    ): Promise<RuleApplicationResult> {
         if (!this.currentRules) {
-            return { violations: [], appliedRules: 0, skippedRules: 0, errors: ['Rules not initialized'] }
+            return {
+                violations: [],
+                appliedRules: 0,
+                skippedRules: 0,
+                errors: ['Rules not initialized'],
+            }
         }
 
         const violations: RuleViolation[] = []
@@ -65,9 +74,12 @@ export class RuleService {
                             severity: rule.severity,
                             message: rule.message,
                             filePath,
-                            lineNumber: this.getLineNumber(code, match.index || 0),
+                            lineNumber: this.getLineNumber(
+                                code,
+                                match.index || 0
+                            ),
                             fix: rule.fix,
-                            category: rule.category
+                            category: rule.category,
                         }
 
                         // Check if this match is in the exceptions list
@@ -77,7 +89,9 @@ export class RuleService {
                         }
                     }
                 } catch (error) {
-                    log.warn(`Invalid regex pattern in rule ${rule.id}: ${pattern}`)
+                    log.warn(
+                        `Invalid regex pattern in rule ${rule.id}: ${pattern}`
+                    )
                 }
             }
         }
@@ -86,7 +100,7 @@ export class RuleService {
             violations,
             appliedRules,
             skippedRules,
-            errors: this.currentRules.errors
+            errors: this.currentRules.errors,
         }
     }
 
@@ -101,7 +115,7 @@ export class RuleService {
         }
 
         const applicableRules = this.ruleParser.getRulesForFile(filePath)
-        const activeRules = applicableRules.filter(r => r.enabled)
+        const activeRules = applicableRules.filter((r) => r.enabled)
 
         if (activeRules.length === 0) {
             return context
@@ -109,7 +123,7 @@ export class RuleService {
 
         // Build rules context for AI
         let rulesContext = '\n\n--- Team Rules ---\n'
-        
+
         // Group rules by category
         const rulesByCategory = new Map<Rule['category'], Rule[]>()
         for (const rule of activeRules) {
@@ -157,7 +171,11 @@ export class RuleService {
         await this.initialize(projectPath)
     }
 
-    async updateRuleSet(name: string, updates: Partial<RuleSet>, projectPath: string): Promise<void> {
+    async updateRuleSet(
+        name: string,
+        updates: Partial<RuleSet>,
+        projectPath: string
+    ): Promise<void> {
         const existing = this.getRuleSet(name)
         if (!existing) {
             throw new Error(`Rule set not found: ${name}`)
@@ -181,11 +199,15 @@ export class RuleService {
         await this.toggleRule(ruleId, false, projectPath)
     }
 
-    private async toggleRule(ruleId: string, enabled: boolean, projectPath: string): Promise<void> {
+    private async toggleRule(
+        ruleId: string,
+        enabled: boolean,
+        projectPath: string
+    ): Promise<void> {
         const ruleSets = this.getAllRuleSets()
-        
+
         for (const ruleSet of ruleSets) {
-            const rule = ruleSet.rules.find(r => r.id === ruleId)
+            const rule = ruleSet.rules.find((r) => r.id === ruleId)
             if (rule) {
                 rule.enabled = enabled
                 await this.ruleParser.saveRuleSet(ruleSet, projectPath)
@@ -205,8 +227,8 @@ export class RuleService {
         rulesBySeverity: Record<Rule['severity'], number>
     } {
         const ruleSets = this.getAllRuleSets()
-        const allRules = ruleSets.flatMap(rs => rs.rules)
-        const activeRules = allRules.filter(r => r.enabled)
+        const allRules = ruleSets.flatMap((rs) => rs.rules)
+        const activeRules = allRules.filter((r) => r.enabled)
 
         const rulesByCategory: Record<Rule['category'], number> = {
             style: 0,
@@ -215,14 +237,14 @@ export class RuleService {
             security: 0,
             performance: 0,
             testing: 0,
-            custom: 0
+            custom: 0,
         }
 
         const rulesBySeverity: Record<Rule['severity'], number> = {
             error: 0,
             warning: 0,
             suggestion: 0,
-            info: 0
+            info: 0,
         }
 
         for (const rule of allRules) {
@@ -235,7 +257,7 @@ export class RuleService {
             totalRules: allRules.length,
             activeRules: activeRules.length,
             rulesByCategory,
-            rulesBySeverity
+            rulesBySeverity,
         }
     }
 
@@ -250,7 +272,7 @@ export class RuleService {
     async importRules(json: string, projectPath: string): Promise<void> {
         try {
             const parsed = JSON.parse(json) as ParsedRules
-            
+
             for (const ruleSet of parsed.ruleSets.values()) {
                 await this.ruleParser.saveRuleSet(ruleSet, projectPath)
             }

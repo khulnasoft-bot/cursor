@@ -24,12 +24,15 @@ class NDJSONService {
     private config: NDJSONIngestConfig | null = null
     private processing = false
 
-    async ingestFromFile(filePath: string, config?: Partial<NDJSONIngestConfig>): Promise<number> {
+    async ingestFromFile(
+        filePath: string,
+        config?: Partial<NDJSONIngestConfig>
+    ): Promise<number> {
         const ingestConfig: NDJSONIngestConfig = {
             source: filePath,
             batchSize: config?.batchSize || 100,
             autoProcess: config?.autoProcess !== false,
-            ...config
+            ...config,
         }
 
         this.config = ingestConfig
@@ -38,7 +41,7 @@ class NDJSONService {
             const fileStream = fs.createReadStream(filePath)
             const rl = readline.createInterface({
                 input: fileStream,
-                crlfDelay: Infinity
+                crlfDelay: Infinity,
             })
 
             let count = 0
@@ -49,13 +52,16 @@ class NDJSONService {
                         const record: NDJSONRecord = {
                             data,
                             timestamp: new Date(),
-                            source: filePath
+                            source: filePath,
                         }
                         this.records.push(record)
                         count++
 
                         // Process in batches
-                        if (ingestConfig.autoProcess && count % ingestConfig.batchSize === 0) {
+                        if (
+                            ingestConfig.autoProcess &&
+                            count % ingestConfig.batchSize === 0
+                        ) {
                             await this.processBatch()
                         }
                     } catch (error) {
@@ -77,7 +83,10 @@ class NDJSONService {
         }
     }
 
-    async ingestFromString(ndjsonString: string, source: string = 'string'): Promise<number> {
+    async ingestFromString(
+        ndjsonString: string,
+        source: string = 'string'
+    ): Promise<number> {
         try {
             const lines = ndjsonString.split('\n')
             let count = 0
@@ -89,7 +98,7 @@ class NDJSONService {
                         const record: NDJSONRecord = {
                             data,
                             timestamp: new Date(),
-                            source
+                            source,
                         }
                         this.records.push(record)
                         count++
@@ -124,11 +133,13 @@ class NDJSONService {
     }
 
     getRecordsBySource(source: string): NDJSONRecord[] {
-        return this.records.filter(r => r.source === source)
+        return this.records.filter((r) => r.source === source)
     }
 
     getRecordsByDateRange(start: Date, end: Date): NDJSONRecord[] {
-        return this.records.filter(r => r.timestamp >= start && r.timestamp <= end)
+        return this.records.filter(
+            (r) => r.timestamp >= start && r.timestamp <= end
+        )
     }
 
     queryRecords(predicate: (record: NDJSONRecord) => boolean): NDJSONRecord[] {
@@ -141,7 +152,7 @@ class NDJSONService {
     }
 
     clearRecordsBySource(source: string): void {
-        this.records = this.records.filter(r => r.source !== source)
+        this.records = this.records.filter((r) => r.source !== source)
         log.info(`Cleared NDJSON records from source: ${source}`)
     }
 
@@ -149,14 +160,16 @@ class NDJSONService {
         return new Promise((resolve, reject) => {
             try {
                 const writeStream = fs.createWriteStream(outputPath)
-                
+
                 for (const record of this.records) {
                     writeStream.write(JSON.stringify(record.data) + '\n')
                 }
 
                 writeStream.end()
                 writeStream.on('finish', () => {
-                    log.info(`Exported ${this.records.length} records to ${outputPath}`)
+                    log.info(
+                        `Exported ${this.records.length} records to ${outputPath}`
+                    )
                     resolve()
                 })
                 writeStream.on('error', reject)

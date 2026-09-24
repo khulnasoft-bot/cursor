@@ -4,7 +4,13 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import type { DebugSession, DebugBreakpoint, DebugStackFrame, DebugVariable, DebugThread } from '../../main/debuggerService'
+import type {
+    DebugSession,
+    DebugBreakpoint,
+    DebugStackFrame,
+    DebugVariable,
+    DebugThread,
+} from '../../main/debuggerService'
 
 interface DebuggerState {
     sessions: DebugSession[]
@@ -25,7 +31,7 @@ const initialState: DebuggerState = {
     variables: [],
     threads: [],
     isDebugging: false,
-    isPaused: false
+    isPaused: false,
 }
 
 const debuggerSlice = createSlice({
@@ -39,7 +45,9 @@ const debuggerSlice = createSlice({
             state.sessions.push(action.payload)
         },
         removeSession: (state, action: PayloadAction<string>) => {
-            state.sessions = state.sessions.filter(s => s.id !== action.payload)
+            state.sessions = state.sessions.filter(
+                (s) => s.id !== action.payload
+            )
             if (state.activeSessionId === action.payload) {
                 state.activeSessionId = null
             }
@@ -47,21 +55,32 @@ const debuggerSlice = createSlice({
         setActiveSession: (state, action: PayloadAction<string | null>) => {
             state.activeSessionId = action.payload
         },
-        setBreakpoints: (state, action: PayloadAction<Map<string, DebugBreakpoint[]>>) => {
+        setBreakpoints: (
+            state,
+            action: PayloadAction<Map<string, DebugBreakpoint[]>>
+        ) => {
             state.breakpoints = action.payload
         },
-        addBreakpoint: (state, action: PayloadAction<{ path: string; breakpoint: DebugBreakpoint }>) => {
+        addBreakpoint: (
+            state,
+            action: PayloadAction<{ path: string; breakpoint: DebugBreakpoint }>
+        ) => {
             const { path, breakpoint } = action.payload
             if (!state.breakpoints.has(path)) {
                 state.breakpoints.set(path, [])
             }
             state.breakpoints.get(path)!.push(breakpoint)
         },
-        removeBreakpoint: (state, action: PayloadAction<{ path: string; breakpointId: string }>) => {
+        removeBreakpoint: (
+            state,
+            action: PayloadAction<{ path: string; breakpointId: string }>
+        ) => {
             const { path, breakpointId } = action.payload
             const breakpoints = state.breakpoints.get(path)
             if (breakpoints) {
-                const index = breakpoints.findIndex(bp => bp.id === breakpointId)
+                const index = breakpoints.findIndex(
+                    (bp) => bp.id === breakpointId
+                )
                 if (index !== -1) {
                     breakpoints.splice(index, 1)
                 }
@@ -91,8 +110,8 @@ const debuggerSlice = createSlice({
             state.threads = []
             state.isDebugging = false
             state.isPaused = false
-        }
-    }
+        },
+    },
 })
 
 export const {
@@ -108,7 +127,7 @@ export const {
     setThreads,
     setDebugging,
     setPaused,
-    clearDebugger
+    clearDebugger,
 } = debuggerSlice.actions
 
 export default debuggerSlice.reducer

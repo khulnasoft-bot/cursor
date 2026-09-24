@@ -178,7 +178,9 @@ export function App() {
     const rootPath = useAppSelector(getRootPath)
     const folders = useAppSelector(getFolders)
     const leftSideExpanded = useAppSelector(tsel.getLeftSideExpanded)
-    const composerPanelOpen = useAppSelector((state: FullState) => state.toolState.composerPanelOpen)
+    const composerPanelOpen = useAppSelector(
+        (state: FullState) => state.toolState.composerPanelOpen
+    )
 
     const [automationPanelOpen, setAutomationPanelOpen] = useState(false)
     const [cloudAgentPanelOpen, setCloudAgentPanelOpen] = useState(false)
@@ -265,8 +267,8 @@ export function App() {
         isNotFirstTime == false
             ? 'welcome'
             : Object.keys(folders).length <= 1
-            ? 'folder'
-            : 'normal'
+              ? 'folder'
+              : 'normal'
 
     const [dragging, setDragging] = useState(false)
     const [leftSideWidth, setLeftSideWidth] = useState(250)

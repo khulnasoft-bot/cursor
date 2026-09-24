@@ -32,6 +32,7 @@ cursor/
 ## Development Workflow
 
 ### Initial Setup
+
 ```bash
 npm i
 ./setup.sh  # Mac/Linux
@@ -39,17 +40,20 @@ npm i
 ```
 
 ### Running the Application
+
 ```bash
 npm start
 ```
 
 ### Building
+
 ```bash
 npm run make      # Create distributable
 npm run package   # Package without making distributable
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint      # ESLint
 npm run format    # Prettier
@@ -60,23 +64,27 @@ npm test          # Run tests
 ## Key Architecture Points
 
 ### Electron Processes
+
 - **Main Process**: Handles OS interactions, window management, file operations
 - **Renderer Process**: React-based UI, CodeMirror editor integration
 - **IPC**: Use `@electron/remote` carefully, prefer secure IPC patterns
 
 ### CodeMirror Integration
+
 - Uses CodeMirror 6 as the text editor
 - Language support via @codemirror/lang-* packages
 - Custom extensions for Cursor-specific features
 - Vim mode support via custom adapter
 
 ### State Management
+
 - Redux Toolkit for global state
 - Feature-based slice organization
 - Async operations with createAsyncThunk
 - Reselect for memoized selectors
 
 ### Build Configuration
+
 - Webpack for bundling (main and renderer separate)
 - Electron Forge for packaging
 - Custom loaders for TypeScript, CSS, etc.
@@ -107,6 +115,7 @@ npm test          # Run tests
 ## Common Tasks
 
 When working on this codebase:
+
 1. Understand the Electron architecture (main vs renderer)
 2. Follow existing patterns for similar features
 3. Use TypeScript strictly - no `any` types

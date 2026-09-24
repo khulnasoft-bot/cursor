@@ -22,11 +22,11 @@ class ResolverService {
 
     async resolveAuthority(authority: string): Promise<string> {
         log.info(`Resolving authority: ${authority}`)
-        
+
         // Placeholder for actual authority resolution logic
         // This would typically involve connecting to a remote server
         // and establishing a secure connection
-        
+
         this.connected = true
         return authority
     }

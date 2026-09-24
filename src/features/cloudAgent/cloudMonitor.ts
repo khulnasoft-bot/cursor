@@ -108,7 +108,7 @@ export class CloudMonitor {
 
         const newConfig: MonitorConfig = {
             ...config,
-            id: configId
+            id: configId,
         }
 
         this.configs.set(configId, newConfig)
@@ -116,7 +116,10 @@ export class CloudMonitor {
         return newConfig
     }
 
-    updateMonitorConfig(configId: string, updates: Partial<MonitorConfig>): MonitorConfig | null {
+    updateMonitorConfig(
+        configId: string,
+        updates: Partial<MonitorConfig>
+    ): MonitorConfig | null {
         const config = this.configs.get(configId)
         if (!config) return null
 
@@ -154,7 +157,7 @@ export class CloudMonitor {
                 const metricData: MetricData = {
                     timestamp: new Date(),
                     instanceId: instance.id,
-                    metrics
+                    metrics,
                 }
 
                 this.metrics.push(metricData)
@@ -170,7 +173,9 @@ export class CloudMonitor {
         }
     }
 
-    private async getInstanceMetrics(_instanceId: string): Promise<MetricData['metrics'] | null> {
+    private async getInstanceMetrics(
+        _instanceId: string
+    ): Promise<MetricData['metrics'] | null> {
         // Placeholder for actual metrics collection
         return {
             cpu: Math.random() * 100,
@@ -178,26 +183,35 @@ export class CloudMonitor {
             storage: Math.random() * 100,
             networkIn: Math.random() * 1000,
             networkOut: Math.random() * 1000,
-            diskIO: Math.random() * 100
+            diskIO: Math.random() * 100,
         }
     }
 
     getMetrics(instanceId?: string): MetricData[] {
         if (instanceId) {
-            return this.metrics.filter(m => m.instanceId === instanceId)
+            return this.metrics.filter((m) => m.instanceId === instanceId)
         }
         return [...this.metrics]
     }
 
-    getMetricsByTimeRange(start: Date, end: Date, instanceId?: string): MetricData[] {
-        let filtered = this.metrics.filter(m => m.timestamp >= start && m.timestamp <= end)
+    getMetricsByTimeRange(
+        start: Date,
+        end: Date,
+        instanceId?: string
+    ): MetricData[] {
+        let filtered = this.metrics.filter(
+            (m) => m.timestamp >= start && m.timestamp <= end
+        )
         if (instanceId) {
-            filtered = filtered.filter(m => m.instanceId === instanceId)
+            filtered = filtered.filter((m) => m.instanceId === instanceId)
         }
         return filtered
     }
 
-    getAggregatedMetrics(instanceId: string, duration: number = 3600000): {
+    getAggregatedMetrics(
+        instanceId: string,
+        duration: number = 3600000
+    ): {
         avgCpu: number
         avgMemory: number
         avgStorage: number
@@ -211,14 +225,24 @@ export class CloudMonitor {
 
         if (metrics.length === 0) return null
 
-        const sum = metrics.reduce((acc, m) => ({
-            cpu: acc.cpu + m.metrics.cpu,
-            memory: acc.memory + m.metrics.memory,
-            storage: acc.storage + m.metrics.storage,
-            networkIn: acc.networkIn + m.metrics.networkIn,
-            networkOut: acc.networkOut + m.metrics.networkOut,
-            diskIO: acc.diskIO + m.metrics.diskIO
-        }), { cpu: 0, memory: 0, storage: 0, networkIn: 0, networkOut: 0, diskIO: 0 })
+        const sum = metrics.reduce(
+            (acc, m) => ({
+                cpu: acc.cpu + m.metrics.cpu,
+                memory: acc.memory + m.metrics.memory,
+                storage: acc.storage + m.metrics.storage,
+                networkIn: acc.networkIn + m.metrics.networkIn,
+                networkOut: acc.networkOut + m.metrics.networkOut,
+                diskIO: acc.diskIO + m.metrics.diskIO,
+            }),
+            {
+                cpu: 0,
+                memory: 0,
+                storage: 0,
+                networkIn: 0,
+                networkOut: 0,
+                diskIO: 0,
+            }
+        )
 
         const count = metrics.length
 
@@ -228,19 +252,24 @@ export class CloudMonitor {
             avgStorage: sum.storage / count,
             avgNetworkIn: sum.networkIn / count,
             avgNetworkOut: sum.networkOut / count,
-            avgDiskIO: sum.diskIO / count
+            avgDiskIO: sum.diskIO / count,
         }
     }
 
     // Logging
-    log(instanceId: string, level: LogEntry['level'], message: string, context?: Record<string, any>): void {
+    log(
+        instanceId: string,
+        level: LogEntry['level'],
+        message: string,
+        context?: Record<string, any>
+    ): void {
         const entry: LogEntry = {
             id: `log-${++this.logCounter}`,
             timestamp: new Date(),
             instanceId,
             level,
             message,
-            context
+            context,
         }
 
         this.logs.push(entry)
@@ -257,44 +286,58 @@ export class CloudMonitor {
         let filtered = [...this.logs]
 
         if (instanceId) {
-            filtered = filtered.filter(l => l.instanceId === instanceId)
+            filtered = filtered.filter((l) => l.instanceId === instanceId)
         }
 
         if (level) {
-            filtered = filtered.filter(l => l.level === level)
+            filtered = filtered.filter((l) => l.level === level)
         }
 
         return filtered
     }
 
-    getLogsByTimeRange(start: Date, end: Date, instanceId?: string): LogEntry[] {
-        let filtered = this.logs.filter(l => l.timestamp >= start && l.timestamp <= end)
+    getLogsByTimeRange(
+        start: Date,
+        end: Date,
+        instanceId?: string
+    ): LogEntry[] {
+        let filtered = this.logs.filter(
+            (l) => l.timestamp >= start && l.timestamp <= end
+        )
         if (instanceId) {
-            filtered = filtered.filter(l => l.instanceId === instanceId)
+            filtered = filtered.filter((l) => l.instanceId === instanceId)
         }
         return filtered
     }
 
     searchLogs(query: string): LogEntry[] {
         const queryLower = query.toLowerCase()
-        return this.logs.filter(l =>
-            l.message.toLowerCase().includes(queryLower) ||
-            JSON.stringify(l.context || {}).toLowerCase().includes(queryLower)
+        return this.logs.filter(
+            (l) =>
+                l.message.toLowerCase().includes(queryLower) ||
+                JSON.stringify(l.context || {})
+                    .toLowerCase()
+                    .includes(queryLower)
         )
     }
 
     clearLogs(instanceId?: string): void {
         if (instanceId) {
-            this.logs = this.logs.filter(l => l.instanceId !== instanceId)
+            this.logs = this.logs.filter((l) => l.instanceId !== instanceId)
         } else {
             this.logs = []
             this.logCounter = 0
         }
-        log.info(`Cleared logs${instanceId ? ` for instance ${instanceId}` : ''}`)
+        log.info(
+            `Cleared logs${instanceId ? ` for instance ${instanceId}` : ''}`
+        )
     }
 
     // Alerts
-    private async checkAlertThresholds(instanceId: string, metrics: MetricData['metrics']): Promise<void> {
+    private async checkAlertThresholds(
+        instanceId: string,
+        metrics: MetricData['metrics']
+    ): Promise<void> {
         const configs = this.getMonitorConfigs()
 
         for (const config of configs.values()) {
@@ -303,16 +346,28 @@ export class CloudMonitor {
             const thresholds = config.alertThresholds
 
             if (metrics.cpu > thresholds.cpuUtilization) {
-                this.createAlert('warning', 'cpu_utilization', instanceId,
+                this.createAlert(
+                    'warning',
+                    'cpu_utilization',
+                    instanceId,
                     `CPU utilization exceeded threshold: ${metrics.cpu.toFixed(1)}%`,
-                    { current: metrics.cpu, threshold: thresholds.cpuUtilization }
+                    {
+                        current: metrics.cpu,
+                        threshold: thresholds.cpuUtilization,
+                    }
                 )
             }
 
             if (metrics.memory > thresholds.memoryUtilization) {
-                this.createAlert('warning', 'memory_utilization', instanceId,
+                this.createAlert(
+                    'warning',
+                    'memory_utilization',
+                    instanceId,
                     `Memory utilization exceeded threshold: ${metrics.memory.toFixed(1)}%`,
-                    { current: metrics.memory, threshold: thresholds.memoryUtilization }
+                    {
+                        current: metrics.memory,
+                        threshold: thresholds.memoryUtilization,
+                    }
                 )
             }
         }
@@ -333,7 +388,7 @@ export class CloudMonitor {
             instanceId,
             message,
             details,
-            acknowledged: false
+            acknowledged: false,
         }
 
         this.alerts.push(alert)
@@ -343,7 +398,7 @@ export class CloudMonitor {
     }
 
     acknowledgeAlert(alertId: string): boolean {
-        const alert = this.alerts.find(a => a.id === alertId)
+        const alert = this.alerts.find((a) => a.id === alertId)
         if (!alert) return false
 
         alert.acknowledged = true
@@ -352,7 +407,7 @@ export class CloudMonitor {
     }
 
     resolveAlert(alertId: string): boolean {
-        const alert = this.alerts.find(a => a.id === alertId)
+        const alert = this.alerts.find((a) => a.id === alertId)
         if (!alert) return false
 
         alert.acknowledged = true
@@ -366,20 +421,20 @@ export class CloudMonitor {
     }
 
     getUnacknowledgedAlerts(): Alert[] {
-        return this.alerts.filter(a => !a.acknowledged)
+        return this.alerts.filter((a) => !a.acknowledged)
     }
 
     getAlertsBySeverity(severity: Alert['severity']): Alert[] {
-        return this.alerts.filter(a => a.severity === severity)
+        return this.alerts.filter((a) => a.severity === severity)
     }
 
     getAlertsByInstance(instanceId: string): Alert[] {
-        return this.alerts.filter(a => a.instanceId === instanceId)
+        return this.alerts.filter((a) => a.instanceId === instanceId)
     }
 
     getRecentAlerts(minutes: number = 60): Alert[] {
         const cutoff = new Date(Date.now() - minutes * 60 * 1000)
-        return this.alerts.filter(a => a.timestamp >= cutoff)
+        return this.alerts.filter((a) => a.timestamp >= cutoff)
     }
 
     clearAlerts(): void {
@@ -403,7 +458,9 @@ export class CloudMonitor {
             if (metrics.avgStorage > 90) issues.push('High storage utilization')
         }
 
-        const recentAlerts = this.getRecentAlerts(30).filter(a => a.instanceId === instanceId && a.severity === 'error')
+        const recentAlerts = this.getRecentAlerts(30).filter(
+            (a) => a.instanceId === instanceId && a.severity === 'error'
+        )
         if (recentAlerts.length > 0) {
             issues.push('Recent error alerts')
         }
@@ -411,7 +468,7 @@ export class CloudMonitor {
         return {
             healthy: issues.length === 0,
             issues,
-            metrics
+            metrics,
         }
     }
 
@@ -431,7 +488,9 @@ export class CloudMonitor {
             if (health.healthy) {
                 healthyInstances++
             } else {
-                allIssues.push(...health.issues.map(i => `${instance.id}: ${i}`))
+                allIssues.push(
+                    ...health.issues.map((i) => `${instance.id}: ${i}`)
+                )
             }
         }
 
@@ -440,7 +499,7 @@ export class CloudMonitor {
             totalInstances: instances.length,
             healthyInstances,
             unhealthyInstances: instances.length - healthyInstances,
-            issues: allIssues
+            issues: allIssues,
         }
     }
 
@@ -460,9 +519,12 @@ export class CloudMonitor {
             totalLogs: this.logs.length,
             totalAlerts: this.alerts.length,
             unacknowledgedAlerts: this.getUnacknowledgedAlerts().length,
-            criticalAlerts: this.alerts.filter(a => a.severity === 'critical').length,
-            errorAlerts: this.alerts.filter(a => a.severity === 'error').length,
-            warningAlerts: this.alerts.filter(a => a.severity === 'warning').length
+            criticalAlerts: this.alerts.filter((a) => a.severity === 'critical')
+                .length,
+            errorAlerts: this.alerts.filter((a) => a.severity === 'error')
+                .length,
+            warningAlerts: this.alerts.filter((a) => a.severity === 'warning')
+                .length,
         }
     }
 

@@ -28,12 +28,16 @@ class MCPService {
     private servers: Map<string, MCPServer> = new Map()
     private serverIdCounter = 0
 
-    async startServer(name: string, command: string, args: string[] = []): Promise<string> {
+    async startServer(
+        name: string,
+        command: string,
+        args: string[] = []
+    ): Promise<string> {
         const serverId = `mcp-${++this.serverIdCounter}`
-        
+
         try {
             const process = spawn(command, args, {
-                stdio: ['pipe', 'pipe', 'pipe']
+                stdio: ['pipe', 'pipe', 'pipe'],
             })
 
             const server: MCPServer = {
@@ -42,7 +46,7 @@ class MCPService {
                 command,
                 args,
                 process,
-                connected: false
+                connected: false,
             }
 
             this.setupProcessHandlers(server)
@@ -67,7 +71,10 @@ class MCPService {
                     this.handleServerMessage(server, parsed)
                 }
             } catch (error) {
-                log.warn(`Failed to parse MCP message from ${server.name}:`, error)
+                log.warn(
+                    `Failed to parse MCP message from ${server.name}:`,
+                    error
+                )
             }
         })
 
@@ -89,7 +96,7 @@ class MCPService {
 
     private handleServerMessage(server: MCPServer, message: MCPMessage) {
         log.info(`MCP message from ${server.name}:`, message)
-        
+
         // Handle initialization response
         if (message.result && message.result.serverInfo) {
             server.connected = true
@@ -97,7 +104,10 @@ class MCPService {
         }
     }
 
-    async sendMessage(serverId: string, message: MCPMessage): Promise<MCPMessage> {
+    async sendMessage(
+        serverId: string,
+        message: MCPMessage
+    ): Promise<MCPMessage> {
         const server = this.servers.get(serverId)
         if (!server || !server.process) {
             throw new Error(`Server not found or not running: ${serverId}`)
@@ -105,7 +115,7 @@ class MCPService {
 
         return new Promise((resolve, reject) => {
             const messageStr = JSON.stringify(message) + '\n'
-            
+
             const timeout = setTimeout(() => {
                 reject(new Error('MCP request timeout'))
             }, 30000)
@@ -144,39 +154,45 @@ class MCPService {
                 capabilities: {},
                 clientInfo: {
                     name: 'Cursor',
-                    version: '3.9.16'
-                }
-            }
+                    version: '3.9.16',
+                },
+            },
         }
 
         const response = await this.sendMessage(serverId, initMessage)
-        
+
         if (response.error) {
-            throw new Error(`MCP initialization failed: ${response.error.message}`)
+            throw new Error(
+                `MCP initialization failed: ${response.error.message}`
+            )
         }
 
         // Send initialized notification
         const initializedMessage: MCPMessage = {
             jsonrpc: '2.0',
-            method: 'notifications/initialized'
+            method: 'notifications/initialized',
         }
-        
+
         await this.sendMessage(serverId, initializedMessage)
     }
 
-    async callTool(serverId: string, toolName: string, params: any = {}): Promise<any> {
+    async callTool(
+        serverId: string,
+        toolName: string,
+        params: any = {}
+    ): Promise<any> {
         const message: MCPMessage = {
             jsonrpc: '2.0',
             id: Date.now(),
             method: 'tools/call',
             params: {
                 name: toolName,
-                arguments: params
-            }
+                arguments: params,
+            },
         }
 
         const response = await this.sendMessage(serverId, message)
-        
+
         if (response.error) {
             throw new Error(`Tool call failed: ${response.error.message}`)
         }
@@ -188,11 +204,11 @@ class MCPService {
         const message: MCPMessage = {
             jsonrpc: '2.0',
             id: Date.now(),
-            method: 'tools/list'
+            method: 'tools/list',
         }
 
         const response = await this.sendMessage(serverId, message)
-        
+
         if (response.error) {
             throw new Error(`Failed to list tools: ${response.error.message}`)
         }

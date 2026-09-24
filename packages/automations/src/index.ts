@@ -8,7 +8,7 @@ export {
     AutomationService,
     getAutomationService,
     destroyAutomationService,
-    createAutomationService
+    createAutomationService,
 } from './automationService'
 
 // Types
@@ -22,7 +22,7 @@ export type {
     AutomationExecution,
     AutomationConfig,
     AutomationStatistics,
-    ActionResult
+    ActionResult,
 } from './types'
 
 // Logger
@@ -31,7 +31,7 @@ export {
     LogLevel,
     ConsoleLogger,
     NoOpLogger,
-    MemoryLogger
+    MemoryLogger,
 } from './logger'
 
 // Action Registry
@@ -40,7 +40,7 @@ export {
     ActionDefinition,
     getActionRegistry,
     destroyActionRegistry,
-    createActionRegistry
+    createActionRegistry,
 } from './actions/actionRegistry'
 
 // Trigger System
@@ -49,7 +49,7 @@ export {
     TriggerHandler,
     getTriggerSystem,
     destroyTriggerSystem,
-    createTriggerSystem
+    createTriggerSystem,
 } from './triggers/triggerSystem'
 
 // Scheduler
@@ -59,7 +59,7 @@ export {
     RecurringSchedule,
     getAutomationScheduler,
     destroyAutomationScheduler,
-    createAutomationScheduler
+    createAutomationScheduler,
 } from './scheduler/automationScheduler'
 
 // Templates
@@ -68,5 +68,5 @@ export {
     AutomationTemplate,
     getAutomationTemplates,
     destroyAutomationTemplates,
-    createAutomationTemplates
+    createAutomationTemplates,
 } from './templates/automationTemplates'

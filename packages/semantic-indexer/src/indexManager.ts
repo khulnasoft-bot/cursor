@@ -3,11 +3,7 @@
  * Manages index lifecycle, updates, and persistence
  */
 
-import {
-    CodeChunk,
-    SemanticIndex,
-    IndexerConfig
-} from './types'
+import { CodeChunk, SemanticIndex, IndexerConfig } from './types'
 import { Logger, ConsoleLogger } from './logger'
 
 export interface IndexSnapshot {
@@ -31,23 +27,26 @@ export class IndexManager {
             maxIndexSize: config.maxIndexSize ?? 100000,
             enableCache: config.enableCache ?? true,
             enablePersistence: config.enablePersistence ?? false,
-            logLevel: config.logLevel || 'info'
+            logLevel: config.logLevel || 'info',
         }
         this.logger = logger || new ConsoleLogger()
         this.snapshots = new Map()
-        
+
         this.index = {
             chunks: new Map(),
             filePaths: new Set(),
             lastIndexed: new Date(),
             totalChunks: 0,
-            version: '1.0.0'
+            version: '1.0.0',
         }
     }
 
     addChunk(chunk: CodeChunk): void {
         // Check index size limit
-        if (this.config.maxIndexSize && this.index.totalChunks >= this.config.maxIndexSize) {
+        if (
+            this.config.maxIndexSize &&
+            this.index.totalChunks >= this.config.maxIndexSize
+        ) {
             this.logger.warn('Index size limit reached, consider pruning')
         }
 
@@ -65,7 +64,7 @@ export class IndexManager {
 
         // Check if file still has chunks
         const fileHasChunks = Array.from(this.index.chunks.values()).some(
-            c => c.filePath === chunk.filePath
+            (c) => c.filePath === chunk.filePath
         )
 
         if (!fileHasChunks) {
@@ -108,7 +107,7 @@ export class IndexManager {
             filePaths: new Set(this.index.filePaths),
             lastIndexed: this.index.lastIndexed,
             totalChunks: this.index.totalChunks,
-            version: this.index.version
+            version: this.index.version,
         }
     }
 
@@ -118,7 +117,7 @@ export class IndexManager {
             filePaths: new Set(index.filePaths),
             lastIndexed: index.lastIndexed,
             totalChunks: index.totalChunks,
-            version: index.version
+            version: index.version,
         }
         this.logger.info('Index updated')
     }
@@ -129,7 +128,7 @@ export class IndexManager {
             timestamp: new Date(),
             chunkCount: this.index.totalChunks,
             fileCount: this.index.filePaths.size,
-            checksum: this.computeChecksum()
+            checksum: this.computeChecksum(),
         }
 
         const snapshotId = `snapshot-${snapshot.timestamp.getTime()}`
@@ -177,11 +176,11 @@ export class IndexManager {
         // Simple checksum based on chunk count and file paths
         const filePaths = Array.from(this.index.filePaths).sort()
         const data = `${this.index.totalChunks}:${filePaths.join(',')}:${this.index.version}`
-        
+
         let hash = 0
         for (let i = 0; i < data.length; i++) {
             const char = data.charCodeAt(i)
-            hash = ((hash << 5) - hash) + char
+            hash = (hash << 5) - hash + char
             hash = hash & hash
         }
         return hash.toString(36)
@@ -199,7 +198,7 @@ export class IndexManager {
             totalFiles: this.index.filePaths.size,
             lastIndexed: this.index.lastIndexed,
             version: this.index.version,
-            snapshots: this.snapshots.size
+            snapshots: this.snapshots.size,
         }
     }
 
@@ -209,7 +208,7 @@ export class IndexManager {
             filePaths: new Set(),
             lastIndexed: new Date(),
             totalChunks: 0,
-            version: '1.0.0'
+            version: '1.0.0',
         }
         this.logger.info('Index cleared')
     }
@@ -273,7 +272,7 @@ export class IndexManager {
         // Check for orphaned file paths
         for (const filePath of this.index.filePaths) {
             const hasChunks = Array.from(this.index.chunks.values()).some(
-                c => c.filePath === filePath
+                (c) => c.filePath === filePath
             )
             if (!hasChunks) {
                 errors.push(`Orphaned file path: ${filePath} (no chunks)`)
@@ -282,7 +281,7 @@ export class IndexManager {
 
         return {
             valid: errors.length === 0,
-            errors
+            errors,
         }
     }
 
@@ -305,7 +304,10 @@ export class IndexManager {
 // Singleton instance
 let indexManager: IndexManager | null = null
 
-export function getIndexManager(config?: IndexerConfig, logger?: Logger): IndexManager {
+export function getIndexManager(
+    config?: IndexerConfig,
+    logger?: Logger
+): IndexManager {
     if (!indexManager) {
         indexManager = new IndexManager(config, logger)
     }
@@ -319,6 +321,9 @@ export function destroyIndexManager(): void {
     }
 }
 
-export function createIndexManager(config?: IndexerConfig, logger?: Logger): IndexManager {
+export function createIndexManager(
+    config?: IndexerConfig,
+    logger?: Logger
+): IndexManager {
     return new IndexManager(config, logger)
 }

@@ -36,15 +36,18 @@ class BrowserAutomation {
     private sessions: Map<string, BrowserSession> = new Map()
     private sessionIdCounter = 0
 
-    async createSession(options: BrowserAutomationOptions = {}): Promise<string> {
+    async createSession(
+        options: BrowserAutomationOptions = {}
+    ): Promise<string> {
         const sessionId = `session-${++this.sessionIdCounter}`
-        
+
         const defaultOptions: BrowserAutomationOptions = {
             headless: true,
             width: 1280,
             height: 720,
-            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-            ...options
+            userAgent:
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            ...options,
         }
 
         const browserWindow = new BrowserWindow({
@@ -57,19 +60,21 @@ class BrowserAutomation {
                 sandbox: true,
                 webSecurity: true,
                 allowRunningInsecureContent: false,
-            }
+            },
         })
 
         // Set user agent if provided
         if (defaultOptions.userAgent) {
-            await browserWindow.webContents.session.setUserAgent(defaultOptions.userAgent)
+            await browserWindow.webContents.session.setUserAgent(
+                defaultOptions.userAgent
+            )
         }
 
         const session: BrowserSession = {
             id: sessionId,
             window: browserWindow,
             url: 'about:blank',
-            createdAt: new Date()
+            createdAt: new Date(),
         }
 
         this.sessions.set(sessionId, session)
@@ -78,7 +83,11 @@ class BrowserAutomation {
         return sessionId
     }
 
-    async navigate(sessionId: string, url: string, options: NavigationOptions = {}): Promise<void> {
+    async navigate(
+        sessionId: string,
+        url: string,
+        options: NavigationOptions = {}
+    ): Promise<void> {
         const session = this.sessions.get(sessionId)
         if (!session) {
             throw new Error(`Session not found: ${sessionId}`)
@@ -87,7 +96,7 @@ class BrowserAutomation {
         const defaultOptions: NavigationOptions = {
             waitUntil: 'load',
             timeout: 30000,
-            ...options
+            ...options,
         }
 
         try {
@@ -116,7 +125,11 @@ class BrowserAutomation {
         `)
     }
 
-    async type(sessionId: string, selector: string, text: string): Promise<void> {
+    async type(
+        sessionId: string,
+        selector: string,
+        text: string
+    ): Promise<void> {
         const session = this.sessions.get(sessionId)
         if (!session) {
             throw new Error(`Session not found: ${sessionId}`)
@@ -143,7 +156,9 @@ class BrowserAutomation {
             ? `document.querySelector('${selector}')?.innerText || ''`
             : `document.body.innerText`
 
-        return await session.window.webContents.executeJavaScript(`return ${script}`)
+        return await session.window.webContents.executeJavaScript(
+            `return ${script}`
+        )
     }
 
     async extractHTML(sessionId: string, selector?: string): Promise<string> {
@@ -156,7 +171,9 @@ class BrowserAutomation {
             ? `document.querySelector('${selector}')?.outerHTML || ''`
             : `document.body.outerHTML`
 
-        return await session.window.webContents.executeJavaScript(`return ${script}`)
+        return await session.window.webContents.executeJavaScript(
+            `return ${script}`
+        )
     }
 
     async screenshot(sessionId: string): Promise<Buffer> {
@@ -178,7 +195,11 @@ class BrowserAutomation {
         return await session.window.webContents.executeJavaScript(script)
     }
 
-    async waitForSelector(sessionId: string, selector: string, timeout = 5000): Promise<boolean> {
+    async waitForSelector(
+        sessionId: string,
+        selector: string,
+        timeout = 5000
+    ): Promise<boolean> {
         const session = this.sessions.get(sessionId)
         if (!session) {
             throw new Error(`Session not found: ${sessionId}`)

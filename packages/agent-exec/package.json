@@ -1,34 +1,34 @@
 {
-  "name": "@cursor/agent-exec",
-  "version": "1.0.0",
-  "description": "Autonomous agent execution service with planning, memory, and decision-making",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
-  },
-  "keywords": [
-    "cursor",
-    "agent",
-    "autonomous",
-    "planning",
-    "memory",
-    "orchestration"
-  ],
-  "author": "Cursor Team",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
-    "jest": "^30.5.2",
-    "typescript": "^7.0.2"
-  },
-  "dependencies": {},
-  "files": [
-    "dist",
-    "README.md"
-  ]
+    "name": "@cursor/agent-exec",
+    "version": "1.0.0",
+    "description": "Autonomous agent execution service with planning, memory, and decision-making",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch",
+        "prepublishOnly": "npm run build",
+        "test": "jest"
+    },
+    "keywords": [
+        "cursor",
+        "agent",
+        "autonomous",
+        "planning",
+        "memory",
+        "orchestration"
+    ],
+    "author": "Cursor Team",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.0.0",
+        "jest": "^30.5.2",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {},
+    "files": [
+        "dist",
+        "README.md"
+    ]
 }

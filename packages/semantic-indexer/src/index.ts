@@ -8,7 +8,7 @@ export {
     SemanticIndexer,
     getSemanticIndexer,
     destroySemanticIndexer,
-    createSemanticIndexer
+    createSemanticIndexer,
 } from './semanticIndexer'
 
 // Embedding generator
@@ -16,19 +16,17 @@ export {
     EmbeddingGenerator,
     getEmbeddingGenerator,
     destroyEmbeddingGenerator,
-    createEmbeddingGenerator
+    createEmbeddingGenerator,
 } from './embeddingGenerator'
 
-export type {
-    EmbeddingService
-} from './embeddingGenerator'
+export type { EmbeddingService } from './embeddingGenerator'
 
 // Relationship mapper
 export {
     RelationshipMapper,
     getRelationshipMapper,
     destroyRelationshipMapper,
-    createRelationshipMapper
+    createRelationshipMapper,
 } from './relationshipMapper'
 
 // Search engine
@@ -36,24 +34,20 @@ export {
     SearchEngine,
     getSearchEngine,
     destroySearchEngine,
-    createSearchEngine
+    createSearchEngine,
 } from './searchEngine'
 
-export type {
-    SearchOptions
-} from './searchEngine'
+export type { SearchOptions } from './searchEngine'
 
 // Index manager
 export {
     IndexManager,
     getIndexManager,
     destroyIndexManager,
-    createIndexManager
+    createIndexManager,
 } from './indexManager'
 
-export type {
-    IndexSnapshot
-} from './indexManager'
+export type { IndexSnapshot } from './indexManager'
 
 // Types
 export type {
@@ -64,13 +58,8 @@ export type {
     EmbeddingConfig,
     IndexerConfig,
     FileRelationship,
-    RelationshipGraph
+    RelationshipGraph,
 } from './types'
 
 // Logger
-export {
-    Logger,
-    LogLevel,
-    ConsoleLogger,
-    NoOpLogger
-} from './logger'
+export { Logger, LogLevel, ConsoleLogger, NoOpLogger } from './logger'

@@ -20,7 +20,12 @@ export interface SandboxConfig {
 }
 
 export interface SandboxViolation {
-    type: 'path_access' | 'command_execution' | 'resource_limit' | 'network_access' | 'system_command'
+    type:
+        | 'path_access'
+        | 'command_execution'
+        | 'resource_limit'
+        | 'network_access'
+        | 'system_command'
     severity: 'warning' | 'error' | 'critical'
     message: string
     details?: any
@@ -43,7 +48,7 @@ export class AgentSandbox {
             allowSystemCommands: false,
             requireConfirmation: true,
             logLevel: 'info',
-            ...config
+            ...config,
         }
     }
 
@@ -61,7 +66,10 @@ export class AgentSandbox {
         return this.active
     }
 
-    checkPathAccess(filePath: string, operation: 'read' | 'write' | 'delete'): { allowed: boolean; violation?: SandboxViolation } {
+    checkPathAccess(
+        filePath: string,
+        operation: 'read' | 'write' | 'delete'
+    ): { allowed: boolean; violation?: SandboxViolation } {
         if (!this.active) return { allowed: true }
 
         const normalizedPath = path.normalize(filePath)
@@ -74,7 +82,7 @@ export class AgentSandbox {
                     severity: 'error',
                     message: `Access to blocked path denied: ${filePath}`,
                     details: { path: filePath, operation },
-                    timestamp: new Date()
+                    timestamp: new Date(),
                 }
                 this.violations.push(violation)
                 log.warn(`Path access violation: ${filePath}`)
@@ -91,14 +99,14 @@ export class AgentSandbox {
                     break
                 }
             }
-            
+
             if (!allowed) {
                 const violation: SandboxViolation = {
                     type: 'path_access',
                     severity: 'warning',
                     message: `Access to path outside allowed directories: ${filePath}`,
                     details: { path: filePath, operation },
-                    timestamp: new Date()
+                    timestamp: new Date(),
                 }
                 this.violations.push(violation)
                 log.warn(`Path access violation: ${filePath}`)
@@ -115,7 +123,10 @@ export class AgentSandbox {
         return { allowed: true }
     }
 
-    checkCommandExecution(command: string): { allowed: boolean; violation?: SandboxViolation } {
+    checkCommandExecution(command: string): {
+        allowed: boolean
+        violation?: SandboxViolation
+    } {
         if (!this.active) return { allowed: true }
 
         if (!this.config.allowSystemCommands) {
@@ -124,7 +135,7 @@ export class AgentSandbox {
                 severity: 'error',
                 message: 'System command execution is disabled',
                 details: { command },
-                timestamp: new Date()
+                timestamp: new Date(),
             }
             this.violations.push(violation)
             log.warn(`System command violation: ${command}`)
@@ -132,7 +143,16 @@ export class AgentSandbox {
         }
 
         // Check for dangerous commands
-        const dangerousCommands = ['rm', 'dd', 'mkfs', 'format', 'fdisk', 'shutdown', 'reboot', 'halt']
+        const dangerousCommands = [
+            'rm',
+            'dd',
+            'mkfs',
+            'format',
+            'fdisk',
+            'shutdown',
+            'reboot',
+            'halt',
+        ]
         const commandParts = command.split(' ')
         const baseCommand = commandParts[0]
 
@@ -142,7 +162,7 @@ export class AgentSandbox {
                 severity: 'critical',
                 message: `Dangerous command blocked: ${baseCommand}`,
                 details: { command },
-                timestamp: new Date()
+                timestamp: new Date(),
             }
             this.violations.push(violation)
             log.error(`Dangerous command violation: ${command}`)
@@ -152,7 +172,10 @@ export class AgentSandbox {
         return { allowed: true }
     }
 
-    checkNetworkAccess(url: string): { allowed: boolean; violation?: SandboxViolation } {
+    checkNetworkAccess(url: string): {
+        allowed: boolean
+        violation?: SandboxViolation
+    } {
         if (!this.active) return { allowed: true }
 
         if (!this.config.allowNetworkAccess) {
@@ -161,7 +184,7 @@ export class AgentSandbox {
                 severity: 'error',
                 message: 'Network access is disabled',
                 details: { url },
-                timestamp: new Date()
+                timestamp: new Date(),
             }
             this.violations.push(violation)
             log.warn(`Network access violation: ${url}`)
@@ -174,16 +197,23 @@ export class AgentSandbox {
         return { allowed: true }
     }
 
-    checkResourceUsage(operation: string, size?: number): { allowed: boolean; violation?: SandboxViolation } {
+    checkResourceUsage(
+        operation: string,
+        size?: number
+    ): { allowed: boolean; violation?: SandboxViolation } {
         if (!this.active) return { allowed: true }
 
-        if (size && operation === 'file_write' && size > this.config.maxFileSize) {
+        if (
+            size &&
+            operation === 'file_write' &&
+            size > this.config.maxFileSize
+        ) {
             const violation: SandboxViolation = {
                 type: 'resource_limit',
                 severity: 'error',
                 message: `File size exceeds maximum allowed: ${size} > ${this.config.maxFileSize}`,
                 details: { operation, size, maxSize: this.config.maxFileSize },
-                timestamp: new Date()
+                timestamp: new Date(),
             }
             this.violations.push(violation)
             log.warn(`Resource limit violation: file size ${size}`)
@@ -202,7 +232,9 @@ export class AgentSandbox {
     }
 
     removeAllowedPath(path: string): void {
-        this.config.allowedPaths = this.config.allowedPaths.filter(p => p !== path)
+        this.config.allowedPaths = this.config.allowedPaths.filter(
+            (p) => p !== path
+        )
         log.info(`Removed allowed path: ${path}`)
     }
 
@@ -212,7 +244,9 @@ export class AgentSandbox {
     }
 
     removeBlockedPath(path: string): void {
-        this.config.blockedPaths = this.config.blockedPaths.filter(p => p !== path)
+        this.config.blockedPaths = this.config.blockedPaths.filter(
+            (p) => p !== path
+        )
         log.info(`Removed blocked path: ${path}`)
     }
 
@@ -251,11 +285,13 @@ export class AgentSandbox {
     }
 
     getViolationsByType(type: SandboxViolation['type']): SandboxViolation[] {
-        return this.violations.filter(v => v.type === type)
+        return this.violations.filter((v) => v.type === type)
     }
 
-    getViolationsBySeverity(severity: SandboxViolation['severity']): SandboxViolation[] {
-        return this.violations.filter(v => v.severity === severity)
+    getViolationsBySeverity(
+        severity: SandboxViolation['severity']
+    ): SandboxViolation[] {
+        return this.violations.filter((v) => v.severity === severity)
     }
 
     clearViolations(): void {
@@ -294,7 +330,7 @@ export class AgentSandbox {
             allowNetworkAccess: false,
             allowSystemCommands: false,
             requireConfirmation: true,
-            logLevel: 'info'
+            logLevel: 'info',
         }
         this.violations = []
         log.info('Reset sandbox to defaults')
@@ -302,7 +338,7 @@ export class AgentSandbox {
 
     async createSandboxDirectory(basePath: string): Promise<string> {
         const sandboxDir = path.join(basePath, '.sandbox')
-        
+
         try {
             await fs.mkdir(sandboxDir, { recursive: true })
             this.addAllowedPath(sandboxDir)
@@ -338,7 +374,7 @@ export class AgentSandbox {
             criticalViolations: this.getCriticalViolationCount(),
             allowedPaths: this.config.allowedPaths.length,
             blockedPaths: this.config.blockedPaths.length,
-            config: this.getConfig()
+            config: this.getConfig(),
         }
     }
 }

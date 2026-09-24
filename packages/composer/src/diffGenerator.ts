@@ -45,25 +45,33 @@ export class DiffGenerator {
 
     generateDiff(oldContent: string, newContent: string): DiffHunk[] {
         const hunks: DiffHunk[] = []
-        
+
         const oldLines = oldContent.split('\n')
         const newLines = newContent.split('\n')
-        
+
         // Simple line-by-line diff
         let oldIndex = 0
         let newIndex = 0
-        
+
         while (oldIndex < oldLines.length || newIndex < newLines.length) {
             const oldLine = oldLines[oldIndex]
             const newLine = newLines[newIndex]
-            
+
             if (oldLine === newLine) {
                 // Lines are equal
                 oldIndex++
                 newIndex++
-            } else if (oldIndex < oldLines.length && newIndex < newLines.length) {
+            } else if (
+                oldIndex < oldLines.length &&
+                newIndex < newLines.length
+            ) {
                 // Lines differ - create a hunk
-                const hunk = this.createDiffHunk(oldLines, newLines, oldIndex, newIndex)
+                const hunk = this.createDiffHunk(
+                    oldLines,
+                    newLines,
+                    oldIndex,
+                    newIndex
+                )
                 if (hunk) {
                     hunks.push(hunk)
                     oldIndex += hunk.oldLines.length
@@ -81,7 +89,7 @@ export class DiffGenerator {
                     newEnd: newIndex,
                     oldLines: oldLines.slice(oldIndex),
                     newLines: [],
-                    type: 'remove'
+                    type: 'remove',
                 })
                 oldIndex = oldLines.length
             } else {
@@ -93,12 +101,12 @@ export class DiffGenerator {
                     newEnd: newLines.length,
                     oldLines: [],
                     newLines: newLines.slice(newIndex),
-                    type: 'add'
+                    type: 'add',
                 })
                 newIndex = newLines.length
             }
         }
-        
+
         return hunks
     }
 
@@ -111,21 +119,25 @@ export class DiffGenerator {
         // Find the extent of the difference
         let oldEnd = oldStart
         let newEnd = newStart
-        
+
         const maxHunkSize = 10 // Limit hunk size for simplicity
-        
-        while (oldEnd < oldLines.length && newEnd < newLines.length && (oldEnd - oldStart < maxHunkSize || newEnd - newStart < maxHunkSize)) {
+
+        while (
+            oldEnd < oldLines.length &&
+            newEnd < newLines.length &&
+            (oldEnd - oldStart < maxHunkSize || newEnd - newStart < maxHunkSize)
+        ) {
             if (oldLines[oldEnd] === newLines[newEnd]) {
                 break
             }
             oldEnd++
             newEnd++
         }
-        
+
         if (oldEnd === oldStart && newEnd === newStart) {
             return null
         }
-        
+
         return {
             oldStart: oldStart + 1,
             oldEnd: oldEnd,
@@ -133,42 +145,55 @@ export class DiffGenerator {
             newEnd: newEnd,
             oldLines: oldLines.slice(oldStart, oldEnd),
             newLines: newLines.slice(newStart, newEnd),
-            type: this.determineHunkType(oldLines.slice(oldStart, oldEnd), newLines.slice(newStart, newEnd))
+            type: this.determineHunkType(
+                oldLines.slice(oldStart, oldEnd),
+                newLines.slice(newStart, newEnd)
+            ),
         }
     }
 
-    private determineHunkType(oldLines: string[], newLines: string[]): DiffHunk['type'] {
+    private determineHunkType(
+        oldLines: string[],
+        newLines: string[]
+    ): DiffHunk['type'] {
         if (oldLines.length === 0) return 'add'
         if (newLines.length === 0) return 'remove'
         if (oldLines.length === newLines.length) return 'replace'
         return 'replace'
     }
 
-    generateFileDiff(filePath: string, oldContent: string, newContent: string): FileDiff {
+    generateFileDiff(
+        filePath: string,
+        oldContent: string,
+        newContent: string
+    ): FileDiff {
         const hunks = this.generateDiff(oldContent, newContent)
-        
+
         let additions = 0
         let deletions = 0
         let modifications = 0
-        
+
         for (const hunk of hunks) {
             if (hunk.type === 'add') {
                 additions += hunk.newLines.length
             } else if (hunk.type === 'remove') {
                 deletions += hunk.oldLines.length
             } else if (hunk.type === 'replace') {
-                modifications += Math.max(hunk.oldLines.length, hunk.newLines.length)
+                modifications += Math.max(
+                    hunk.oldLines.length,
+                    hunk.newLines.length
+                )
             }
         }
-        
+
         return {
             filePath,
             hunks,
             summary: {
                 additions,
                 deletions,
-                modifications
-            }
+                modifications,
+            },
         }
     }
 
@@ -180,42 +205,46 @@ export class DiffGenerator {
         let totalAdditions = 0
         let totalDeletions = 0
         let totalModifications = 0
-        
+
         for (const filePath of executionOrder) {
             const change = fileChanges.get(filePath)
             if (!change) continue
-            
-            const fileDiff = this.generateFileDiff(filePath, change.oldContent, change.newContent)
+
+            const fileDiff = this.generateFileDiff(
+                filePath,
+                change.oldContent,
+                change.newContent
+            )
             diffs.set(filePath, fileDiff)
-            
+
             totalAdditions += fileDiff.summary.additions
             totalDeletions += fileDiff.summary.deletions
             totalModifications += fileDiff.summary.modifications
         }
-        
+
         return {
             diffs,
             totalChanges: {
                 files: diffs.size,
                 additions: totalAdditions,
                 deletions: totalDeletions,
-                modifications: totalModifications
+                modifications: totalModifications,
             },
-            executionOrder
+            executionOrder,
         }
     }
 
     formatDiffHunk(hunk: DiffHunk): string {
         let output = `@@ -${hunk.oldStart},${hunk.oldEnd} +${hunk.newStart},${hunk.newEnd} @@\n`
-        
+
         for (const line of hunk.oldLines) {
             output += `-${line}\n`
         }
-        
+
         for (const line of hunk.newLines) {
             output += `+${line}\n`
         }
-        
+
         return output
     }
 
@@ -223,11 +252,11 @@ export class DiffGenerator {
         let output = `diff --git a/${fileDiff.filePath} b/${fileDiff.filePath}\n`
         output += `--- a/${fileDiff.filePath}\n`
         output += `+++ b/${fileDiff.filePath}\n`
-        
+
         for (const hunk of fileDiff.hunks) {
             output += this.formatDiffHunk(hunk)
         }
-        
+
         return output
     }
 
@@ -237,7 +266,7 @@ export class DiffGenerator {
         output += `Additions: ${multiFileDiff.totalChanges.additions}\n`
         output += `Deletions: ${multiFileDiff.totalChanges.deletions}\n`
         output += `Modifications: ${multiFileDiff.totalChanges.modifications}\n\n`
-        
+
         for (const filePath of multiFileDiff.executionOrder) {
             const fileDiff = multiFileDiff.diffs.get(filePath)
             if (fileDiff) {
@@ -245,7 +274,7 @@ export class DiffGenerator {
                 output += '\n'
             }
         }
-        
+
         return output
     }
 
@@ -253,31 +282,35 @@ export class DiffGenerator {
         const lines = content.split('\n')
         const result: string[] = []
         let lineIndex = 0
-        
+
         for (const hunk of hunks) {
             // Add lines before the hunk
             while (lineIndex < hunk.oldStart - 1) {
                 result.push(lines[lineIndex])
                 lineIndex++
             }
-            
+
             // Skip removed lines
             lineIndex += hunk.oldLines.length
-            
+
             // Add new lines
             result.push(...hunk.newLines)
         }
-        
+
         // Add remaining lines
         while (lineIndex < lines.length) {
             result.push(lines[lineIndex])
             lineIndex++
         }
-        
+
         return result.join('\n')
     }
 
-    validateDiff(oldContent: string, newContent: string, hunks: DiffHunk[]): boolean {
+    validateDiff(
+        oldContent: string,
+        newContent: string,
+        hunks: DiffHunk[]
+    ): boolean {
         try {
             const applied = this.applyDiff(oldContent, hunks)
             return applied === newContent
@@ -295,14 +328,14 @@ export class DiffGenerator {
         newLabel?: string
     ): string {
         const fileDiff = this.generateFileDiff(filePath, oldContent, newContent)
-        
+
         let output = `--- ${oldLabel || 'a/' + filePath}\n`
         output += `+++ ${newLabel || 'b/' + filePath}\n`
-        
+
         for (const hunk of fileDiff.hunks) {
             output += this.formatDiffHunk(hunk)
         }
-        
+
         return output
     }
 }

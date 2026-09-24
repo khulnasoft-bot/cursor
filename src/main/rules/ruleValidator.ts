@@ -95,7 +95,7 @@ export class RuleValidator {
         return {
             valid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         }
     }
 
@@ -121,9 +121,15 @@ export class RuleValidator {
             for (const rule of ruleSet.rules) {
                 const validation = this.validateRule(rule)
                 if (!validation.valid) {
-                    errors.push(`Rule ${rule.id || 'unnamed'}: ${validation.errors.join(', ')}`)
+                    errors.push(
+                        `Rule ${rule.id || 'unnamed'}: ${validation.errors.join(', ')}`
+                    )
                 }
-                warnings.push(...validation.warnings.map(w => `Rule ${rule.id || 'unnamed'}: ${w}`))
+                warnings.push(
+                    ...validation.warnings.map(
+                        (w) => `Rule ${rule.id || 'unnamed'}: ${w}`
+                    )
+                )
             }
         }
 
@@ -135,19 +141,29 @@ export class RuleValidator {
         return {
             valid: errors.length === 0,
             errors,
-            warnings
+            warnings,
         }
     }
 
-    async testRule(rule: Rule, testSamples: TestCodeSample[]): Promise<TestResult[]> {
+    async testRule(
+        rule: Rule,
+        testSamples: TestCodeSample[]
+    ): Promise<TestResult[]> {
         const results: TestResult[] = []
 
         for (const sample of testSamples) {
             try {
-                const applicationResult = await this.ruleService.applyRulesToCode(sample.code, sample.filePath)
+                const applicationResult =
+                    await this.ruleService.applyRulesToCode(
+                        sample.code,
+                        sample.filePath
+                    )
 
-                const ruleViolations = applicationResult.violations.filter(v => v.ruleId === rule.id)
-                const passed = ruleViolations.length === sample.expectedViolations
+                const ruleViolations = applicationResult.violations.filter(
+                    (v) => v.ruleId === rule.id
+                )
+                const passed =
+                    ruleViolations.length === sample.expectedViolations
 
                 results.push({
                     ruleId: rule.id,
@@ -155,7 +171,7 @@ export class RuleValidator {
                     passed,
                     expectedViolations: sample.expectedViolations,
                     actualViolations: ruleViolations.length,
-                    sampleName: sample.name
+                    sampleName: sample.name,
                 })
             } catch (error) {
                 results.push({
@@ -165,7 +181,10 @@ export class RuleValidator {
                     expectedViolations: sample.expectedViolations,
                     actualViolations: 0,
                     sampleName: sample.name,
-                    error: error instanceof Error ? error.message : 'Unknown error'
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
                 })
             }
         }
@@ -173,7 +192,10 @@ export class RuleValidator {
         return results
     }
 
-    async testRuleSet(ruleSetName: string, testSamples: TestCodeSample[]): Promise<Map<string, TestResult[]>> {
+    async testRuleSet(
+        ruleSetName: string,
+        testSamples: TestCodeSample[]
+    ): Promise<Map<string, TestResult[]>> {
         const ruleSet = this.ruleParser.getRuleSet(ruleSetName)
         if (!ruleSet) {
             throw new Error(`Rule set not found: ${ruleSetName}`)
@@ -200,7 +222,7 @@ export class RuleValidator {
                 code: positiveCode,
                 filePath: rule.appliesTo[0] || 'test.js',
                 expectedViolations: 1,
-                description: 'Code that should trigger the rule'
+                description: 'Code that should trigger the rule',
             })
         }
 
@@ -212,7 +234,7 @@ export class RuleValidator {
                 code: negativeCode,
                 filePath: rule.appliesTo[0] || 'test.js',
                 expectedViolations: 0,
-                description: 'Code that should not trigger the rule'
+                description: 'Code that should not trigger the rule',
             })
         }
 
@@ -290,7 +312,7 @@ export class RuleValidator {
         return {
             ruleSetValidation,
             ruleValidations,
-            testResults
+            testResults,
         }
     }
 

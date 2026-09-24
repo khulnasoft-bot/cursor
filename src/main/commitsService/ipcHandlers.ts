@@ -19,7 +19,13 @@ export function setupCommitsServiceIpcs() {
                 return { success: true, info }
             } catch (error) {
                 log.error('Failed to get repository info:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -27,13 +33,28 @@ export function setupCommitsServiceIpcs() {
     // Create commit
     ipcMain.handle(
         'commits-service-create-commit',
-        async (_event: IpcMainInvokeEvent, repoPath: string, message: string, files?: string[]) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            message: string,
+            files?: string[]
+        ) => {
             try {
-                const hash = await commitsService.createCommit(repoPath, message, files)
+                const hash = await commitsService.createCommit(
+                    repoPath,
+                    message,
+                    files
+                )
                 return { success: true, hash }
             } catch (error) {
                 log.error('Failed to create commit:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -41,13 +62,23 @@ export function setupCommitsServiceIpcs() {
     // Switch branch
     ipcMain.handle(
         'commits-service-switch-branch',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branchName: string
+        ) => {
             try {
                 await commitsService.switchBranch(repoPath, branchName)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to switch branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -55,13 +86,23 @@ export function setupCommitsServiceIpcs() {
     // Create branch
     ipcMain.handle(
         'commits-service-create-branch',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branchName: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branchName: string
+        ) => {
             try {
                 await commitsService.createBranch(repoPath, branchName)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to create branch:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -75,7 +116,13 @@ export function setupCommitsServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to pull:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -83,13 +130,23 @@ export function setupCommitsServiceIpcs() {
     // Push changes
     ipcMain.handle(
         'commits-service-push',
-        async (_event: IpcMainInvokeEvent, repoPath: string, branch?: string) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            repoPath: string,
+            branch?: string
+        ) => {
             try {
                 await commitsService.push(repoPath, branch)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to push:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -103,24 +160,30 @@ export function setupCommitsServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to track metric:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get metrics
-    ipcMain.handle(
-        'commits-service-get-metrics',
-        async () => {
-            try {
-                const metrics = commitsService.getMetrics()
-                return { success: true, metrics: Array.from(metrics.entries()) }
-            } catch (error) {
-                log.error('Failed to get metrics:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('commits-service-get-metrics', async () => {
+        try {
+            const metrics = commitsService.getMetrics()
+            return { success: true, metrics: Array.from(metrics.entries()) }
+        } catch (error) {
+            log.error('Failed to get metrics:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Clear cache
     ipcMain.handle(
@@ -131,7 +194,13 @@ export function setupCommitsServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to clear cache:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )

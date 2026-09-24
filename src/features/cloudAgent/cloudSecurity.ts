@@ -41,7 +41,12 @@ export interface Session {
 
 export interface SecurityEvent {
     id: string
-    type: 'authentication' | 'authorization' | 'rate_limit' | 'suspicious' | 'other'
+    type:
+        | 'authentication'
+        | 'authorization'
+        | 'rate_limit'
+        | 'suspicious'
+        | 'other'
     severity: 'info' | 'warning' | 'error' | 'critical'
     timestamp: Date
     message: string
@@ -57,12 +62,13 @@ export class CloudSecurity {
         sessionTimeoutMinutes: 60,
         allowedIPs: [],
         rateLimitingEnabled: true,
-        maxRequestsPerMinute: 100
+        maxRequestsPerMinute: 100,
     }
     private apiKeys: Map<string, ApiKey> = new Map()
     private sessions: Map<string, Session> = new Map()
     private securityEvents: SecurityEvent[] = []
-    private rateLimitMap: Map<string, { count: number; resetTime: Date }> = new Map()
+    private rateLimitMap: Map<string, { count: number; resetTime: Date }> =
+        new Map()
     private apiKeyCounter = 0
     private sessionCounter = 0
     private eventCounter = 0
@@ -92,7 +98,11 @@ export class CloudSecurity {
     }
 
     // API Key Management
-    createApiKey(name: string, permissions: string[], expiresInDays?: number): ApiKey {
+    createApiKey(
+        name: string,
+        permissions: string[],
+        expiresInDays?: number
+    ): ApiKey {
         const apiKeyId = `apikey-${++this.apiKeyCounter}`
         const key = this.generateApiKey()
         const hashedKey = this.hashKey(key)
@@ -104,12 +114,18 @@ export class CloudSecurity {
             hashedKey,
             permissions,
             createdAt: new Date(),
-            expiresAt: expiresInDays ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000) : undefined,
-            revoked: false
+            expiresAt: expiresInDays
+                ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+                : undefined,
+            revoked: false,
         }
 
         this.apiKeys.set(apiKeyId, apiKey)
-        this.logSecurityEvent('authentication', 'info', `API key created: ${name}`)
+        this.logSecurityEvent(
+            'authentication',
+            'info',
+            `API key created: ${name}`
+        )
 
         log.info(`Created API key: ${name}`)
         return apiKey
@@ -123,7 +139,11 @@ export class CloudSecurity {
         return crypto.createHash('sha256').update(key).digest('hex')
     }
 
-    validateApiKey(key: string): { valid: boolean; apiKey?: ApiKey; error?: string } {
+    validateApiKey(key: string): {
+        valid: boolean
+        apiKey?: ApiKey
+        error?: string
+    } {
         const hashedKey = this.hashKey(key)
 
         for (const apiKey of this.apiKeys.values()) {
@@ -149,7 +169,11 @@ export class CloudSecurity {
         if (!apiKey) return false
 
         apiKey.revoked = true
-        this.logSecurityEvent('authentication', 'warning', `API key revoked: ${apiKey.name}`)
+        this.logSecurityEvent(
+            'authentication',
+            'warning',
+            `API key revoked: ${apiKey.name}`
+        )
 
         log.info(`Revoked API key: ${apiKey.name}`)
         return true
@@ -160,7 +184,11 @@ export class CloudSecurity {
         if (!apiKey) return false
 
         this.apiKeys.delete(apiKeyId)
-        this.logSecurityEvent('authentication', 'info', `API key deleted: ${apiKey.name}`)
+        this.logSecurityEvent(
+            'authentication',
+            'info',
+            `API key deleted: ${apiKey.name}`
+        )
 
         log.info(`Deleted API key: ${apiKey.name}`)
         return true
@@ -188,14 +216,22 @@ export class CloudSecurity {
         // Revoke old key
         this.revokeApiKey(apiKeyId)
 
-        this.logSecurityEvent('authentication', 'info', `API key rotated: ${oldApiKey.name}`)
+        this.logSecurityEvent(
+            'authentication',
+            'info',
+            `API key rotated: ${oldApiKey.name}`
+        )
 
         log.info(`Rotated API key: ${oldApiKey.name}`)
         return newApiKey
     }
 
     // Session Management
-    createSession(userId: string, ipAddress?: string, userAgent?: string): Session {
+    createSession(
+        userId: string,
+        ipAddress?: string,
+        userAgent?: string
+    ): Session {
         const sessionId = `session-${++this.sessionCounter}`
         const token = this.generateSessionToken()
 
@@ -204,14 +240,20 @@ export class CloudSecurity {
             userId,
             token,
             createdAt: new Date(),
-            expiresAt: new Date(Date.now() + this.config.sessionTimeoutMinutes * 60 * 1000),
+            expiresAt: new Date(
+                Date.now() + this.config.sessionTimeoutMinutes * 60 * 1000
+            ),
             ipAddress,
             userAgent,
-            active: true
+            active: true,
         }
 
         this.sessions.set(sessionId, session)
-        this.logSecurityEvent('authentication', 'info', `Session created for user: ${userId}`)
+        this.logSecurityEvent(
+            'authentication',
+            'info',
+            `Session created for user: ${userId}`
+        )
 
         log.info(`Created session for user: ${userId}`)
         return session
@@ -221,7 +263,11 @@ export class CloudSecurity {
         return crypto.randomBytes(32).toString('hex')
     }
 
-    validateSession(token: string): { valid: boolean; session?: Session; error?: string } {
+    validateSession(token: string): {
+        valid: boolean
+        session?: Session
+        error?: string
+    } {
         for (const session of this.sessions.values()) {
             if (session.token === token) {
                 if (!session.active) {
@@ -245,7 +291,11 @@ export class CloudSecurity {
         if (!session) return false
 
         session.active = false
-        this.logSecurityEvent('authentication', 'info', `Session invalidated: ${sessionId}`)
+        this.logSecurityEvent(
+            'authentication',
+            'info',
+            `Session invalidated: ${sessionId}`
+        )
 
         log.info(`Invalidated session: ${sessionId}`)
         return true
@@ -256,15 +306,21 @@ export class CloudSecurity {
     }
 
     getActiveSessions(): Session[] {
-        return this.getSessions().filter(s => s.active && s.expiresAt > new Date())
+        return this.getSessions().filter(
+            (s) => s.active && s.expiresAt > new Date()
+        )
     }
 
     getSessionsByUser(userId: string): Session[] {
-        return this.getSessions().filter(s => s.userId === userId)
+        return this.getSessions().filter((s) => s.userId === userId)
     }
 
     // Rate Limiting
-    private checkRateLimit(identifier: string): { allowed: boolean; remaining: number; resetTime: Date } {
+    private checkRateLimit(identifier: string): {
+        allowed: boolean
+        remaining: number
+        resetTime: Date
+    } {
         if (!this.config.rateLimitingEnabled) {
             return { allowed: true, remaining: Infinity, resetTime: new Date() }
         }
@@ -276,17 +332,21 @@ export class CloudSecurity {
         if (!rateLimit || rateLimit.resetTime < now) {
             rateLimit = {
                 count: 0,
-                resetTime: new Date(now.getTime() + 60 * 1000)
+                resetTime: new Date(now.getTime() + 60 * 1000),
             }
             this.rateLimitMap.set(identifier, rateLimit)
         }
 
         if (rateLimit.count >= this.config.maxRequestsPerMinute) {
-            this.logSecurityEvent('rate_limit', 'warning', `Rate limit exceeded for: ${identifier}`)
+            this.logSecurityEvent(
+                'rate_limit',
+                'warning',
+                `Rate limit exceeded for: ${identifier}`
+            )
             return {
                 allowed: false,
                 remaining: 0,
-                resetTime: rateLimit.resetTime
+                resetTime: rateLimit.resetTime,
             }
         }
 
@@ -296,7 +356,7 @@ export class CloudSecurity {
         return {
             allowed: true,
             remaining,
-            resetTime: rateLimit.resetTime
+            resetTime: rateLimit.resetTime,
         }
     }
 
@@ -339,7 +399,7 @@ export class CloudSecurity {
             timestamp: new Date(),
             message,
             details,
-            ipAddress
+            ipAddress,
         }
 
         this.securityEvents.push(event)
@@ -357,16 +417,18 @@ export class CloudSecurity {
     }
 
     getSecurityEventsByType(type: SecurityEvent['type']): SecurityEvent[] {
-        return this.securityEvents.filter(e => e.type === type)
+        return this.securityEvents.filter((e) => e.type === type)
     }
 
-    getSecurityEventsBySeverity(severity: SecurityEvent['severity']): SecurityEvent[] {
-        return this.securityEvents.filter(e => e.severity === severity)
+    getSecurityEventsBySeverity(
+        severity: SecurityEvent['severity']
+    ): SecurityEvent[] {
+        return this.securityEvents.filter((e) => e.severity === severity)
     }
 
     getRecentSecurityEvents(minutes: number = 60): SecurityEvent[] {
         const cutoff = new Date(Date.now() - minutes * 60 * 1000)
-        return this.securityEvents.filter(e => e.timestamp >= cutoff)
+        return this.securityEvents.filter((e) => e.timestamp >= cutoff)
     }
 
     clearSecurityEvents(): void {
@@ -395,7 +457,7 @@ export class CloudSecurity {
             key,
             iv,
             authTag,
-            Buffer.from(encrypted, 'hex')
+            Buffer.from(encrypted, 'hex'),
         ])
 
         return combined.toString('base64')
@@ -438,13 +500,16 @@ export class CloudSecurity {
 
         return {
             totalApiKeys: apiKeys.length,
-            activeApiKeys: apiKeys.filter(k => !k.revoked && (!k.expiresAt || k.expiresAt > new Date())).length,
-            revokedApiKeys: apiKeys.filter(k => k.revoked).length,
+            activeApiKeys: apiKeys.filter(
+                (k) => !k.revoked && (!k.expiresAt || k.expiresAt > new Date())
+            ).length,
+            revokedApiKeys: apiKeys.filter((k) => k.revoked).length,
             totalSessions: sessions.length,
             activeSessions: this.getActiveSessions().length,
             totalSecurityEvents: events.length,
-            criticalEvents: events.filter(e => e.severity === 'critical').length,
-            rateLimitHits: events.filter(e => e.type === 'rate_limit').length
+            criticalEvents: events.filter((e) => e.severity === 'critical')
+                .length,
+            rateLimitHits: events.filter((e) => e.type === 'rate_limit').length,
         }
     }
 

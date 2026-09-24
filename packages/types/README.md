@@ -11,7 +11,13 @@ npm install @cursor/types
 ## Usage
 
 ```typescript
-import { File, Folder, ChatState, IFileService, IAIService } from '@cursor/types'
+import {
+    File,
+    Folder,
+    ChatState,
+    IFileService,
+    IAIService,
+} from '@cursor/types'
 
 // Use types in your application
 const file: File = {
@@ -19,7 +25,7 @@ const file: File = {
     name: 'example.ts',
     renameName: null,
     isSelected: false,
-    saved: true
+    saved: true,
 }
 
 // Implement service interfaces
@@ -34,6 +40,7 @@ class MyFileService implements IFileService {
 ## Available Types
 
 ### Window State Types
+
 - `File` - File representation
 - `Folder` - Folder representation
 - `Tab` - Tab representation
@@ -43,6 +50,7 @@ class MyFileService implements IFileService {
 - `FullState` - Complete application state
 
 ### Service Interfaces
+
 - `IFileService` - File indexing and search service
 - `IAIService` - AI service with multi-provider support
 - `IRuleService` - Rules engine for code analysis
@@ -51,6 +59,7 @@ class MyFileService implements IFileService {
 - `IComposerService` - Multi-file editing orchestration
 
 ### Common Types
+
 - `Logger` - Logger interface
 - `AIContext` - AI context for prompts
 - `Tool` - Tool definition for AI

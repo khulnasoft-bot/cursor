@@ -42,7 +42,7 @@ export class AgentProgress {
             estimatedTimeRemaining: plan.estimatedDuration,
             errors: [],
             stepsCompleted: [],
-            stepsFailed: []
+            stepsFailed: [],
         }
 
         this.executions.set(executionId, snapshot)
@@ -53,19 +53,26 @@ export class AgentProgress {
         const snapshot = this.executions.get(executionId)
         if (!snapshot) return
 
-        const completedSteps = plan.steps.filter(s => s.status === 'completed')
-        const failedSteps = plan.steps.filter(s => s.status === 'failed')
+        const completedSteps = plan.steps.filter(
+            (s) => s.status === 'completed'
+        )
+        const failedSteps = plan.steps.filter((s) => s.status === 'failed')
 
         snapshot.currentStep = plan.currentStep
         snapshot.status = plan.status
         snapshot.percentage = (plan.currentStep / plan.totalSteps) * 100
-        snapshot.currentStepDescription = plan.steps[plan.currentStep]?.description || 'Processing'
+        snapshot.currentStepDescription =
+            plan.steps[plan.currentStep]?.description || 'Processing'
         snapshot.estimatedTimeRemaining = this.calculateRemainingTime(plan)
-        snapshot.errors = failedSteps.map(s => s.error || '').filter(e => e.length > 0)
-        snapshot.stepsCompleted = completedSteps.map(s => s.id)
-        snapshot.stepsFailed = failedSteps.map(s => s.id)
+        snapshot.errors = failedSteps
+            .map((s) => s.error || '')
+            .filter((e) => e.length > 0)
+        snapshot.stepsCompleted = completedSteps.map((s) => s.id)
+        snapshot.stepsFailed = failedSteps.map((s) => s.id)
 
-        this.logger.debug(`Updated progress for ${executionId}: ${snapshot.percentage.toFixed(1)}%`)
+        this.logger.debug(
+            `Updated progress for ${executionId}: ${snapshot.percentage.toFixed(1)}%`
+        )
     }
 
     completeExecution(executionId: string, plan: AgentPlan): void {
@@ -75,15 +82,20 @@ export class AgentProgress {
         snapshot.status = plan.status
         snapshot.percentage = 100
         snapshot.currentStep = plan.totalSteps
-        snapshot.currentStepDescription = plan.status === 'completed' ? 'Completed' : 'Failed'
+        snapshot.currentStepDescription =
+            plan.status === 'completed' ? 'Completed' : 'Failed'
         snapshot.estimatedTimeRemaining = 0
 
-        const completedSteps = plan.steps.filter(s => s.status === 'completed')
-        const failedSteps = plan.steps.filter(s => s.status === 'failed')
-        snapshot.stepsCompleted = completedSteps.map(s => s.id)
-        snapshot.stepsFailed = failedSteps.map(s => s.id)
+        const completedSteps = plan.steps.filter(
+            (s) => s.status === 'completed'
+        )
+        const failedSteps = plan.steps.filter((s) => s.status === 'failed')
+        snapshot.stepsCompleted = completedSteps.map((s) => s.id)
+        snapshot.stepsFailed = failedSteps.map((s) => s.id)
 
-        this.logger.info(`Completed tracking execution: ${executionId} (${snapshot.status})`)
+        this.logger.info(
+            `Completed tracking execution: ${executionId} (${snapshot.status})`
+        )
     }
 
     getProgress(executionId: string): ProgressSnapshot | undefined {
@@ -95,11 +107,13 @@ export class AgentProgress {
     }
 
     getActiveProgress(): ProgressSnapshot[] {
-        return this.getAllProgress().filter(p => p.status === 'in_progress')
+        return this.getAllProgress().filter((p) => p.status === 'in_progress')
     }
 
     getCompletedProgress(): ProgressSnapshot[] {
-        return this.getAllProgress().filter(p => p.status === 'completed' || p.status === 'failed')
+        return this.getAllProgress().filter(
+            (p) => p.status === 'completed' || p.status === 'failed'
+        )
     }
 
     private calculateRemainingTime(plan: AgentPlan): number {
@@ -136,8 +150,11 @@ export class AgentProgress {
         return {
             totalExecutions: allProgress.length,
             activeExecutions: this.getActiveProgress().length,
-            completedExecutions: completed.filter(p => p.status === 'completed').length,
-            failedExecutions: completed.filter(p => p.status === 'failed').length
+            completedExecutions: completed.filter(
+                (p) => p.status === 'completed'
+            ).length,
+            failedExecutions: completed.filter((p) => p.status === 'failed')
+                .length,
         }
     }
 

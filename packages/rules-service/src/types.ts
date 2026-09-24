@@ -11,7 +11,14 @@ export type RuleSeverity = 'error' | 'warning' | 'suggestion' | 'info'
 /**
  * Rule categories
  */
-export type RuleCategory = 'style' | 'naming' | 'architecture' | 'security' | 'performance' | 'testing' | 'custom'
+export type RuleCategory =
+    | 'style'
+    | 'naming'
+    | 'architecture'
+    | 'security'
+    | 'performance'
+    | 'testing'
+    | 'custom'
 
 /**
  * Rule definition

@@ -58,13 +58,13 @@ class DebuggerService {
         args: string[] = []
     ): Promise<string> {
         const sessionId = `debug-${++this.sessionIdCounter}`
-        
+
         try {
             // For now, we'll start with a basic node debugger
             // This can be extended to support other languages
             const debugArgs = this.getDebugArgs(type, request, program, args)
             const process = spawn('node', debugArgs, {
-                stdio: ['pipe', 'pipe', 'pipe']
+                stdio: ['pipe', 'pipe', 'pipe'],
             })
 
             const session: DebugSession = {
@@ -75,7 +75,7 @@ class DebuggerService {
                 program,
                 process,
                 connected: false,
-                breakpoints: new Map()
+                breakpoints: new Map(),
             }
 
             this.setupProcessHandlers(session)
@@ -89,7 +89,12 @@ class DebuggerService {
         }
     }
 
-    private getDebugArgs(type: string, request: string, program: string, args: string[]): string[] {
+    private getDebugArgs(
+        type: string,
+        request: string,
+        program: string,
+        args: string[]
+    ): string[] {
         // Basic Node.js debugging configuration
         // This will be expanded for other languages
         if (type === 'node' || type === 'node2') {
@@ -116,7 +121,10 @@ class DebuggerService {
                     }
                 }
             } catch (error) {
-                log.warn(`Failed to parse debug message from ${session.name}:`, error)
+                log.warn(
+                    `Failed to parse debug message from ${session.name}:`,
+                    error
+                )
             }
         })
 
@@ -138,7 +146,7 @@ class DebuggerService {
 
     private handleDebugMessage(session: DebugSession, message: any) {
         log.info(`Debug message from ${session.name}:`, message)
-        
+
         // Handle initialization response
         if (message.type === 'response' && message.command === 'initialize') {
             session.connected = true
@@ -146,7 +154,12 @@ class DebuggerService {
         }
     }
 
-    async setBreakpoint(sessionId: string, path: string, line: number, column: number = 0): Promise<string> {
+    async setBreakpoint(
+        sessionId: string,
+        path: string,
+        line: number,
+        column: number = 0
+    ): Promise<string> {
         const session = this.sessions.get(sessionId)
         if (!session) {
             throw new Error(`Session not found: ${sessionId}`)
@@ -158,7 +171,7 @@ class DebuggerService {
             line,
             column,
             path,
-            verified: false
+            verified: false,
         }
 
         if (!session.breakpoints.has(path)) {
@@ -170,14 +183,17 @@ class DebuggerService {
         return breakpointId
     }
 
-    async removeBreakpoint(sessionId: string, breakpointId: string): Promise<void> {
+    async removeBreakpoint(
+        sessionId: string,
+        breakpointId: string
+    ): Promise<void> {
         const session = this.sessions.get(sessionId)
         if (!session) {
             throw new Error(`Session not found: ${sessionId}`)
         }
 
         for (const [path, breakpoints] of session.breakpoints) {
-            const index = breakpoints.findIndex(bp => bp.id === breakpointId)
+            const index = breakpoints.findIndex((bp) => bp.id === breakpointId)
             if (index !== -1) {
                 breakpoints.splice(index, 1)
                 if (breakpoints.length === 0) {
@@ -214,7 +230,7 @@ class DebuggerService {
         await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'continue'
+            command: 'continue',
         })
 
         log.info(`Continued debug session ${sessionId}`)
@@ -229,7 +245,7 @@ class DebuggerService {
         await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'pause'
+            command: 'pause',
         })
 
         log.info(`Paused debug session ${sessionId}`)
@@ -244,7 +260,7 @@ class DebuggerService {
         await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'next'
+            command: 'next',
         })
 
         log.info(`Step over in debug session ${sessionId}`)
@@ -259,7 +275,7 @@ class DebuggerService {
         await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'stepIn'
+            command: 'stepIn',
         })
 
         log.info(`Step into in debug session ${sessionId}`)
@@ -274,7 +290,7 @@ class DebuggerService {
         await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'stepOut'
+            command: 'stepOut',
         })
 
         log.info(`Step out in debug session ${sessionId}`)
@@ -294,15 +310,18 @@ class DebuggerService {
             arguments: {
                 threadId: 1,
                 startFrame: 0,
-                levels: 20
-            }
+                levels: 20,
+            },
         })
 
         // Parse stack frames from response
         return response.body?.stackFrames || []
     }
 
-    async getVariables(sessionId: string, variablesReference: number): Promise<DebugVariable[]> {
+    async getVariables(
+        sessionId: string,
+        variablesReference: number
+    ): Promise<DebugVariable[]> {
         const session = this.sessions.get(sessionId)
         if (!session || !session.connected) {
             throw new Error(`Session not found or not connected: ${sessionId}`)
@@ -313,8 +332,8 @@ class DebuggerService {
             type: 'request',
             command: 'variables',
             arguments: {
-                variablesReference
-            }
+                variablesReference,
+            },
         })
 
         return response.body?.variables || []
@@ -329,13 +348,16 @@ class DebuggerService {
         const response = await this.sendDAPMessage(session, {
             seq: 1,
             type: 'request',
-            command: 'threads'
+            command: 'threads',
         })
 
         return response.body?.threads || []
     }
 
-    private async sendDAPMessage(session: DebugSession, message: any): Promise<any> {
+    private async sendDAPMessage(
+        session: DebugSession,
+        message: any
+    ): Promise<any> {
         if (!session.process) {
             throw new Error('Session process not available')
         }
@@ -344,7 +366,7 @@ class DebuggerService {
             const messageStr = JSON.stringify(message)
             const contentLength = Buffer.byteLength(messageStr, 'utf8')
             const fullMessage = `Content-Length: ${contentLength}\r\n\r\n${messageStr}`
-            
+
             const timeout = setTimeout(() => {
                 reject(new Error('DAP request timeout'))
             }, 30000)
@@ -358,7 +380,10 @@ class DebuggerService {
                         const response = JSON.parse(match[0])
                         if (response.request_seq === message.seq) {
                             clearTimeout(timeout)
-                            session.process?.stdout?.off('data', responseHandler)
+                            session.process?.stdout?.off(
+                                'data',
+                                responseHandler
+                            )
                             resolve(response)
                         }
                     }

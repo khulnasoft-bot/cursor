@@ -159,7 +159,9 @@ export async function getPayload({
 
     // Resolve mentions to context
     const mentionResolver = getMentionResolver(state.global.rootPath || '')
-    const mentionContext = await mentionResolver.resolveMentions(parsedMessage.mentions)
+    const mentionContext = await mentionResolver.resolveMentions(
+        parsedMessage.mentions
+    )
 
     if (!(forContinue || forDiagnostics)) {
         posthog.capture('Submitted Prompt', {
@@ -313,8 +315,8 @@ export async function getPayload({
         maxOrigLine: forContinue
             ? getLastBotMessage(chatState, conversationId)!.maxOrigLine
             : forDiagnostics
-            ? lastUserMessage.maxOrigLine
-            : null,
+              ? lastUserMessage.maxOrigLine
+              : null,
         diagnostics:
             forDiagnostics && editorView
                 ? getFixLSPBlobForServerWithSideEffects(

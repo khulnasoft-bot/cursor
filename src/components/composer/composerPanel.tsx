@@ -5,7 +5,11 @@
 
 import React, { useState } from 'react'
 import { getComposerService, getDiffGenerator } from '../../features/composer'
-import type { ComposerResult, ComposerExecution, FileDiff } from '../../features/composer'
+import type {
+    ComposerResult,
+    ComposerExecution,
+    FileDiff,
+} from '../../features/composer'
 
 interface ComposerPanelProps {
     isOpen: boolean
@@ -13,7 +17,11 @@ interface ComposerPanelProps {
     projectPath: string
 }
 
-export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelProps) {
+export function ComposerPanel({
+    isOpen,
+    onClose,
+    projectPath,
+}: ComposerPanelProps) {
     const [prompt, setPrompt] = useState('')
     const [planning, setPlanning] = useState(false)
     const [executing, setExecuting] = useState(false)
@@ -45,8 +53,8 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
                 prompt,
                 context: {
                     projectPath,
-                    files
-                }
+                    files,
+                },
             }
 
             const planResult = await composerService.planChanges(request)
@@ -75,8 +83,8 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
     }
 
     const handleAcceptChange = (filePath: string) => {
-        setAcceptedFiles(prev => new Set([...prev, filePath]))
-        setRejectedFiles(prev => {
+        setAcceptedFiles((prev) => new Set([...prev, filePath]))
+        setRejectedFiles((prev) => {
             const newSet = new Set(prev)
             newSet.delete(filePath)
             return newSet
@@ -84,8 +92,8 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
     }
 
     const handleRejectChange = (filePath: string) => {
-        setRejectedFiles(prev => new Set([...prev, filePath]))
-        setAcceptedFiles(prev => {
+        setRejectedFiles((prev) => new Set([...prev, filePath]))
+        setAcceptedFiles((prev) => {
             const newSet = new Set(prev)
             newSet.delete(filePath)
             return newSet
@@ -94,14 +102,14 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
 
     const handleAcceptAll = () => {
         if (result) {
-            setAcceptedFiles(new Set(result.changes.map(c => c.filePath)))
+            setAcceptedFiles(new Set(result.changes.map((c) => c.filePath)))
             setRejectedFiles(new Set())
         }
     }
 
     const handleRejectAll = () => {
         if (result) {
-            setRejectedFiles(new Set(result.changes.map(c => c.filePath)))
+            setRejectedFiles(new Set(result.changes.map((c) => c.filePath)))
             setAcceptedFiles(new Set())
         }
     }
@@ -110,7 +118,9 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
         if (!result) return
 
         // Filter to only execute accepted files
-        const acceptedChanges = result.changes.filter(c => acceptedFiles.has(c.filePath))
+        const acceptedChanges = result.changes.filter((c) =>
+            acceptedFiles.has(c.filePath)
+        )
 
         if (acceptedChanges.length === 0) {
             console.warn('No files accepted for execution')
@@ -124,9 +134,12 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
             const filteredResult: ComposerResult = {
                 ...result,
                 changes: acceptedChanges,
-                executionOrder: result.executionOrder.filter(path => acceptedFiles.has(path))
+                executionOrder: result.executionOrder.filter((path) =>
+                    acceptedFiles.has(path)
+                ),
             }
-            const execResult = await composerService.executeChanges(filteredResult)
+            const execResult =
+                await composerService.executeChanges(filteredResult)
             setExecution(execResult)
         } catch (error) {
             console.error('Failed to execute changes:', error)
@@ -141,7 +154,9 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
         <div className="composer-panel">
             <div className="composer-panel__header">
                 <h2>Composer - Multi-file Editing</h2>
-                <button onClick={onClose} className="composer-panel__close">×</button>
+                <button onClick={onClose} className="composer-panel__close">
+                    ×
+                </button>
             </div>
 
             <div className="composer-panel__content">
@@ -167,55 +182,91 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
                         <div className="composer-panel__summary">
                             <h3>Planned Changes</h3>
                             <p>{result.summary}</p>
-                            <p>Estimated time: {Math.round(result.estimatedTime / 1000)}s</p>
+                            <p>
+                                Estimated time:{' '}
+                                {Math.round(result.estimatedTime / 1000)}s
+                            </p>
                         </div>
 
                         <div className="composer-panel__files">
                             <h3>Files to Change ({result.changes.length})</h3>
                             <div className="composer-panel__file-list">
-                                {result.executionOrder.map((filePath, index) => {
-                                    const change = result.changes.find(c => c.filePath === filePath)
-                                    const diff = diffs.get(filePath)
-                                    const isAccepted = acceptedFiles.has(filePath)
-                                    const isRejected = rejectedFiles.has(filePath)
-                                    return (
-                                        <div
-                                            key={filePath}
-                                            className={`composer-panel__file-item ${selectedFile === filePath ? 'selected' : ''} ${isAccepted ? 'accepted' : ''} ${isRejected ? 'rejected' : ''}`}
-                                        >
-                                            <span className="composer-panel__file-index">{index + 1}.</span>
-                                            <span className="composer-panel__file-path" onClick={() => setSelectedFile(filePath)}>{filePath}</span>
-                                            {diff && (
-                                                <span className="composer-panel__file-stats">
-                                                    +{diff.summary.additions} -{diff.summary.deletions}
+                                {result.executionOrder.map(
+                                    (filePath, index) => {
+                                        const change = result.changes.find(
+                                            (c) => c.filePath === filePath
+                                        )
+                                        const diff = diffs.get(filePath)
+                                        const isAccepted =
+                                            acceptedFiles.has(filePath)
+                                        const isRejected =
+                                            rejectedFiles.has(filePath)
+                                        return (
+                                            <div
+                                                key={filePath}
+                                                className={`composer-panel__file-item ${selectedFile === filePath ? 'selected' : ''} ${isAccepted ? 'accepted' : ''} ${isRejected ? 'rejected' : ''}`}
+                                            >
+                                                <span className="composer-panel__file-index">
+                                                    {index + 1}.
                                                 </span>
-                                            )}
-                                            <div className="composer-panel__file-actions">
-                                                <button
-                                                    onClick={() => handleAcceptChange(filePath)}
-                                                    disabled={isAccepted}
-                                                    className="composer-panel__file-button composer-panel__file-button--accept"
-                                                    title="Accept change"
+                                                <span
+                                                    className="composer-panel__file-path"
+                                                    onClick={() =>
+                                                        setSelectedFile(
+                                                            filePath
+                                                        )
+                                                    }
                                                 >
-                                                    ✓
-                                                </button>
-                                                <button
-                                                    onClick={() => handleRejectChange(filePath)}
-                                                    disabled={isRejected}
-                                                    className="composer-panel__file-button composer-panel__file-button--reject"
-                                                    title="Reject change"
-                                                >
-                                                    ✗
-                                                </button>
+                                                    {filePath}
+                                                </span>
+                                                {diff && (
+                                                    <span className="composer-panel__file-stats">
+                                                        +
+                                                        {diff.summary.additions}{' '}
+                                                        -
+                                                        {diff.summary.deletions}
+                                                    </span>
+                                                )}
+                                                <div className="composer-panel__file-actions">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleAcceptChange(
+                                                                filePath
+                                                            )
+                                                        }
+                                                        disabled={isAccepted}
+                                                        className="composer-panel__file-button composer-panel__file-button--accept"
+                                                        title="Accept change"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleRejectChange(
+                                                                filePath
+                                                            )
+                                                        }
+                                                        disabled={isRejected}
+                                                        className="composer-panel__file-button composer-panel__file-button--reject"
+                                                        title="Reject change"
+                                                    >
+                                                        ✗
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    }
+                                )}
                             </div>
                             <div className="composer-panel__file-summary">
                                 <span>Accepted: {acceptedFiles.size}</span>
                                 <span>Rejected: {rejectedFiles.size}</span>
-                                <span>Pending: {result.changes.length - acceptedFiles.size - rejectedFiles.size}</span>
+                                <span>
+                                    Pending:{' '}
+                                    {result.changes.length -
+                                        acceptedFiles.size -
+                                        rejectedFiles.size}
+                                </span>
                             </div>
                         </div>
 
@@ -234,7 +285,9 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
                                 disabled={executing}
                                 className="composer-panel__button composer-panel__button--primary"
                             >
-                                {executing ? 'Executing...' : 'Execute All Changes'}
+                                {executing
+                                    ? 'Executing...'
+                                    : 'Execute All Changes'}
                             </button>
                             <button
                                 onClick={handleAcceptAll}
@@ -259,11 +312,14 @@ export function ComposerPanel({ isOpen, onClose, projectPath }: ComposerPanelPro
                             <div className="composer-panel__progress-bar">
                                 <div
                                     className="composer-panel__progress-fill"
-                                    style={{ width: `${(execution.currentStep / execution.totalSteps) * 100}%` }}
+                                    style={{
+                                        width: `${(execution.currentStep / execution.totalSteps) * 100}%`,
+                                    }}
                                 />
                             </div>
                             <p>
-                                Step {execution.currentStep} of {execution.totalSteps}
+                                Step {execution.currentStep} of{' '}
+                                {execution.totalSteps}
                             </p>
                         </div>
                         {execution.status === 'completed' && (
@@ -289,16 +345,23 @@ function renderDiff(fileDiff: FileDiff): JSX.Element {
             {fileDiff.hunks.map((hunk, index) => (
                 <div key={index} className="diff-hunk">
                     <div className="diff-hunk-header">
-                        @@ -{hunk.oldStart},{hunk.oldEnd} +{hunk.newStart},{hunk.newEnd} @@
+                        @@ -{hunk.oldStart},{hunk.oldEnd} +{hunk.newStart},
+                        {hunk.newEnd} @@
                     </div>
                     {hunk.oldLines.map((line, i) => (
-                        <div key={`old-${i}`} className="diff-line diff-line--removed">
+                        <div
+                            key={`old-${i}`}
+                            className="diff-line diff-line--removed"
+                        >
                             <span className="diff-line-marker">-</span>
                             <span className="diff-line-content">{line}</span>
                         </div>
                     ))}
                     {hunk.newLines.map((line, i) => (
-                        <div key={`new-${i}`} className="diff-line diff-line--added">
+                        <div
+                            key={`new-${i}`}
+                            className="diff-line diff-line--added"
+                        >
                             <span className="diff-line-marker">+</span>
                             <span className="diff-line-content">{line}</span>
                         </div>

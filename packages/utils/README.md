@@ -35,16 +35,21 @@ import {
     topologicalSort,
     buildDependencyGraph,
     debounce,
-    throttle
+    throttle,
 } from '@cursor/utils'
 
 // Example: Platform detection
 const platform = getPlatformInfo()
-console.log(`Running on ${platform.IS_MAC ? 'macOS' : platform.IS_WINDOWS ? 'Windows' : 'Linux'}`)
+console.log(
+    `Running on ${platform.IS_MAC ? 'macOS' : platform.IS_WINDOWS ? 'Windows' : 'Linux'}`
+)
 
 // Example: Path joining
 const path = joinPaths('/home/user', 'documents')
-const advancedPath = joinPathsAdvanced('/home/user/project', '../other/file.txt')
+const advancedPath = joinPathsAdvanced(
+    '/home/user/project',
+    '../other/file.txt'
+)
 
 // Example: Text processing
 const cleanText = removeBeginningAndEndingLineBreaks('\n\nHello World\n\n')
@@ -54,7 +59,7 @@ const shortText = truncate('This is a very long string', 10)
 const nodes = [
     { id: 'a', data: {}, dependencies: ['b', 'c'] },
     { id: 'b', data: {}, dependencies: [] },
-    { id: 'c', data: {}, dependencies: ['b'] }
+    { id: 'c', data: {}, dependencies: ['b'] },
 ]
 const sorted = topologicalSort(nodes) // ['b', 'c', 'a']
 
@@ -67,6 +72,7 @@ const debouncedSearch = debounce((query: string) => {
 ## Available Utilities
 
 ### Error Handling
+
 - `ExpectedBackendError` - Base class for expected errors
 - `NoAuthRateLimitError` - Rate limit error for unauthenticated requests
 - `AuthRateLimitError` - Rate limit error for authenticated requests
@@ -80,11 +86,13 @@ const debouncedSearch = debounce((query: string) => {
 - `isExpectedError()` - Type guard for expected errors
 
 ### Streaming
+
 - `streamSource()` - Stream data from server-sent events
 - `anotherStreamSource()` - Alternative streaming function
 - `streamWithParser()` - Stream with custom parser
 
 ### Platform Utilities
+
 - `getPlatformInfo()` - Get platform information
 - `joinPaths()` - Join path parts
 - `joinPathsAdvanced()` - Advanced path joining with ./ and ../ support
@@ -94,6 +102,7 @@ const debouncedSearch = debounce((query: string) => {
 - `getDirectoryName()` - Get directory name
 
 ### Text Processing
+
 - `removeBeginningAndEndingLineBreaks()` - Remove leading/trailing line breaks
 - `removeWhitespace()` - Remove all whitespace
 - `truncate()` - Truncate string to max length
@@ -112,6 +121,7 @@ const debouncedSearch = debounce((query: string) => {
 - `unescapeRegex()` - Unescape regex characters
 
 ### Algorithms
+
 - `topologicalSort()` - Topological sort for dependency graphs
 - `buildDependencyGraph()` - Build dependency graph
 - `detectCycles()` - Detect cycles in graphs

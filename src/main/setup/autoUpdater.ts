@@ -54,9 +54,12 @@ export default function setupAutoUpdater() {
         if (isAppInApplicationsFolder) {
             if (app.isPackaged) {
                 todesktop.autoUpdater.checkForUpdates()
-                setInterval(() => {
-                    todesktop.autoUpdater.checkForUpdates()
-                }, 1000 * 60 * 15)
+                setInterval(
+                    () => {
+                        todesktop.autoUpdater.checkForUpdates()
+                    },
+                    1000 * 60 * 15
+                )
             }
         }
     })

@@ -37,7 +37,11 @@ export class ContextAnalyzer {
         this.logger = logger || new ConsoleLogger()
     }
 
-    analyzeFile(filePath: string, content: string, language?: string): FileContext {
+    analyzeFile(
+        filePath: string,
+        content: string,
+        language?: string
+    ): FileContext {
         this.logger.info(`Analyzing file: ${filePath}`)
 
         const fileContext: FileContext = {
@@ -48,7 +52,7 @@ export class ContextAnalyzer {
             exports: this.extractExports(content, language),
             dependencies: [],
             dependents: [],
-            symbols: this.extractSymbols(content, language)
+            symbols: this.extractSymbols(content, language),
         }
 
         return fileContext
@@ -70,7 +74,7 @@ export class ContextAnalyzer {
         // Build dependency graph
         for (const [filePath, context] of nodes) {
             const dependencies = new Set<string>()
-            
+
             for (const imp of context.imports) {
                 // Find files that export this symbol
                 for (const [otherPath, otherContext] of nodes) {
@@ -144,37 +148,40 @@ export class ContextAnalyzer {
         indirectDependents: string[]
         totalImpact: number
     } {
-        const reverseEdges = graph.reverseEdges.get(filePath) || new Set<string>()
+        const reverseEdges =
+            graph.reverseEdges.get(filePath) || new Set<string>()
         const directDependents = Array.from(reverseEdges)
-        const indirectDependents = this.getAffectedFiles(filePath, graph, 2).filter(
-            (f) => !directDependents.includes(f)
-        )
+        const indirectDependents = this.getAffectedFiles(
+            filePath,
+            graph,
+            2
+        ).filter((f) => !directDependents.includes(f))
 
         return {
             directDependents,
             indirectDependents,
-            totalImpact: directDependents.length + indirectDependents.length
+            totalImpact: directDependents.length + indirectDependents.length,
         }
     }
 
     private detectLanguage(filePath: string): string {
         const ext = filePath.split('.').pop()?.toLowerCase()
         const languageMap: Record<string, string> = {
-            'ts': 'typescript',
-            'tsx': 'typescript',
-            'js': 'javascript',
-            'jsx': 'javascript',
-            'py': 'python',
-            'java': 'java',
-            'go': 'go',
-            'rs': 'rust',
-            'cpp': 'cpp',
-            'c': 'c',
-            'cs': 'csharp',
-            'php': 'php',
-            'rb': 'ruby',
-            'swift': 'swift',
-            'kt': 'kotlin'
+            ts: 'typescript',
+            tsx: 'typescript',
+            js: 'javascript',
+            jsx: 'javascript',
+            py: 'python',
+            java: 'java',
+            go: 'go',
+            rs: 'rust',
+            cpp: 'cpp',
+            c: 'c',
+            cs: 'csharp',
+            php: 'php',
+            rb: 'ruby',
+            swift: 'swift',
+            kt: 'kotlin',
         }
 
         return languageMap[ext || ''] || 'text'
@@ -188,7 +195,7 @@ export class ContextAnalyzer {
             /import\s+.*\s+from\s+['"]([^'"]+)['"]/g,
             /import\s+['"]([^'"]+)['"]/g,
             /require\(['"]([^'"]+)['"]\)/g,
-            /#include\s*[<"]([^>"]+)[>"]/g
+            /#include\s*[<"]([^>"]+)[>"]/g,
         ]
 
         for (const pattern of patterns) {
@@ -208,14 +215,14 @@ export class ContextAnalyzer {
         const patterns = [
             /export\s+(?:default\s+)?(?:class|function|const|let|var)\s+(\w+)/g,
             /export\s*\{\s*([^}]+)\s*\}/g,
-            /module\.exports\s*=\s*(\w+)/g
+            /module\.exports\s*=\s*(\w+)/g,
         ]
 
         for (const pattern of patterns) {
             let match
             while ((match = pattern.exec(content)) !== null) {
                 if (match[1]) {
-                    const names = match[1].split(',').map(s => s.trim())
+                    const names = match[1].split(',').map((s) => s.trim())
                     exports.push(...names)
                 }
             }
@@ -230,11 +237,14 @@ export class ContextAnalyzer {
 
         // Simple regex-based symbol extraction
         const patterns = [
-            { regex: /(?:class|interface|type)\s+(\w+)/g, type: 'class' as const },
+            {
+                regex: /(?:class|interface|type)\s+(\w+)/g,
+                type: 'class' as const,
+            },
             { regex: /function\s+(\w+)/g, type: 'function' as const },
             { regex: /const\s+(\w+)\s*=/g, type: 'variable' as const },
             { regex: /let\s+(\w+)\s*=/g, type: 'variable' as const },
-            { regex: /var\s+(\w+)\s*=/g, type: 'variable' as const }
+            { regex: /var\s+(\w+)\s*=/g, type: 'variable' as const },
         ]
 
         for (let i = 0; i < lines.length; i++) {
@@ -248,7 +258,7 @@ export class ContextAnalyzer {
                         type,
                         line: i + 1,
                         column: line.indexOf(match[1]),
-                        exported: line.includes('export')
+                        exported: line.includes('export'),
                     })
                 }
             }
@@ -281,8 +291,8 @@ export class ContextAnalyzer {
         for (const [otherPath, otherContext] of graph.nodes) {
             if (otherPath === filePath) continue
 
-            const commonSymbols = fileContext.symbols.filter(s1 =>
-                otherContext.symbols.some(s2 => s1.name === s2.name)
+            const commonSymbols = fileContext.symbols.filter((s1) =>
+                otherContext.symbols.some((s2) => s1.name === s2.name)
             )
 
             if (commonSymbols.length > 0) {

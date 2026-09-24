@@ -215,8 +215,7 @@ export const openFile = createAsyncThunk(
         }: {
             filePath: string
             selectionRegions?:
-                | { start: LSP.Position; end: LSP.Position }[]
-                | null
+                { start: LSP.Position; end: LSP.Position }[] | null
         },
         { getState, dispatch }
     ) => {

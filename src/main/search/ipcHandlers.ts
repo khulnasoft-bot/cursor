@@ -18,11 +18,20 @@ export function setupSearch() {
             try {
                 const results = await searchService.search(options)
                 // Rank results
-                const rankedResults = searchService.rankResults(results, options.pattern)
+                const rankedResults = searchService.rankResults(
+                    results,
+                    options.pattern
+                )
                 return { success: true, results: rankedResults }
             } catch (error) {
                 log.error('Search failed:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -30,14 +39,32 @@ export function setupSearch() {
     // Search in specific file
     ipcMain.handle(
         'search-in-file',
-        async (_event: IpcMainInvokeEvent, filePath: string, pattern: string, options?: Partial<SearchOptions>) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            filePath: string,
+            pattern: string,
+            options?: Partial<SearchOptions>
+        ) => {
             try {
-                const results = await searchService.searchInFile(filePath, pattern, options)
-                const rankedResults = searchService.rankResults(results, pattern)
+                const results = await searchService.searchInFile(
+                    filePath,
+                    pattern,
+                    options
+                )
+                const rankedResults = searchService.rankResults(
+                    results,
+                    pattern
+                )
                 return { success: true, results: rankedResults }
             } catch (error) {
                 log.error('File search failed:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -45,13 +72,23 @@ export function setupSearch() {
     // Build search index
     ipcMain.handle(
         'search-build-index',
-        async (_event: IpcMainInvokeEvent, directory: string, fileExtensions?: string[]) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            directory: string,
+            fileExtensions?: string[]
+        ) => {
             try {
                 await searchService.buildIndex(directory, fileExtensions)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to build search index:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -63,12 +100,21 @@ export function setupSearch() {
             try {
                 searchService.startWatching(directory, (filePath, event) => {
                     // Notify renderer of file changes
-                    _event.sender.send('search-file-changed', { filePath, event })
+                    _event.sender.send('search-file-changed', {
+                        filePath,
+                        event,
+                    })
                 })
                 return { success: true }
             } catch (error) {
                 log.error('Failed to start watching directory:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -82,66 +128,72 @@ export function setupSearch() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to stop watching directory:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Stop all watching
-    ipcMain.handle(
-        'search-stop-all-watching',
-        async () => {
-            try {
-                searchService.stopAllWatching()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to stop all watching:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('search-stop-all-watching', async () => {
+        try {
+            searchService.stopAllWatching()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to stop all watching:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get index stats
-    ipcMain.handle(
-        'search-get-index-stats',
-        async () => {
-            try {
-                const stats = searchService.getIndexStats()
-                return { success: true, stats }
-            } catch (error) {
-                log.error('Failed to get index stats:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('search-get-index-stats', async () => {
+        try {
+            const stats = searchService.getIndexStats()
+            return { success: true, stats }
+        } catch (error) {
+            log.error('Failed to get index stats:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Clear index
-    ipcMain.handle(
-        'search-clear-index',
-        async () => {
-            try {
-                searchService.clearIndex()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to clear index:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('search-clear-index', async () => {
+        try {
+            searchService.clearIndex()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to clear index:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Check if ripgrep is available
-    ipcMain.handle(
-        'search-is-ripgrep-available',
-        async () => {
-            try {
-                const available = searchService.isRipgrepAvailable()
-                return { success: true, available }
-            } catch (error) {
-                log.error('Failed to check ripgrep availability:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('search-is-ripgrep-available', async () => {
+        try {
+            const available = searchService.isRipgrepAvailable()
+            return { success: true, available }
+        } catch (error) {
+            log.error('Failed to check ripgrep availability:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('Search IPC handlers registered')
 }

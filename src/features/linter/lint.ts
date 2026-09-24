@@ -842,7 +842,10 @@ class PanelItem {
     id = 'item_' + Math.floor(Math.random() * 0xffffffff).toString(16)
     dom: HTMLElement
 
-    constructor(view: EditorView, readonly diagnostic: Diagnostic) {
+    constructor(
+        view: EditorView,
+        readonly diagnostic: Diagnostic
+    ) {
         this.dom = renderDiagnostic(view, diagnostic, true)
         this.dom.id = this.id
         this.dom.setAttribute('role', 'option')
@@ -1319,14 +1322,17 @@ class LintGutterMarker extends GutterMarker {
     severity: 'info' | 'warning' | 'error' | 'aiwarning' | 'none'
     constructor(readonly diagnostics: readonly Diagnostic[]) {
         super()
-        this.severity = diagnostics.reduce((max, d) => {
-            const s = d.severity
-            return s == 'error' ||
-                s == 'warning' ||
-                (s == 'aiwarning' && max == 'info')
-                ? s
-                : max
-        }, 'info' as 'info' | 'warning' | 'error' | 'aiwarning')
+        this.severity = diagnostics.reduce(
+            (max, d) => {
+                const s = d.severity
+                return s == 'error' ||
+                    s == 'warning' ||
+                    (s == 'aiwarning' && max == 'info')
+                    ? s
+                    : max
+            },
+            'info' as 'info' | 'warning' | 'error' | 'aiwarning'
+        )
     }
 
     toDOM(view: EditorView) {

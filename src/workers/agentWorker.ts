@@ -20,7 +20,7 @@ export interface AgentResponse {
 // Worker message handler
 self.onmessage = async (event: MessageEvent<AgentTask>) => {
     const task = event.data
-    
+
     try {
         switch (task.type) {
             case 'completion':
@@ -39,7 +39,10 @@ self.onmessage = async (event: MessageEvent<AgentTask>) => {
                 sendError(task.id, `Unknown task type: ${task.type}`)
         }
     } catch (error) {
-        sendError(task.id, error instanceof Error ? error.message : 'Unknown error')
+        sendError(
+            task.id,
+            error instanceof Error ? error.message : 'Unknown error'
+        )
     }
 }
 
@@ -60,56 +63,60 @@ function sendProgress(id: string, progress: number) {
 
 async function handleCompletion(task: AgentTask) {
     const { file, content, pos } = task.data
-    
+
     // Simulate completion generation
     // In production, this would call the Cursor API
     sendProgress(task.id, 0.2)
-    
+
     // Process completion logic
     const completion = await generateCompletion(file, content, pos)
-    
+
     sendProgress(task.id, 1.0)
     sendResult(task.id, { completion })
 }
 
 async function handleChat(task: AgentTask) {
     const { messages, context } = task.data
-    
+
     sendProgress(task.id, 0.1)
-    
+
     // Process chat logic
     const response = await processChat(messages, context)
-    
+
     sendProgress(task.id, 1.0)
     sendResult(task.id, { response })
 }
 
 async function handleAnalysis(task: AgentTask) {
     const { code, language } = task.data
-    
+
     sendProgress(task.id, 0.3)
-    
+
     // Analyze code
     const analysis = await analyzeCode(code, language)
-    
+
     sendProgress(task.id, 1.0)
     sendResult(task.id, { analysis })
 }
 
 async function handleFix(task: AgentTask) {
     const { code, errors, language } = task.data
-    
+
     sendProgress(task.id, 0.2)
-    
+
     // Fix code errors
     const fixed = await fixCode(code, errors, language)
-    
+
     sendProgress(task.id, 1.0)
     sendResult(task.id, { fixed })
 }
 
 // Helper functions (these would be implemented with actual AI logic)
-async function generateCompletion(file: string, content: string, pos: number): Promise<string> {
+async function generateCompletion(
+    file: string,
+    content: string,
+    pos: number
+): Promise<string> {
     // Placeholder for actual completion generation
     // In production, this would call the Cursor backend API
     return '' // Return generated completion
@@ -126,7 +133,11 @@ async function analyzeCode(code: string, language: string): Promise<any> {
     return { suggestions: [], issues: [] }
 }
 
-async function fixCode(code: string, errors: any[], language: string): Promise<string> {
+async function fixCode(
+    code: string,
+    errors: any[],
+    language: string
+): Promise<string> {
     // Placeholder for code fixing
     return code // Return fixed code
 }

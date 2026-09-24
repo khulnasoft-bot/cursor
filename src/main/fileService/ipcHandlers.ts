@@ -14,13 +14,23 @@ export function setupFileServiceIpcs() {
     // Index a directory
     ipcMain.handle(
         'file-service-index-directory',
-        async (_event: IpcMainInvokeEvent, directoryPath: string, options: IndexingOptions = {}) => {
+        async (
+            _event: IpcMainInvokeEvent,
+            directoryPath: string,
+            options: IndexingOptions = {}
+        ) => {
             try {
                 await fileService.indexDirectory(directoryPath, options)
                 return { success: true }
             } catch (error) {
                 log.error('Failed to index directory:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -34,7 +44,13 @@ export function setupFileServiceIpcs() {
                 return { success: true, results }
             } catch (error) {
                 log.error('Failed to search:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -48,7 +64,13 @@ export function setupFileServiceIpcs() {
                 return { success: true, content }
             } catch (error) {
                 log.error('Failed to get file content:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -62,7 +84,13 @@ export function setupFileServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to update file:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -76,38 +104,44 @@ export function setupFileServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to remove file:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Clear the entire index
-    ipcMain.handle(
-        'file-service-clear-index',
-        async () => {
-            try {
-                fileService.clearIndex()
-                return { success: true }
-            } catch (error) {
-                log.error('Failed to clear index:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('file-service-clear-index', async () => {
+        try {
+            fileService.clearIndex()
+            return { success: true }
+        } catch (error) {
+            log.error('Failed to clear index:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get index statistics
-    ipcMain.handle(
-        'file-service-get-stats',
-        async () => {
-            try {
-                const stats = fileService.getIndexStats()
-                return { success: true, stats }
-            } catch (error) {
-                log.error('Failed to get stats:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('file-service-get-stats', async () => {
+        try {
+            const stats = fileService.getIndexStats()
+            return { success: true, stats }
+        } catch (error) {
+            log.error('Failed to get stats:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('File service IPC handlers registered')
 }

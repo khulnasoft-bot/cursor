@@ -20,7 +20,13 @@ export function setupTextmateServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to register TextMate grammar:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -34,7 +40,13 @@ export function setupTextmateServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to unregister TextMate grammar:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -48,24 +60,30 @@ export function setupTextmateServiceIpcs() {
                 return { success: true, grammar }
             } catch (error) {
                 log.error('Failed to get TextMate grammar:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get all grammars
-    ipcMain.handle(
-        'textmate-service-get-all',
-        async () => {
-            try {
-                const grammars = textmateService.getGrammars()
-                return { success: true, grammars }
-            } catch (error) {
-                log.error('Failed to get TextMate grammars:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('textmate-service-get-all', async () => {
+        try {
+            const grammars = textmateService.getGrammars()
+            return { success: true, grammars }
+        } catch (error) {
+            log.error('Failed to get TextMate grammars:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     // Get grammar by language
     ipcMain.handle(
@@ -76,7 +94,13 @@ export function setupTextmateServiceIpcs() {
                 return { success: true, grammars }
             } catch (error) {
                 log.error('Failed to get TextMate grammars by language:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
@@ -90,24 +114,30 @@ export function setupTextmateServiceIpcs() {
                 return { success: true }
             } catch (error) {
                 log.error('Failed to load TextMate grammar from file:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+                return {
+                    success: false,
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error',
+                }
             }
         }
     )
 
     // Get grammars path
-    ipcMain.handle(
-        'textmate-service-get-path',
-        async () => {
-            try {
-                const grammarsPath = textmateService.getGrammarsPath()
-                return { success: true, grammarsPath }
-            } catch (error) {
-                log.error('Failed to get grammars path:', error)
-                return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    ipcMain.handle('textmate-service-get-path', async () => {
+        try {
+            const grammarsPath = textmateService.getGrammarsPath()
+            return { success: true, grammarsPath }
+        } catch (error) {
+            log.error('Failed to get grammars path:', error)
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
             }
         }
-    )
+    })
 
     log.info('TextMate service IPC handlers registered')
 }

@@ -7,7 +7,7 @@ import {
     AIProvider,
     ModelConfig,
     ModelCapabilities,
-    ProviderConfig
+    ProviderConfig,
 } from './types'
 
 /**
@@ -16,7 +16,11 @@ import {
 export interface AIProviderImplementation {
     name: string
     call(messages: any[], config: any): Promise<string>
-    stream(messages: any[], config: any, onChunk: (chunk: string) => void): Promise<void>
+    stream(
+        messages: any[],
+        config: any,
+        onChunk: (chunk: string) => void
+    ): Promise<void>
 }
 
 /**
@@ -25,7 +29,8 @@ export interface AIProviderImplementation {
 export class ProviderRegistry {
     private providers: Map<string, ProviderConfig> = new Map()
     private modelRegistry: Map<string, ModelConfig> = new Map()
-    private implementations: Map<AIProvider, AIProviderImplementation> = new Map()
+    private implementations: Map<AIProvider, AIProviderImplementation> =
+        new Map()
 
     constructor() {
         this.initializeDefaultModels()
@@ -43,12 +48,12 @@ export class ProviderRegistry {
                 maxContextTokens: 128000,
                 supportsImages: true,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.005
+                costPer1kTokens: 0.005,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 4096
-            }
+                maxTokens: 4096,
+            },
         })
 
         this.registerModel({
@@ -61,12 +66,12 @@ export class ProviderRegistry {
                 maxContextTokens: 128000,
                 supportsImages: true,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.01
+                costPer1kTokens: 0.01,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 4096
-            }
+                maxTokens: 4096,
+            },
         })
 
         this.registerModel({
@@ -79,12 +84,12 @@ export class ProviderRegistry {
                 maxContextTokens: 16385,
                 supportsImages: false,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.0015
+                costPer1kTokens: 0.0015,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 4096
-            }
+                maxTokens: 4096,
+            },
         })
 
         // Anthropic Models
@@ -98,12 +103,12 @@ export class ProviderRegistry {
                 maxContextTokens: 200000,
                 supportsImages: true,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.003
+                costPer1kTokens: 0.003,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 4096
-            }
+                maxTokens: 4096,
+            },
         })
 
         this.registerModel({
@@ -116,12 +121,12 @@ export class ProviderRegistry {
                 maxContextTokens: 200000,
                 supportsImages: true,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.015
+                costPer1kTokens: 0.015,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 4096
-            }
+                maxTokens: 4096,
+            },
         })
 
         // Google Models
@@ -135,12 +140,12 @@ export class ProviderRegistry {
                 maxContextTokens: 1000000,
                 supportsImages: true,
                 supportsSystemMessages: true,
-                costPer1kTokens: 0.0035
+                costPer1kTokens: 0.0035,
             },
             defaultParams: {
                 temperature: 0.7,
-                maxTokens: 8192
-            }
+                maxTokens: 8192,
+            },
         })
     }
 
@@ -157,7 +162,7 @@ export class ProviderRegistry {
     }
 
     getModelsByProvider(provider: AIProvider): ModelConfig[] {
-        return this.getModels().filter(m => m.provider === provider)
+        return this.getModels().filter((m) => m.provider === provider)
     }
 
     registerProvider(config: ProviderConfig): void {
@@ -172,11 +177,16 @@ export class ProviderRegistry {
         return Array.from(this.providers.values())
     }
 
-    registerImplementation(provider: AIProvider, implementation: AIProviderImplementation): void {
+    registerImplementation(
+        provider: AIProvider,
+        implementation: AIProviderImplementation
+    ): void {
         this.implementations.set(provider, implementation)
     }
 
-    getImplementation(provider: AIProvider): AIProviderImplementation | undefined {
+    getImplementation(
+        provider: AIProvider
+    ): AIProviderImplementation | undefined {
         return this.implementations.get(provider)
     }
 
@@ -186,7 +196,7 @@ export class ProviderRegistry {
     }
 
     getAvailableProviders(): AIProvider[] {
-        return Array.from(new Set(this.getModels().map(m => m.provider)))
+        return Array.from(new Set(this.getModels().map((m) => m.provider)))
     }
 
     isModelAvailable(modelId: string): boolean {
@@ -194,6 +204,9 @@ export class ProviderRegistry {
     }
 
     isProviderAvailable(provider: AIProvider): boolean {
-        return this.providers.has(provider) || this.getModelsByProvider(provider).length > 0
+        return (
+            this.providers.has(provider) ||
+            this.getModelsByProvider(provider).length > 0
+        )
     }
 }

@@ -42,12 +42,12 @@ export class AgentSandbox {
                 maxMemoryMB: 512,
                 maxCpuPercent: 80,
                 maxDiskMB: 1024,
-                maxTimeMs: 300000
+                maxTimeMs: 300000,
             },
             allowedPaths: ['/tmp', '/home'],
             forbiddenPaths: ['/etc', '/sys', '/proc'],
             networkAccess: false,
-            environment: {}
+            environment: {},
         }
         this.logger = logger || new ConsoleLogger()
     }
@@ -60,8 +60,8 @@ export class AgentSandbox {
             ...customConfig,
             resourceLimits: {
                 ...this.defaultConfig.resourceLimits,
-                ...customConfig?.resourceLimits
-            }
+                ...customConfig?.resourceLimits,
+            },
         }
 
         const sandbox: SandboxInstance = {
@@ -70,9 +70,9 @@ export class AgentSandbox {
             resourceUsage: {
                 memoryMB: 0,
                 cpuPercent: 0,
-                diskMB: 0
+                diskMB: 0,
             },
-            config
+            config,
         }
 
         this.sandboxes.set(sandboxId, sandbox)
@@ -117,10 +117,13 @@ export class AgentSandbox {
     }
 
     getActiveSandboxes(): SandboxInstance[] {
-        return this.getSandboxes().filter(s => s.status === 'active')
+        return this.getSandboxes().filter((s) => s.status === 'active')
     }
 
-    validatePath(sandboxId: string, path: string): { allowed: boolean; reason?: string } {
+    validatePath(
+        sandboxId: string,
+        path: string
+    ): { allowed: boolean; reason?: string } {
         const sandbox = this.sandboxes.get(sandboxId)
         if (!sandbox) {
             return { allowed: false, reason: 'Sandbox not found' }
@@ -129,13 +132,18 @@ export class AgentSandbox {
         // Check forbidden paths
         for (const forbidden of sandbox.config.forbiddenPaths) {
             if (path.startsWith(forbidden)) {
-                return { allowed: false, reason: `Path is forbidden: ${forbidden}` }
+                return {
+                    allowed: false,
+                    reason: `Path is forbidden: ${forbidden}`,
+                }
             }
         }
 
         // Check allowed paths (if specified, only allow those)
         if (sandbox.config.allowedPaths.length > 0) {
-            const allowed = sandbox.config.allowedPaths.some(allowed => path.startsWith(allowed))
+            const allowed = sandbox.config.allowedPaths.some((allowed) =>
+                path.startsWith(allowed)
+            )
             if (!allowed) {
                 return { allowed: false, reason: 'Path not in allowed list' }
             }
@@ -144,19 +152,30 @@ export class AgentSandbox {
         return { allowed: true }
     }
 
-    updateResourceUsage(sandboxId: string, usage: Partial<SandboxInstance['resourceUsage']>): void {
+    updateResourceUsage(
+        sandboxId: string,
+        usage: Partial<SandboxInstance['resourceUsage']>
+    ): void {
         const sandbox = this.sandboxes.get(sandboxId)
         if (!sandbox) return
 
         sandbox.resourceUsage = { ...sandbox.resourceUsage, ...usage }
 
         // Check resource limits
-        if (sandbox.config.resourceLimits.maxMemoryMB && sandbox.resourceUsage.memoryMB > sandbox.config.resourceLimits.maxMemoryMB) {
+        if (
+            sandbox.config.resourceLimits.maxMemoryMB &&
+            sandbox.resourceUsage.memoryMB >
+                sandbox.config.resourceLimits.maxMemoryMB
+        ) {
             this.logger.warn(`Sandbox ${sandboxId} exceeded memory limit`)
             this.suspendSandbox(sandboxId)
         }
 
-        if (sandbox.config.resourceLimits.maxCpuPercent && sandbox.resourceUsage.cpuPercent > sandbox.config.resourceLimits.maxCpuPercent) {
+        if (
+            sandbox.config.resourceLimits.maxCpuPercent &&
+            sandbox.resourceUsage.cpuPercent >
+                sandbox.config.resourceLimits.maxCpuPercent
+        ) {
             this.logger.warn(`Sandbox ${sandboxId} exceeded CPU limit`)
             this.suspendSandbox(sandboxId)
         }
@@ -164,7 +183,10 @@ export class AgentSandbox {
 
     cleanupSandboxes(): void {
         for (const [sandboxId, sandbox] of this.sandboxes) {
-            if (sandbox.status === 'suspended' || sandbox.status === 'terminated') {
+            if (
+                sandbox.status === 'suspended' ||
+                sandbox.status === 'terminated'
+            ) {
                 this.sandboxes.delete(sandboxId)
             }
         }
@@ -181,7 +203,10 @@ export class AgentSandbox {
 // Singleton instance
 let agentSandbox: AgentSandbox | null = null
 
-export function getAgentSandbox(config?: AgentConfig, logger?: Logger): AgentSandbox {
+export function getAgentSandbox(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentSandbox {
     if (!agentSandbox) {
         agentSandbox = new AgentSandbox(config, logger)
     }
@@ -195,6 +220,9 @@ export function destroyAgentSandbox(): void {
     }
 }
 
-export function createAgentSandbox(config?: AgentConfig, logger?: Logger): AgentSandbox {
+export function createAgentSandbox(
+    config?: AgentConfig,
+    logger?: Logger
+): AgentSandbox {
     return new AgentSandbox(config, logger)
 }

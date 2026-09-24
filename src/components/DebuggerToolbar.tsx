@@ -5,7 +5,14 @@
 
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faStop, faArrowRight, faArrowDown, faArrowUp, faPause } from '@fortawesome/free-solid-svg-icons'
+import {
+    faPlay,
+    faStop,
+    faArrowRight,
+    faArrowDown,
+    faArrowUp,
+    faPause,
+} from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../app/store'
 import {
@@ -14,12 +21,14 @@ import {
     stepOver,
     stepInto,
     stepOut,
-    stopDebugSession
+    stopDebugSession,
 } from '../features/debugger/debuggerThunks'
 
 const DebuggerToolbar: React.FC = () => {
     const dispatch = useDispatch()
-    const { activeSessionId, isDebugging, isPaused } = useSelector((state: RootState) => state.debugger)
+    const { activeSessionId, isDebugging, isPaused } = useSelector(
+        (state: RootState) => state.debugger
+    )
 
     const handleContinue = () => {
         if (activeSessionId) {
@@ -68,7 +77,10 @@ const DebuggerToolbar: React.FC = () => {
                 className="p-2 hover:bg-gray-700 rounded transition-colors"
                 title={isPaused ? 'Continue' : 'Pause'}
             >
-                <FontAwesomeIcon icon={isPaused ? faPlay : faPause} className="text-green-400" />
+                <FontAwesomeIcon
+                    icon={isPaused ? faPlay : faPause}
+                    className="text-green-400"
+                />
             </button>
             <button
                 onClick={handleStepOver}
@@ -76,7 +88,10 @@ const DebuggerToolbar: React.FC = () => {
                 title="Step Over"
                 disabled={!isPaused}
             >
-                <FontAwesomeIcon icon={faArrowRight} className="text-blue-400" />
+                <FontAwesomeIcon
+                    icon={faArrowRight}
+                    className="text-blue-400"
+                />
             </button>
             <button
                 onClick={handleStepInto}

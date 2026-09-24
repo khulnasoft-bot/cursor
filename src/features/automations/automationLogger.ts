@@ -47,7 +47,13 @@ export class AutomationLogger {
         return this.active
     }
 
-    log(level: LogEntry['level'], message: string, data?: Record<string, any>, workflowId?: string, executionId?: string): void {
+    log(
+        level: LogEntry['level'],
+        message: string,
+        data?: Record<string, any>,
+        workflowId?: string,
+        executionId?: string
+    ): void {
         if (!this.active) return
 
         const entry: LogEntry = {
@@ -57,7 +63,7 @@ export class AutomationLogger {
             workflowId,
             executionId,
             message,
-            data
+            data,
         }
 
         this.logs.push(entry)
@@ -71,19 +77,39 @@ export class AutomationLogger {
         log[level](`[Automation] ${message}`, data || '')
     }
 
-    info(message: string, data?: Record<string, any>, workflowId?: string, executionId?: string): void {
+    info(
+        message: string,
+        data?: Record<string, any>,
+        workflowId?: string,
+        executionId?: string
+    ): void {
         this.log('info', message, data, workflowId, executionId)
     }
 
-    warn(message: string, data?: Record<string, any>, workflowId?: string, executionId?: string): void {
+    warn(
+        message: string,
+        data?: Record<string, any>,
+        workflowId?: string,
+        executionId?: string
+    ): void {
         this.log('warn', message, data, workflowId, executionId)
     }
 
-    error(message: string, data?: Record<string, any>, workflowId?: string, executionId?: string): void {
+    error(
+        message: string,
+        data?: Record<string, any>,
+        workflowId?: string,
+        executionId?: string
+    ): void {
         this.log('error', message, data, workflowId, executionId)
     }
 
-    debug(message: string, data?: Record<string, any>, workflowId?: string, executionId?: string): void {
+    debug(
+        message: string,
+        data?: Record<string, any>,
+        workflowId?: string,
+        executionId?: string
+    ): void {
         this.log('debug', message, data, workflowId, executionId)
     }
 
@@ -92,26 +118,31 @@ export class AutomationLogger {
     }
 
     getLogsByLevel(level: LogEntry['level']): LogEntry[] {
-        return this.logs.filter(l => l.level === level)
+        return this.logs.filter((l) => l.level === level)
     }
 
     getLogsByWorkflow(workflowId: string): LogEntry[] {
-        return this.logs.filter(l => l.workflowId === workflowId)
+        return this.logs.filter((l) => l.workflowId === workflowId)
     }
 
     getLogsByExecution(executionId: string): LogEntry[] {
-        return this.logs.filter(l => l.executionId === executionId)
+        return this.logs.filter((l) => l.executionId === executionId)
     }
 
     getLogsByTimeRange(start: Date, end: Date): LogEntry[] {
-        return this.logs.filter(l => l.timestamp >= start && l.timestamp <= end)
+        return this.logs.filter(
+            (l) => l.timestamp >= start && l.timestamp <= end
+        )
     }
 
     searchLogs(query: string): LogEntry[] {
         const queryLower = query.toLowerCase()
-        return this.logs.filter(l =>
-            l.message.toLowerCase().includes(queryLower) ||
-            JSON.stringify(l.data || {}).toLowerCase().includes(queryLower)
+        return this.logs.filter(
+            (l) =>
+                l.message.toLowerCase().includes(queryLower) ||
+                JSON.stringify(l.data || {})
+                    .toLowerCase()
+                    .includes(queryLower)
         )
     }
 
@@ -123,7 +154,7 @@ export class AutomationLogger {
 
     clearLogsBefore(date: Date): number {
         const beforeCount = this.logs.length
-        this.logs = this.logs.filter(l => l.timestamp >= date)
+        this.logs = this.logs.filter((l) => l.timestamp >= date)
         const cleared = beforeCount - this.logs.length
         log.info(`Cleared ${cleared} logs before ${date}`)
         return cleared
@@ -132,22 +163,31 @@ export class AutomationLogger {
     getMonitoringMetrics(): MonitoringMetrics {
         const executions = this.automationService.getExecutions()
         const totalExecutions = executions.length
-        const successfulExecutions = executions.filter(e => e.status === 'completed').length
-        const failedExecutions = executions.filter(e => e.status === 'failed').length
+        const successfulExecutions = executions.filter(
+            (e) => e.status === 'completed'
+        ).length
+        const failedExecutions = executions.filter(
+            (e) => e.status === 'failed'
+        ).length
 
         // Calculate average execution time
-        const completedExecutions = executions.filter(e => e.status === 'completed' && e.endTime)
-        const averageExecutionTime = completedExecutions.length > 0
-            ? completedExecutions.reduce((sum, e) => {
-                const duration = e.endTime!.getTime() - e.startTime.getTime()
-                return sum + duration
-            }, 0) / completedExecutions.length
-            : 0
+        const completedExecutions = executions.filter(
+            (e) => e.status === 'completed' && e.endTime
+        )
+        const averageExecutionTime =
+            completedExecutions.length > 0
+                ? completedExecutions.reduce((sum, e) => {
+                      const duration =
+                          e.endTime!.getTime() - e.startTime.getTime()
+                      return sum + duration
+                  }, 0) / completedExecutions.length
+                : 0
 
         // Count executions by workflow
         const executionsByWorkflow: Record<string, number> = {}
         for (const execution of executions) {
-            executionsByWorkflow[execution.workflowId] = (executionsByWorkflow[execution.workflowId] || 0) + 1
+            executionsByWorkflow[execution.workflowId] =
+                (executionsByWorkflow[execution.workflowId] || 0) + 1
         }
 
         // Count executions by hour (last 24 hours)
@@ -163,7 +203,8 @@ export class AutomationLogger {
         }
 
         // Calculate error rate
-        const errorRate = totalExecutions > 0 ? (failedExecutions / totalExecutions) * 100 : 0
+        const errorRate =
+            totalExecutions > 0 ? (failedExecutions / totalExecutions) * 100 : 0
 
         return {
             totalExecutions,
@@ -172,7 +213,7 @@ export class AutomationLogger {
             averageExecutionTime,
             executionsByWorkflow,
             executionsByHour,
-            errorRate
+            errorRate,
         }
     }
 
@@ -186,22 +227,32 @@ export class AutomationLogger {
         lastRun?: Date
         lastStatus?: string
     } {
-        const executions = this.automationService.getExecutionsByWorkflow(workflowId)
+        const executions =
+            this.automationService.getExecutionsByWorkflow(workflowId)
         const _workflow = this.automationService.getWorkflow(workflowId)
 
         const totalRuns = executions.length
-        const successfulRuns = executions.filter(e => e.status === 'completed').length
-        const failedRuns = executions.filter(e => e.status === 'failed').length
+        const successfulRuns = executions.filter(
+            (e) => e.status === 'completed'
+        ).length
+        const failedRuns = executions.filter(
+            (e) => e.status === 'failed'
+        ).length
 
-        const successRate = totalRuns > 0 ? (successfulRuns / totalRuns) * 100 : 0
+        const successRate =
+            totalRuns > 0 ? (successfulRuns / totalRuns) * 100 : 0
 
-        const completedExecutions = executions.filter(e => e.status === 'completed' && e.endTime)
-        const averageExecutionTime = completedExecutions.length > 0
-            ? completedExecutions.reduce((sum, e) => {
-                const duration = e.endTime!.getTime() - e.startTime.getTime()
-                return sum + duration
-            }, 0) / completedExecutions.length
-            : 0
+        const completedExecutions = executions.filter(
+            (e) => e.status === 'completed' && e.endTime
+        )
+        const averageExecutionTime =
+            completedExecutions.length > 0
+                ? completedExecutions.reduce((sum, e) => {
+                      const duration =
+                          e.endTime!.getTime() - e.startTime.getTime()
+                      return sum + duration
+                  }, 0) / completedExecutions.length
+                : 0
 
         const lastExecution = executions[executions.length - 1]
 
@@ -213,13 +264,19 @@ export class AutomationLogger {
             successRate,
             averageExecutionTime,
             lastRun: lastExecution?.startTime,
-            lastStatus: lastExecution?.status
+            lastStatus: lastExecution?.status,
         }
     }
 
-    getAllWorkflowHealth(): Record<string, ReturnType<typeof this.getWorkflowHealth>> {
+    getAllWorkflowHealth(): Record<
+        string,
+        ReturnType<typeof this.getWorkflowHealth>
+    > {
         const workflows = this.automationService.getWorkflows()
-        const health: Record<string, ReturnType<typeof this.getWorkflowHealth>> = {}
+        const health: Record<
+            string,
+            ReturnType<typeof this.getWorkflowHealth>
+        > = {}
 
         for (const workflow of workflows) {
             health[workflow.id] = this.getWorkflowHealth(workflow.id)

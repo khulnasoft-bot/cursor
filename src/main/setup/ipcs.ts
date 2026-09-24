@@ -105,9 +105,8 @@ export default function setupIpcs() {
                 folders[newFolderId] = newFolder
 
                 if (depth < origDepth && !badDirectories.includes(name)) {
-                    const fileNameList = await fileSystem.readdirSyncWithIsDir(
-                        dirName
-                    )
+                    const fileNameList =
+                        await fileSystem.readdirSyncWithIsDir(dirName)
                     for (let i = 0; i < fileNameList.length; i++) {
                         const { fileName, isDir } = fileNameList[i]
                         if (fileName == '.DS_Store') continue
