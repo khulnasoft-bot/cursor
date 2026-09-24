@@ -690,7 +690,7 @@ class LSPManager {
         if (!isNode) {
             childProcess = cp.spawn(command, args, {
                 env: process.env,
-                shell: true,
+                shell: false,
             })
         } else {
             childProcess = cp.fork(command, args, {
